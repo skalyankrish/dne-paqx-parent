@@ -8,7 +8,7 @@ services:
   dne-paqx:
     image: IMAGE_NAME_STANDIN:IMAGE_TAG_STANDIN
     container_name: symphony-dne-paqx
-    network_mode: consul_default
+    network_mode: "bridge"
     ports:
       - "8071:8071"
     extra_hosts:
