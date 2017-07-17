@@ -5,7 +5,6 @@ spring:
     consul:
       host: consul
       port: 8500
-      scheme: https
       discovery:
-        healthCkeckPath: ${server.comtext-path}/health
-        hestname: 172.17.0.1
+        healthCheckPath: ${server.comtext-path}/health
+        hostname: 172.17.0.1
