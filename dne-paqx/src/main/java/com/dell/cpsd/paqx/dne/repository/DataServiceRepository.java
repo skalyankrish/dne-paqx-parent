@@ -82,7 +82,7 @@ public interface DataServiceRepository
 
     boolean saveNodeInventory(NodeInventory nodeInventory);
 
-    NodeInventory getNodeIventory(String symphonyUUID) throws NoResultException;
+    NodeInventory getNodeIventory(String symphonyUuid) throws NoResultException;
 
     String getDomainName();
 }

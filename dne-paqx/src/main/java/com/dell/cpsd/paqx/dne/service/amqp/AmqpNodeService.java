@@ -1663,7 +1663,7 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
     }
 
     @Override
-    public Object listNodeInventory(final String symphonyUUID) throws ServiceTimeoutException, ServiceExecutionException
+    public Object listNodeInventory(final String symphonyUuid) throws ServiceTimeoutException, ServiceExecutionException
     {
         MessageProperties messageProperties = new MessageProperties();
         messageProperties.setCorrelationId(UUID.randomUUID().toString());
@@ -1672,7 +1672,7 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
 
         NodeInventoryRequestMessage nodeInventoryRequestMessage = new NodeInventoryRequestMessage();
         nodeInventoryRequestMessage.setMessageProperties(messageProperties);
-        nodeInventoryRequestMessage.setSymphonyUUID(symphonyUUID);
+        nodeInventoryRequestMessage.setSymphonyUuid(symphonyUuid);
 
         ServiceResponse<?> response = processRequest(timeout, new ServiceRequestCallback()
         {

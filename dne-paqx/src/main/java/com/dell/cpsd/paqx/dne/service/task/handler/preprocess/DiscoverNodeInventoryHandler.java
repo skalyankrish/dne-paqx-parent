@@ -75,13 +75,13 @@ public class DiscoverNodeInventoryHandler extends BaseTaskHandler implements IWo
         {
             try
             {
-                String symphonyUUID = nodeInfo.getSymphonyUuid();
+                String symphonyUuid = nodeInfo.getSymphonyUuid();
 
-                Object nodeInventoryResponse = nodeService.listNodeInventory(symphonyUUID);
+                Object nodeInventoryResponse = nodeService.listNodeInventory(symphonyUuid);
                 if (nodeInventoryResponse != null)
                 {
 
-                    NodeInventory nodeInventory = new NodeInventory(symphonyUUID, nodeInventoryResponse.toString());
+                    NodeInventory nodeInventory = new NodeInventory(symphonyUuid, nodeInventoryResponse.toString());
                     boolean isNodeInventorySaved = repository.saveNodeInventory(nodeInventory);
                     if(isNodeInventorySaved) {
                         response.setWorkFlowTaskStatus(Status.SUCCEEDED);
@@ -89,8 +89,8 @@ public class DiscoverNodeInventoryHandler extends BaseTaskHandler implements IWo
                         return isNodeInventorySaved;
                     }
                 } else {
-                    LOGGER.info("There is no node inventory for UUID ", symphonyUUID);
-                    response.addError("There is no node inventory for UUID " + symphonyUUID);
+                    LOGGER.info("There is no node inventory for UUID ", symphonyUuid);
+                    response.addError("There is no node inventory for UUID " + symphonyUuid);
                 }
             }
             catch (ServiceTimeoutException | ServiceExecutionException ex)

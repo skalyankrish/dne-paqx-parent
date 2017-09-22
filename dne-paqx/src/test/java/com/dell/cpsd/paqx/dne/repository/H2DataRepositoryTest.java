@@ -789,7 +789,7 @@ public class H2DataRepositoryTest
         NodeInventory nodeInventoryFound = this.repository.getNodeIventory("FAKE_KEY");
 
         assertNotNull(nodeInventoryFound);
-        assertEquals("FAKE_KEY", nodeInventoryFound.getSymphonyUUID());
+        assertEquals("FAKE_KEY", nodeInventoryFound.getSymphonyUuid());
         assertEquals("FAKE_INVENTORY", nodeInventoryFound.getNodeInventory());
     }
 

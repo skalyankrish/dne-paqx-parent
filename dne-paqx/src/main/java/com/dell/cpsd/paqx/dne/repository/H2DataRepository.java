@@ -270,7 +270,7 @@ public class H2DataRepository implements DataServiceRepository
             return false;
         }
 
-        NodeInventory nodeInventoryData = this.getNodeIventory(nodeInventory.getSymphonyUUID());
+        NodeInventory nodeInventoryData = this.getNodeIventory(nodeInventory.getSymphonyUuid());
         if (nodeInventoryData != null)
         {
             //If it already exists, delete and save the new one.
@@ -284,7 +284,7 @@ public class H2DataRepository implements DataServiceRepository
     }
 
     @Override
-    public NodeInventory getNodeIventory(final String symphonyUUID)
+    public NodeInventory getNodeIventory(final String symphonyUuid)
     {
         NodeInventory result = null;
 
@@ -292,9 +292,9 @@ public class H2DataRepository implements DataServiceRepository
         try
         {
             query = entityManager
-                    .createQuery("SELECT ni FROM NodeInventory as ni where ni.symphonyUUID=:symphonyUUID", NodeInventory.class);
+                    .createQuery("SELECT ni FROM NodeInventory as ni where ni.symphonyUuid=:symphonyUuid", NodeInventory.class);
 
-            query.setParameter("symphonyUUID", symphonyUUID);
+            query.setParameter("symphonyUuid", symphonyUuid);
 
             NodeInventory nodeInventory = query.getSingleResult();
 

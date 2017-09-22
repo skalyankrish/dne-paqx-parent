@@ -80,12 +80,12 @@ public class ConfigIdracTaskHandler extends BaseTaskHandler implements IWorkflow
                 throw new IllegalStateException("No results found.");
             }
 
-            if (findNodeTask.getResults().get("symphonyUUID") == null)
+            if (findNodeTask.getResults().get("symphonyUuid") == null)
             {
                 throw new IllegalStateException("No discovered node info found.");
             }
 
-            String uuid = findNodeTask.getResults().get("symphonyUUID");
+            String uuid = findNodeTask.getResults().get("symphonyUuid");
 
             String ipAddress = job.getInputParams().getIdracIpAddress();
             String gatewayIpAddress = job.getInputParams().getIdracGatewayIpAddress();

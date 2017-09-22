@@ -25,7 +25,7 @@ public class NodeInventory
 {
     @Id
     @Column(name = "SYMPHONY_UUID", unique = true, nullable = false)
-    private String symphonyUUID;
+    private String symphonyUuid;
 
     @Lob
     @Column(name = "NODE_INVENTORY")
@@ -33,20 +33,20 @@ public class NodeInventory
 
     public NodeInventory(){}
 
-    public NodeInventory(String symphonyUUID, String nodeInventory)
+    public NodeInventory(String symphonyUuid, String nodeInventory)
     {
-        this.symphonyUUID = symphonyUUID;
+        this.symphonyUuid = symphonyUuid;
         this.nodeInventory = nodeInventory;
     }
 
-    public String getSymphonyUUID()
+    public String getSymphonyUuid()
     {
-        return symphonyUUID;
+        return symphonyUuid;
     }
 
-    public void setSymphonyUUID(final String symphonyUUID)
+    public void setSymphonyUuid(final String symphonyUuid)
     {
-        this.symphonyUUID = symphonyUUID;
+        this.symphonyUuid = symphonyUuid;
     }
 
     public String getNodeInventory()
@@ -62,6 +62,6 @@ public class NodeInventory
     @Override
     public String toString()
     {
-        return "NodeInventory{" + " symphonyUUID='" + symphonyUUID + '\'' + ", nodeInventory='" + nodeInventory + '\'' + '}';
+        return "NodeInventory{" + " symphonyUuid='" + symphonyUuid + '\'' + ", nodeInventory='" + nodeInventory + '\'' + '}';
     }
 }

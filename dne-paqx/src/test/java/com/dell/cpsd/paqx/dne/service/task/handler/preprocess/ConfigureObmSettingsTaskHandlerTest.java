@@ -76,7 +76,7 @@ public class ConfigureObmSettingsTaskHandlerTest {
 
         Map<String, String> results = new HashMap<>();
 
-        results.put("symphonyUUID", nodeInfo.getSymphonyUuid());
+        results.put("symphonyUuid", nodeInfo.getSymphonyUuid());
         results.put("nodeStatus", nodeInfo.getNodeStatus().toString());
         response.setResults(results);
 

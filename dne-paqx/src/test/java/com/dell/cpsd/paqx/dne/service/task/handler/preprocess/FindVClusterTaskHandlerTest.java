@@ -68,7 +68,7 @@ public class FindVClusterTaskHandlerTest
         NodeInfo nodeInfo = new NodeInfo("symphonyUuid", NodeStatus.DISCOVERED);
         Map<String, String> results = new HashMap<>();
 
-        results.put("symphonyUUID", nodeInfo.getSymphonyUuid());
+        results.put("symphonyUuid", nodeInfo.getSymphonyUuid());
         results.put("nodeStatus", nodeInfo.getNodeStatus().toString());
 
         response.setResults(results);

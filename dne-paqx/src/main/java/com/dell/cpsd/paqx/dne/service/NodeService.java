@@ -54,7 +54,7 @@ public interface NodeService
      * @throws ServiceTimeoutException
      * @throws ServiceExecutionException
      */
-    Object listNodeInventory(String symphonyUUID) throws ServiceTimeoutException, ServiceExecutionException;
+    Object listNodeInventory(String symphonyUuid) throws ServiceTimeoutException, ServiceExecutionException;
 
     /**
      * List the validated cluster names

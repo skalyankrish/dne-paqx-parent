@@ -119,7 +119,7 @@ public class FindDiscoveredNodesTaskHandler extends BaseTaskHandler implements I
 
         if (nodeInfo.getSymphonyUuid() != null)
         {
-            result.put("symphonyUUID", nodeInfo.getSymphonyUuid());
+            result.put("symphonyUuid", nodeInfo.getSymphonyUuid());
         }
 
         if (nodeInfo.getNodeStatus() != null)
