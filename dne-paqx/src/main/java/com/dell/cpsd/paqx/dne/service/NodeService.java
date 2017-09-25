@@ -18,6 +18,16 @@ import com.dell.cpsd.virtualization.capabilities.api.*;
 
 import java.util.List;
 
+/**
+ * Node service interface.
+ *
+ * <p>
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries. All Rights Reserved. Dell EMC Confidential/Proprietary Information
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
+ */
 public interface NodeService
 {
     /**

@@ -20,6 +20,8 @@ import org.springframework.scheduling.annotation.Async;
 import java.util.Map;
 
 /**
+ * Orchestration service.
+ *
  * <p>
  * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
  * Dell EMC Confidential/Proprietary Information
@@ -27,10 +29,8 @@ import java.util.Map;
  *
  * @since 1.0
  */
-
 public class OrchestrationService implements IOrchestrationService
 {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(OrchestrationService.class);
     private static final int WAIT_TIME = 100; // 100 milli-seconds
 

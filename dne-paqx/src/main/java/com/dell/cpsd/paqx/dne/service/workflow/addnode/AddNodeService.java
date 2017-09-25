@@ -47,13 +47,20 @@ import com.dell.cpsd.paqx.dne.service.task.handler.addnode.ChangeIdracCredential
 import com.dell.cpsd.paqx.dne.service.task.handler.addnode.NotifyNodeDiscoveryToUpdateStatusTaskHandler;
 import com.dell.cpsd.sdk.AMQPClient;
 
+/**
+ * Add node workflow service.
+ *
+ * <p>
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries. All Rights Reserved. Dell EMC Confidential/Proprietary Information
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
+ */
 @Service
 public class AddNodeService extends BaseService implements IAddNodeService
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(AddNodeService.class);
-
-//    @Value("#{PropertySplitter.map('${addnode.map.step.to.map}')}")
-//    private Map<String, String> propertyAsMap;
 
     @Autowired
     private NodeService nodeService;
@@ -235,11 +242,6 @@ public class AddNodeService extends BaseService implements IAddNodeService
     {
         return makeNodeExpansionResponse(job, workflowService);
     }
-
-//    public String findPathFromStep(final String step)
-//    {
-//        return propertyAsMap.get(step);
-//    }
 
     public WorkflowService getWorkflowService()
     {

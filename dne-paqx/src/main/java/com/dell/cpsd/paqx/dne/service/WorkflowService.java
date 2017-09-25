@@ -13,6 +13,16 @@ import com.dell.cpsd.paqx.dne.service.model.Step;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Workflow service interface.
+ *
+ * <p>
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries. All Rights Reserved. Dell EMC Confidential/Proprietary Information
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
+ */
 public interface WorkflowService
 {
     /**

@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
+ * Preprocess service.
+ *
  * <p>
  * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
  * Dell EMC Confidential/Proprietary Information
@@ -33,7 +35,6 @@ import java.util.UUID;
  *
  * @since 1.0
  */
-
 @Service
 public class PreProcessService extends BaseService implements IPreProcessService
 {
@@ -102,12 +103,6 @@ public class PreProcessService extends BaseService implements IPreProcessService
         return createTask("Find ProtectionDomain", new FindProtectionDomainTaskHandler(workflowService));
     }
 
-    @Bean("findSystemDataTask")
-    public WorkflowTask findSystemDataTask()
-    {
-        return createTask("Find SystemData", new FindSystemDataTaskHandler(workflowService));
-    }
-
     @Bean("listScaleIoComponentsTask")
     private WorkflowTask listScaleIoComponentsTask()
     {
@@ -150,9 +145,6 @@ public class PreProcessService extends BaseService implements IPreProcessService
         workflowTasks.put("findVCluster", createVClusterTask());
         workflowTasks.put("discoverNodeInventory", discoverNodeInventory());
         //workflowTasks.put("findProtectionDomain", findProtectionDomainTask());
-        //workflowTasks.put("findSystemData", findSystemDataTask());
-        //workflowTasks.put("assignDefaultHostName", assignDefaultHostNameTask());
-        //workflowTasks.put("assignDefaultCredentials", assignDefaultCredentialsTask());
         return workflowTasks;
     }
 
@@ -164,7 +156,6 @@ public class PreProcessService extends BaseService implements IPreProcessService
         return job;
     }
 
-    ///////////////////////////////////////////////
     public Job findJob(UUID jobId)
     {
         final Job job = workflowService.findJob(jobId);
@@ -176,15 +167,6 @@ public class PreProcessService extends BaseService implements IPreProcessService
     {
         return makeNodeExpansionResponse(job, workflowService);
     }
-
-    ////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////
-    //
-
-    //    public String findPathFromStep(final String step)
-    //    {
-    //        return propertyAsMap.get(step);
-    //    }
 
     public WorkflowService getWorkflowService()
     {

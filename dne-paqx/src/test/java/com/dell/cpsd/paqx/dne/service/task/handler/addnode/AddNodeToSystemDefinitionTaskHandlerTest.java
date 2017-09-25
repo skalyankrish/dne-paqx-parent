@@ -29,8 +29,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -81,11 +83,9 @@ public class AddNodeToSystemDefinitionTaskHandlerTest
 
     private String taskName = "addNodeTosystemDefinitionTask";
     private String stepName = "addNodeTosystemDefinitionStep";
-    private String nodeId = "nodeId";
     private String symphonyUuid = "symphonyUuid";
 
     private AddNodeToSystemDefinitionTaskHandler handler;
-    private AddNodeToSystemDefinitionTaskHandler spy;
 
     private List<ConvergedSystem> systems;
     private List<Component> components;
@@ -99,8 +99,7 @@ public class AddNodeToSystemDefinitionTaskHandlerTest
     @Before
     public void setUp()
     {
-        this.handler = new AddNodeToSystemDefinitionTaskHandler(this.client);
-        this.spy = spy(this.handler);
+        this.handler = spy(new AddNodeToSystemDefinitionTaskHandler(this.client));
 
         this.systems = new ArrayList<>();
         this.systems.add(this.system);
@@ -119,9 +118,8 @@ public class AddNodeToSystemDefinitionTaskHandlerTest
     @Test
     public void testExecuteTask_successful_case()
     {
-        doReturn(this.response).when(this.spy).initializeResponse(this.job);
+        doReturn(this.response).when(this.handler).initializeResponse(this.job);
         doReturn(this.request).when(this.job).getInputParams();
-        doReturn(this.nodeId).when(this.request).getNodeId();
         doReturn(this.symphonyUuid).when(this.request).getSymphonyUuid();
         doReturn(this.systems).when(this.client).getConvergedSystems();
         doReturn(this.systems).when(this.client).getComponents(any(ComponentsFilter.class));
@@ -131,7 +129,9 @@ public class AddNodeToSystemDefinitionTaskHandlerTest
         doReturn(this.identity).when(this.component).getIdentity();
         doReturn(this.symphonyUuid).when(this.identity).getIdentifier();
 
-        assertEquals(true, this.spy.executeTask(this.job));
+        boolean result = this.handler.executeTask(this.job);
+
+        assertThat(result, is(true));
         verify(this.client).addComponent(any(), any(), any(), any());
         verify(this.response).setWorkFlowTaskStatus(Status.SUCCEEDED);
         verify(this.response, never()).addError(anyString());
@@ -145,14 +145,16 @@ public class AddNodeToSystemDefinitionTaskHandlerTest
      * @since 1.0
      */
     @Test
-    public void testExecuteTask_node_expansion_request_is_null() throws ServiceTimeoutException, ServiceExecutionException
+    public void testExecuteTask_should_fail_when_the_node_expansion_request_is_null() throws ServiceTimeoutException, ServiceExecutionException
     {
         NodeExpansionRequest nullRequest = null;
 
-        doReturn(this.response).when(this.spy).initializeResponse(this.job);
+        doReturn(this.response).when(this.handler).initializeResponse(this.job);
         doReturn(nullRequest).when(this.job).getInputParams();
 
-        assertEquals(false, this.spy.executeTask(this.job));
+        boolean result = this.handler.executeTask(this.job);
+
+        assertThat(result, is(false));
         verify(this.client, never()).addComponent(any(), any(), any(), any());
         verify(this.response).setWorkFlowTaskStatus(Status.FAILED);
         verify(this.response).addError(anyString());
@@ -164,15 +166,17 @@ public class AddNodeToSystemDefinitionTaskHandlerTest
      * @since 1.0
      */
     @Test
-    public void testExecuteTask_no_discovered_node_because_symphonyuuid_is_empty()
+    public void testExecuteTask_should_fail_when_the_symphonyuuid_is_empty()
     {
         String emptySymphonyUuid = null;
 
-        doReturn(this.response).when(this.spy).initializeResponse(this.job);
+        doReturn(this.response).when(this.handler).initializeResponse(this.job);
         doReturn(this.request).when(this.job).getInputParams();
         doReturn(emptySymphonyUuid).when(this.request).getSymphonyUuid();
 
-        assertEquals(false, this.spy.executeTask(this.job));
+        boolean result = this.handler.executeTask(this.job);
+
+        assertThat(result, is(false));
         verify(this.client, never()).addComponent(any(), any(), any(), any());
         verify(this.response).setWorkFlowTaskStatus(Status.FAILED);
         verify(this.response).addError(anyString());
@@ -184,36 +188,16 @@ public class AddNodeToSystemDefinitionTaskHandlerTest
      * @since 1.0
      */
     @Test
-    public void testExecuteTask_no_discovered_node_because_nodeId_is_empty()
+    public void testExecuteTask_should_fail_when_there_is_no_converged_systems()
     {
-        String emptyNodeId = null;
-
-        doReturn(this.response).when(this.spy).initializeResponse(this.job);
+        doReturn(this.response).when(this.handler).initializeResponse(this.job);
         doReturn(this.request).when(this.job).getInputParams();
-        doReturn(this.symphonyUuid).when(this.request).getSymphonyUuid();
-        doReturn(emptyNodeId).when(this.request).getNodeId();
-
-        assertEquals(false, this.spy.executeTask(this.job));
-        verify(this.client, never()).addComponent(any(), any(), any(), any());
-        verify(this.response).setWorkFlowTaskStatus(Status.FAILED);
-        verify(this.response).addError(anyString());
-    }
-
-    /**
-     * {@link com.dell.cpsd.paqx.dne.service.task.handler.addnode.AddNodeToSystemDefinitionTaskHandler#executeTask(com.dell.cpsd.paqx.dne.domain.Job)}.
-     *
-     * @since 1.0
-     */
-    @Test
-    public void testExecuteTask_no_converged_systems()
-    {
-        doReturn(this.response).when(this.spy).initializeResponse(this.job);
-        doReturn(this.request).when(this.job).getInputParams();
-        doReturn(this.nodeId).when(this.request).getNodeId();
         doReturn(this.symphonyUuid).when(this.request).getSymphonyUuid();
         doReturn(Collections.emptyList()).when(this.client).getConvergedSystems();
 
-        assertEquals(false, this.spy.executeTask(this.job));
+        boolean result = this.handler.executeTask(this.job);
+
+        assertThat(result, is(false));
         verify(this.client, never()).addComponent(any(), any(), any(), any());
         verify(this.response).setWorkFlowTaskStatus(Status.FAILED);
         verify(this.response).addError(anyString());
@@ -225,16 +209,17 @@ public class AddNodeToSystemDefinitionTaskHandlerTest
      * @since 1.0
      */
     @Test
-    public void testExecuteTask_no_converged_system()
+    public void testExecuteTask_should_fail_when_there_is_no_converged_system()
     {
-        doReturn(this.response).when(this.spy).initializeResponse(this.job);
+        doReturn(this.response).when(this.handler).initializeResponse(this.job);
         doReturn(this.request).when(this.job).getInputParams();
-        doReturn(this.nodeId).when(this.request).getNodeId();
         doReturn(this.symphonyUuid).when(this.request).getSymphonyUuid();
         doReturn(this.systems).when(this.client).getConvergedSystems();
         doReturn(Collections.emptyList()).when(this.client).getComponents(any(ComponentsFilter.class));
 
-        assertEquals(false, this.spy.executeTask(this.job));
+        boolean result = this.handler.executeTask(this.job);
+
+        assertThat(result, is(false));
         verify(this.client, never()).addComponent(any(), any(), any(), any());
         verify(this.response).setWorkFlowTaskStatus(Status.FAILED);
         verify(this.response).addError(anyString());
@@ -246,13 +231,12 @@ public class AddNodeToSystemDefinitionTaskHandlerTest
      * @since 1.0
      */
     @Test
-    public void testExecuteTask_node_not_added_to_system_definition()
+    public void testExecuteTask_should_fail_when_the_node_is_not_added_to_system_definition()
     {
         String identifier = "identifier-1";
 
-        doReturn(this.response).when(this.spy).initializeResponse(this.job);
+        doReturn(this.response).when(this.handler).initializeResponse(this.job);
         doReturn(this.request).when(this.job).getInputParams();
-        doReturn(this.nodeId).when(this.request).getNodeId();
         doReturn(this.symphonyUuid).when(this.request).getSymphonyUuid();
         doReturn(this.systems).when(this.client).getConvergedSystems();
         doReturn(this.systems).when(this.client).getComponents(any(ComponentsFilter.class));
@@ -262,7 +246,9 @@ public class AddNodeToSystemDefinitionTaskHandlerTest
         doReturn(this.identity).when(this.component).getIdentity();
         doReturn(identifier).when(this.identity).getIdentifier();
 
-        assertEquals(false, this.spy.executeTask(this.job));
+        boolean result = this.handler.executeTask(this.job);
+
+        assertThat(result, is(false));
         verify(this.client).addComponent(any(), any(), any(), any());
         verify(this.response).setWorkFlowTaskStatus(Status.FAILED);
         verify(this.response).addError(anyString());
@@ -272,13 +258,14 @@ public class AddNodeToSystemDefinitionTaskHandlerTest
      * {@link com.dell.cpsd.paqx.dne.service.task.handler.addnode.AddNodeToSystemDefinitionTaskHandler#initializeResponse(com.dell.cpsd.paqx.dne.domain.Job)}.
      */
     @Test
-    public void testInitializeResponse()
+    public void testInitializeResponse_should_successfully_create_the_response()
     {
         doReturn(this.task).when(this.job).getCurrentTask();
         doReturn(this.taskName).when(this.task).getTaskName();
         doReturn(this.stepName).when(this.job).getStep();
 
         TaskResponse response = this.handler.initializeResponse(this.job);
+
         assertNotNull(response);
         assertEquals(this.taskName, response.getWorkFlowTaskName());
         assertEquals(Status.IN_PROGRESS, response.getWorkFlowTaskStatus());

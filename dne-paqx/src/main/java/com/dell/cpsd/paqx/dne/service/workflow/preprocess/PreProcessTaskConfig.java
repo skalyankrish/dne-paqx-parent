@@ -46,10 +46,7 @@ public class PreProcessTaskConfig {
                 //TODO: Re-enable the find scaleio when mdm is up and running
                 /*"findScaleIO"*/
                 "findVCluster",
-                "findProtectionDomain",
-                "findSystemData",
-                "assignDefaultHostName",
-                "assignDefaultCredentials");
+                "findProtectionDomain");
 
         return workflowSteps;
     }

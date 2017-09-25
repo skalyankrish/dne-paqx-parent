@@ -80,11 +80,19 @@ public class AddNodeToSystemDefinitionTaskHandler extends BaseTaskHandler implem
 
         try
         {
-            if (StringUtils.isEmpty(job.getInputParams().getSymphonyUuid()) || StringUtils.isEmpty(job.getInputParams().getNodeId()))
+            final NodeExpansionRequest inputParams = job.getInputParams();
+
+            if (inputParams == null)
             {
-                throw new IllegalStateException("No discovered node info found.");
+                throw new IllegalStateException("Job input parameters are null");
             }
 
+            final String symphonyUuid = inputParams.getSymphonyUuid();
+
+            if (StringUtils.isEmpty(symphonyUuid))
+            {
+                throw new IllegalStateException("Symphony Id is null");
+            }
 
             List<ConvergedSystem> allConvergedSystems = this.sdkAMQPClient.getConvergedSystems();
             if (CollectionUtils.isEmpty(allConvergedSystems))
@@ -104,7 +112,7 @@ public class AddNodeToSystemDefinitionTaskHandler extends BaseTaskHandler implem
 
             ConvergedSystem systemToBeUpdated = systemDetails.get(0);
 
-            NodeInfo nodeInfo = new NodeInfo(job.getInputParams().getSymphonyUuid(),  NodeStatus.DISCOVERED);
+            NodeInfo nodeInfo = new NodeInfo(symphonyUuid,  NodeStatus.DISCOVERED);
             Component newNode = new Component();
             newNode.setUuid(nodeInfo.getSymphonyUuid());
             newNode.setIdentity(nodeInfo.getIdentity());

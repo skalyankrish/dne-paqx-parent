@@ -18,8 +18,18 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class BaseService {
-
+/**
+ * Abstract base service implementation.
+ *
+ * <p>
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries. All Rights Reserved. Dell EMC Confidential/Proprietary Information
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
+ */
+public abstract class BaseService
+{
     public NodeExpansionResponse makeNodeExpansionResponse(final Job job, final WorkflowService workflowService)
     {
         final NodeExpansionResponse response = new NodeExpansionResponse(job);
