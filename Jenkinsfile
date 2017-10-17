@@ -62,7 +62,7 @@ pipeline {
         }
         stage('Upload to Repo') {
             steps {
-                uploadArtifactsToArtifactory()
+                uploadArtifactsToArtifactory("/master|develop|refactor-wip|stable")
             }
         }
         stage('SonarQube Analysis') {
