@@ -75,8 +75,8 @@ public class VerifyNodeDetail extends BaseWorkflowDelegate
         if (StringUtils.isBlank(nodeDetail.getScaleIoData1KernelIpAddress())) {
             missingFields.add("scaleIoData1KernelIpAddress");
         }
-        if (StringUtils.isBlank(nodeDetail.getScaleIoData1KernelAndSvmSubnetMask())) {
-            missingFields.add("scaleIoData1KernelAndSvmSubnetMask");
+        if (StringUtils.isBlank(nodeDetail.getScaleIoSvmData1SubnetMask())) {
+            missingFields.add("scaleIoSvmData1SubnetMask");
         }
         if (StringUtils.isBlank(nodeDetail.getScaleIoData2SvmIpAddress())) {
             missingFields.add("scaleIoData2SvmIpAddress");
@@ -84,8 +84,8 @@ public class VerifyNodeDetail extends BaseWorkflowDelegate
         if (StringUtils.isBlank(nodeDetail.getScaleIoData2KernelIpAddress())) {
             missingFields.add("scaleIoData2KernelIpAddress");
         }
-        if (StringUtils.isBlank(nodeDetail.getScaleIoData2KernelAndSvmSubnetMask())) {
-            missingFields.add("scaleIoData2KernelAndSvmSubnetMask");
+        if (StringUtils.isBlank(nodeDetail.getScaleIoSvmData2SubnetMask())) {
+            missingFields.add("scaleIoSvmData2SubnetMask");
         }
         if (StringUtils.isBlank(nodeDetail.getScaleIoSvmManagementIpAddress())) {
             missingFields.add("scaleIoSvmManagementIpAddress");

@@ -357,9 +357,9 @@ public class DeployScaleIOVm extends BaseWorkflowDelegate
                 throw new IllegalStateException("ScaleIO Data1 IP Address is null");
             }
 
-            final String scaleIoData1KernelAndSvmSubnetMask = this.inputParams.getScaleIoData1KernelAndSvmSubnetMask();
+            final String scaleIoSvmData1SubnetMask = this.inputParams.getScaleIoSvmData1SubnetMask();
 
-            if (StringUtils.isEmpty(scaleIoData1KernelAndSvmSubnetMask))
+            if (StringUtils.isEmpty(scaleIoSvmData1SubnetMask))
             {
                 throw new IllegalStateException("ScaleIO VM Data1 Subnet Mask is null");
             }
@@ -371,9 +371,9 @@ public class DeployScaleIOVm extends BaseWorkflowDelegate
                 throw new IllegalStateException("ScaleIO Data2 IP Address is null");
             }
 
-            final String scaleIoData2KernelAndSvmSubnetMask = this.inputParams.getScaleIoData2KernelAndSvmSubnetMask();
+            final String scaleIoSvmData2SubnetMask = this.inputParams.getScaleIoSvmData2SubnetMask();
 
-            if (StringUtils.isEmpty(scaleIoData2KernelAndSvmSubnetMask))
+            if (StringUtils.isEmpty(scaleIoSvmData2SubnetMask))
             {
                 throw new IllegalStateException("ScaleIO VM Data2 Subnet Mask is null");
             }
@@ -385,11 +385,11 @@ public class DeployScaleIOVm extends BaseWorkflowDelegate
 
             final NicSetting nicSettingScaleIoData1 = new NicSetting();
             nicSettingScaleIoData1.setIpAddress(scaleIoData1SvmIpAddress);
-            nicSettingScaleIoData1.setSubnetMask(scaleIoData1KernelAndSvmSubnetMask);
+            nicSettingScaleIoData1.setSubnetMask(scaleIoSvmData1SubnetMask);
 
             final NicSetting nicSettingScaleIoData2 = new NicSetting();
             nicSettingScaleIoData2.setIpAddress(scaleIoData2SvmIpAddress);
-            nicSettingScaleIoData2.setSubnetMask(scaleIoData2KernelAndSvmSubnetMask);
+            nicSettingScaleIoData2.setSubnetMask(scaleIoSvmData2SubnetMask);
 
             return Arrays.asList(nicSettingScaleIoMgmt, nicSettingScaleIoData1, nicSettingScaleIoData2);
         }

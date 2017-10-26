@@ -115,8 +115,8 @@ public class AddHostToDvSwitchTaskHandler extends BaseTaskHandler implements IWo
                 throw new IllegalStateException("ScaleIO Data1 IP Address is null or empty");
             }
 
-            final String scaleIoData1KernelAndSvmSubnetMask = inputParams.getScaleIoData1KernelAndSvmSubnetMask();
-            if (StringUtils.isEmpty(scaleIoData1KernelAndSvmSubnetMask))
+            final String scaleIoSvmData1SubnetMask = inputParams.getScaleIoSvmData1SubnetMask();
+            if (StringUtils.isEmpty(scaleIoSvmData1SubnetMask))
             {
                 throw new IllegalStateException("ScaleIO Data1 Subnet Mask is null or empty");
             }
@@ -128,8 +128,8 @@ public class AddHostToDvSwitchTaskHandler extends BaseTaskHandler implements IWo
                 throw new IllegalStateException("ScaleIO Data2 IP Address is null or empty");
             }
 
-            final String scaleIoData2KernelAndSvmSubnetMask = inputParams.getScaleIoData2KernelAndSvmSubnetMask();
-            if (StringUtils.isEmpty(scaleIoData2KernelAndSvmSubnetMask))
+            final String scaleIoSvmData2SubnetMask = inputParams.getScaleIoSvmData2SubnetMask();
+            if (StringUtils.isEmpty(scaleIoSvmData2SubnetMask))
             {
                 throw new IllegalStateException("ScaleIO Data2 Subnet Mask is null or empty");
             }
@@ -214,7 +214,7 @@ public class AddHostToDvSwitchTaskHandler extends BaseTaskHandler implements IWo
             final DvSwitchConfigList dvSwitchConfig1 = new DvSwitchConfigList();
             final List<PortGroupConfigList> portGroupConfigListDvSwitch1 = new ArrayList<>();
             portGroupConfigListDvSwitch1.add(new PortGroupConfigList(dvPortGroupNames.get(DVPORT_GROUP_SIO_DATA1), scaleIoData1SvmIpAddress, null,
-                    scaleIoData1KernelAndSvmSubnetMask));
+                    scaleIoSvmData1SubnetMask));
 
             dvSwitchConfig1.setPortGroupConfigList(portGroupConfigListDvSwitch1);
             dvSwitchConfig1.setSwitchName(dvSwitchNames.get(DVSWITCH1_NAME));
@@ -225,7 +225,7 @@ public class AddHostToDvSwitchTaskHandler extends BaseTaskHandler implements IWo
             final DvSwitchConfigList dvSwitchConfig2 = new DvSwitchConfigList();
             final List<PortGroupConfigList> portGroupConfigListDvSwitch2 = new ArrayList<>();
             portGroupConfigListDvSwitch2.add(new PortGroupConfigList(dvPortGroupNames.get(DVPORT_GROUP_SIO_DATA2), scaleIoData2SvmIpAddress, null,
-                    scaleIoData2KernelAndSvmSubnetMask));
+                    scaleIoSvmData2SubnetMask));
 
             dvSwitchConfig2.setPortGroupConfigList(portGroupConfigListDvSwitch2);
             dvSwitchConfig2.setSwitchName(dvSwitchNames.get(DVSWITCH2_NAME));

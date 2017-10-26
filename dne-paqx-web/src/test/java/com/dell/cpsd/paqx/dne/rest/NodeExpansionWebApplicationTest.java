@@ -5,7 +5,6 @@
 package com.dell.cpsd.paqx.dne.rest;
 
 import com.dell.cpsd.paqx.dne.domain.Job;
-import com.dell.cpsd.paqx.dne.domain.WorkflowTask;
 import com.dell.cpsd.paqx.dne.rest.controller.NodeExpansionController;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.model.DiscoveredNode;
@@ -83,7 +82,7 @@ public class NodeExpansionWebApplicationTest
         request.setIdracIpAddress("4.4.4.4");
         request.setIdracSubnetMask("5.55.5.5");
         request.setEsxiManagementSubnetMask("6.66.6.6");
-        request.setScaleIoData1KernelAndSvmSubnetMask("7.7.7.7");
+        request.setScaleIoSvmData1SubnetMask("7.7.7.7");
         request.setScaleIoData1SvmIpAddress("9.99.9.9");
         request.setSymphonyUuid(UUID.randomUUID().toString());
 
@@ -110,8 +109,8 @@ public class NodeExpansionWebApplicationTest
         params.setEsxiManagementSubnetMask("1.1.1.1");
         assertNotNull(params.getEsxiManagementSubnetMask());
 
-        params.setScaleIoData1KernelAndSvmSubnetMask("1.1.1.1");
-        assertNotNull(params.getScaleIoData1KernelAndSvmSubnetMask());
+        params.setScaleIoSvmData1SubnetMask("1.1.1.1");
+        assertNotNull(params.getScaleIoSvmData1SubnetMask());
 
         params.setScaleIoData1SvmIpAddress("1.1.1.1");
         assertNotNull(params.getScaleIoData1SvmIpAddress());

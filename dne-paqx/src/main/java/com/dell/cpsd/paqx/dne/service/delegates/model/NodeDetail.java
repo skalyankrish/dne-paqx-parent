@@ -23,10 +23,10 @@ public class NodeDetail implements Serializable
 
     private String scaleIoData1SvmIpAddress;
     private String scaleIoData1KernelIpAddress;
-    private String scaleIoData1KernelAndSvmSubnetMask;
+    private String scaleIoSvmData1SubnetMask;
     private String scaleIoData2SvmIpAddress;
     private String scaleIoData2KernelIpAddress;
-    private String scaleIoData2KernelAndSvmSubnetMask;
+    private String scaleIoSvmData2SubnetMask;
     private String scaleIoSvmManagementIpAddress;
     private String scaleIoSvmManagementGatewayAddress;
     private String scaleIoSvmManagementSubnetMask;
@@ -146,14 +146,14 @@ public class NodeDetail implements Serializable
         this.scaleIoData1KernelIpAddress = scaleIoData1KernelIpAddress;
     }
 
-    public String getScaleIoData1KernelAndSvmSubnetMask()
+    public String getscaleIoSvmData1SubnetMask()
     {
-        return scaleIoData1KernelAndSvmSubnetMask;
+        return scaleIoSvmData1SubnetMask;
     }
 
-    public void setScaleIoData1KernelAndSvmSubnetMask(final String scaleIoData1KernelAndSvmSubnetMask)
+    public void setscaleIoSvmData1SubnetMask(final String scaleIoSvmData1SubnetMask)
     {
-        this.scaleIoData1KernelAndSvmSubnetMask = scaleIoData1KernelAndSvmSubnetMask;
+        this.scaleIoSvmData1SubnetMask = scaleIoSvmData1SubnetMask;
     }
 
     public String getScaleIoData2SvmIpAddress()
@@ -176,14 +176,14 @@ public class NodeDetail implements Serializable
         this.scaleIoData2KernelIpAddress = scaleIoData2KernelIpAddress;
     }
 
-    public String getScaleIoData2KernelAndSvmSubnetMask()
+    public String getscaleIoSvmData2SubnetMask()
     {
-        return scaleIoData2KernelAndSvmSubnetMask;
+        return scaleIoSvmData2SubnetMask;
     }
 
-    public void setScaleIoData2KernelAndSvmSubnetMask(final String scaleIoData2KernelAndSvmSubnetMask)
+    public void setscaleIoSvmData2SubnetMask(final String scaleIoSvmData2SubnetMask)
     {
-        this.scaleIoData2KernelAndSvmSubnetMask = scaleIoData2KernelAndSvmSubnetMask;
+        this.scaleIoSvmData2SubnetMask = scaleIoSvmData2SubnetMask;
     }
 
     public String getScaleIoSvmManagementIpAddress()

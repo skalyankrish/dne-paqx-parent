@@ -86,7 +86,7 @@ public class AddNodeToSystemDefinitionTaskHandlerTest
         jobIn = new Job(UUID.randomUUID(), "testWorkflow", "updateSystemDefinition", "in-progress", null);
         NodeExpansionRequest nodeExpansionRequest = new NodeExpansionRequest("idracIpAddress", "idracGatewayIpAddress", "idracSubnetMask",
                 "managementIpAddress", "esxiKernelIpAddress1", "esxiKernelIpAddress2", "esxiManagementHostname", "scaleIoData1SvmIpAddress",
-                "scaleIoData1KernelAndSvmSubnetMask", "scaleIoData2SvmIpAddress", "scaleIoData2KernelAndSvmSubnetMask",
+                "scaleIoSvmData1SubnetMask", "scaleIoData2SvmIpAddress", "scaleIoSvmData2SubnetMask",
                 "scaleIoSvmManagementIpAddress", "scaleIoSvmManagementGatewayAddress", "scaleIoSvmManagementSubnetMask", "symphonyUuid",
                 "clusterName", "vMotionManagementIpAddress", "vMotionManagementSubnetMask", TestUtil.createDeviceAssignmentMap());
         jobIn.setInputParams(nodeExpansionRequest);

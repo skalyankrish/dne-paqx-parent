@@ -110,9 +110,9 @@ public class AddHostToDvSwitchTaskHandlerTest
         doReturn("1.1.1.1").when(this.inputParams).getvMotionManagementIpAddress();
         doReturn("2.2.2.2").when(this.inputParams).getvMotionManagementSubnetMask();
         doReturn("3.3.3.3").when(this.inputParams).getScaleIoData1SvmIpAddress();
-        doReturn("4.4.4.4").when(this.inputParams).getScaleIoData1KernelAndSvmSubnetMask();
+        doReturn("4.4.4.4").when(this.inputParams).getScaleIoSvmData1SubnetMask();
         doReturn("5.5.5.5").when(this.inputParams).getScaleIoData2SvmIpAddress();
-        doReturn("6.6.6.6").when(this.inputParams).getScaleIoData2KernelAndSvmSubnetMask();
+        doReturn("6.6.6.6").when(this.inputParams).getScaleIoSvmData2SubnetMask();
         doReturn(this.dvSwitchNames).when(this.repository).getDvSwitchNames();
         doReturn("dvswitch0").when(this.dvSwitchNames).get("dvswitch0");
         doReturn("dvswitch1").when(this.dvSwitchNames).get("dvswitch1");
@@ -214,9 +214,9 @@ public class AddHostToDvSwitchTaskHandlerTest
         doReturn("1.1.1.1").when(this.inputParams).getvMotionManagementIpAddress();
         doReturn("2.2.2.2").when(this.inputParams).getvMotionManagementSubnetMask();
         doReturn("3.3.3.3").when(this.inputParams).getScaleIoData1SvmIpAddress();
-        doReturn("4.4.4.4").when(this.inputParams).getScaleIoData1KernelAndSvmSubnetMask();
+        doReturn("4.4.4.4").when(this.inputParams).getScaleIoSvmData1SubnetMask();
         doReturn("5.5.5.5").when(this.inputParams).getScaleIoData2SvmIpAddress();
-        doReturn("6.6.6.6").when(this.inputParams).getScaleIoData2KernelAndSvmSubnetMask();
+        doReturn("6.6.6.6").when(this.inputParams).getScaleIoSvmData2SubnetMask();
         doReturn(this.dvSwitchNames).when(this.repository).getDvSwitchNames();
         doReturn("dvswitch0").when(this.dvSwitchNames).get("dvswitch0");
         doReturn("dvswitch1").when(this.dvSwitchNames).get("dvswitch1");
