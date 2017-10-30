@@ -1,3 +1,5 @@
+@Library('Pipeline Libraries@fortify-test') _
+
 UPSTREAM_TRIGGERS = [
     "common-dependencies",
     "common-client-parent",
@@ -37,6 +39,11 @@ pipeline {
         stage('Checkout') {
             steps {
                 doCheckout()
+            }
+        }
+        stage('Fortify Scan') {
+            steps {
+                runFortifyScan()
             }
         }
         stage("Build") {
@@ -101,10 +108,10 @@ pipeline {
             cleanWorkspace()   
         }
         success {
-            successEmail()
+            successEmail(send_to: 'jeffery.cheng@dell.com', only: true)
         }
         failure {
-            failureEmail()
+            failureEmail(send_to: 'jeffery.cheng@dell.com', only: true)
         }
     }
 }
