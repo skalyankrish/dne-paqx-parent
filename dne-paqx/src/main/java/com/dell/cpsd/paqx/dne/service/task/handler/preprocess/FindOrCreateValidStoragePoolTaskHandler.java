@@ -211,7 +211,7 @@ public class FindOrCreateValidStoragePoolTaskHandler extends BaseTaskHandler imp
         storageResponseMessage.getWarnings().forEach(f -> response.addWarning(f.getMessage()));
 
         // if all devices are allocated to existing pools or some of the disks already allocated or < 90GB and no errors
-        if (storageResponseMessage.getDeviceToStoragePoolMap().size() == newDevices.size() || CollectionUtils
+        if (CollectionUtils.size(storageResponseMessage.getDeviceToStoragePoolMap()) == CollectionUtils.size(newDevices) || CollectionUtils
                 .isEmpty(storageResponseMessage.getErrors()))
         {
             LOGGER.info("Storage pool validated successfully.");
