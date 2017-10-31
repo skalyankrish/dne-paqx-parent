@@ -326,7 +326,7 @@ public interface NodeService
      * @param requestMessage - The <code>DatastoreRenameRequestMessage</code> instance
      * @return
      */
-    boolean requestDatastoreRename(DatastoreRenameRequestMessage requestMessage);
+    String requestDatastoreRename(DatastoreRenameRequestMessage requestMessage);
 
     /**
      * Update the VCenter software acceptance level, e.g. partner, community, vmware accepted, vmware certified, etc.

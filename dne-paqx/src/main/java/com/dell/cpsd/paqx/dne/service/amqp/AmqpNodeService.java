@@ -1867,7 +1867,7 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
     }
 
     @Override
-    public boolean requestDatastoreRename(final DatastoreRenameRequestMessage requestMessage)
+    public String requestDatastoreRename(final DatastoreRenameRequestMessage requestMessage)
     {
         try
         {
@@ -1898,7 +1898,7 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
 
             if (datastoreRenameResponseMessage != null)
             {
-                return datastoreRenameResponseMessage.getStatus().equals(DatastoreRenameResponseMessage.Status.SUCCESS);
+                return datastoreRenameResponseMessage.getDatastoreName();
             }
         }
         catch (Exception ex)
@@ -1906,7 +1906,7 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
             LOGGER.error("Exception occurred", ex);
         }
 
-        return false;
+        return null;
     }
 
     @Override

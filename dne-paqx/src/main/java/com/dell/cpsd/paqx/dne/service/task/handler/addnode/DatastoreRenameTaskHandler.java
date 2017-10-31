@@ -17,6 +17,7 @@ import com.dell.cpsd.paqx.dne.service.model.Status;
 import com.dell.cpsd.paqx.dne.service.task.handler.BaseTaskHandler;
 import com.dell.cpsd.virtualization.capabilities.api.Credentials;
 import com.dell.cpsd.virtualization.capabilities.api.DatastoreRenameRequestMessage;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,10 +47,6 @@ public class DatastoreRenameTaskHandler extends BaseTaskHandler implements IWork
     * The <code>DataServiceRepository</code> instance
     */
     private final DataServiceRepository dataServiceRepository;
-
-    private static final String DATASTORE_PREFIX_NAME = "DAS";
-    private static final String SERVER_NUMBER_REGEX   = "[^0-9]";
-    private static final String HYPHEN_SPLITTER       = "-";
 
     /**
      * DatastoreRenameTaskHandler constructor.
@@ -95,20 +92,17 @@ public class DatastoreRenameTaskHandler extends BaseTaskHandler implements IWork
                 throw new IllegalStateException("Hostname is null");
             }
 
-            final String newDatastoreName = buildDatastoreNewName(esxiManagementHostname);
-
             final DatastoreRenameRequestMessage requestMessage = new DatastoreRenameRequestMessage();
             requestMessage.setHostname(esxiManagementHostname);
-            requestMessage.setNewDatastoreName(newDatastoreName);
             requestMessage.setCredentials(new Credentials(vCenterComponentEndpointIdsByEndpointType.getEndpointUrl(), null, null));
             requestMessage.setComponentEndpointIds(new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(
                     vCenterComponentEndpointIdsByEndpointType.getComponentUuid(),
                     vCenterComponentEndpointIdsByEndpointType.getEndpointUuid(),
                     vCenterComponentEndpointIdsByEndpointType.getCredentialUuid()));
 
-            boolean succeeded = this.nodeService.requestDatastoreRename(requestMessage);
+            final String newDatastoreName = this.nodeService.requestDatastoreRename(requestMessage);
 
-            if (!succeeded)
+            if (StringUtils.isEmpty(newDatastoreName))
             {
                 throw new IllegalStateException("Datastore rename failed");
             }
@@ -133,25 +127,5 @@ public class DatastoreRenameTaskHandler extends BaseTaskHandler implements IWork
         final DatastoreRenameTaskResponse response = new DatastoreRenameTaskResponse();
         setupResponse(job, response);
         return response;
-    }
-
-    private static String buildDatastoreNewName(final String esxiManagementHostname)
-    {
-        final StringBuilder builder = new StringBuilder();
-        builder.append(DATASTORE_PREFIX_NAME);
-        String serverNumber;
-
-        if (esxiManagementHostname.contains(HYPHEN_SPLITTER))
-        {
-            serverNumber = esxiManagementHostname.substring(esxiManagementHostname.indexOf(HYPHEN_SPLITTER))
-                    .replaceAll(SERVER_NUMBER_REGEX, "");
-        }
-        else
-        {
-            serverNumber = esxiManagementHostname.replaceAll(SERVER_NUMBER_REGEX, "");
-        }
-
-        builder.append(serverNumber);
-        return builder.toString();
     }
 }

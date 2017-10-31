@@ -72,6 +72,7 @@ public class DatastoreRenameTaskHandlerTest
 
     private DatastoreRenameTaskHandler handler;
     private final String esxiManagementHostname = "fpr1-h17.example.com";
+    private final String newDatastoreName = "DAS100";
 
     @Before
     public void setUp() throws Exception
@@ -87,14 +88,14 @@ public class DatastoreRenameTaskHandlerTest
         doReturn(this.installEsxiTaskResponse).when(this.taskResponseMap).get(anyString());
         doReturn(this.componentEndpointIds).when(this.repository).getVCenterComponentEndpointIdsByEndpointType(anyString());
         doReturn(this.esxiManagementHostname).when(this.installEsxiTaskResponse).getHostname();
-        doReturn(true).when(this.service).requestDatastoreRename(any());
+        doReturn(newDatastoreName).when(this.service).requestDatastoreRename(any());
 
         boolean result = this.handler.executeTask(this.job);
 
         assertThat(result, is(true));
         verify(this.response).setWorkFlowTaskStatus(Status.SUCCEEDED);
         verify(this.response, never()).addError(anyString());
-        String dataStorweName = "DAS17";
+        String dataStorweName = "DAS100";
         verify(this.response).setDatastoreName(dataStorweName);
     }
 
@@ -106,7 +107,7 @@ public class DatastoreRenameTaskHandlerTest
         doReturn(this.installEsxiTaskResponse).when(this.taskResponseMap).get(anyString());
         doReturn(this.componentEndpointIds).when(this.repository).getVCenterComponentEndpointIdsByEndpointType(anyString());
         doReturn(this.esxiManagementHostname).when(this.installEsxiTaskResponse).getHostname();
-        doReturn(false).when(this.service).requestDatastoreRename(any());
+        doReturn(null).when(this.service).requestDatastoreRename(any());
 
         boolean result = this.handler.executeTask(this.job);
 

@@ -1669,6 +1669,7 @@ public class AmqpNodeServiceTest
         final DatastoreRenameRequestMessage requestMessage = mock(DatastoreRenameRequestMessage.class);
         when(responseMessage.getMessageProperties()).thenReturn(messageProperties);
         when(responseMessage.getStatus()).thenReturn(DatastoreRenameResponseMessage.Status.SUCCESS);
+        when(responseMessage.getDatastoreName()).thenReturn("DAS100");
 
         AmqpNodeService nodeService = new AmqpNodeService(consumer, dneProducer, "replyToMe", repository, null, null, null)
         {
@@ -1680,9 +1681,9 @@ public class AmqpNodeServiceTest
             }
         };
 
-        boolean result = nodeService.requestDatastoreRename(requestMessage);
+        final String datastoreName = nodeService.requestDatastoreRename(requestMessage);
 
-        assertTrue(result);
+        assertNotNull(datastoreName);
         Mockito.verify(dneProducer).publishDatastoreRename(any(DatastoreRenameRequestMessage.class));
     }
 
@@ -1703,9 +1704,9 @@ public class AmqpNodeServiceTest
             }
         };
 
-        boolean result = nodeService.requestDatastoreRename(requestMessage);
+        final String datastoreName = nodeService.requestDatastoreRename(requestMessage);
 
-        assertFalse(result);
+        assertNull(datastoreName);
         Mockito.verify(dneProducer).publishDatastoreRename(any(DatastoreRenameRequestMessage.class));
     }
 
