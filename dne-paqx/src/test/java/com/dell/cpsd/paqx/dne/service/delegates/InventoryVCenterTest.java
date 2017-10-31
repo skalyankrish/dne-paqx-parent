@@ -5,31 +5,31 @@
  * </p>
  */
 
-package com.dell.cpsd.paqx.dne.service.delegate;
+package com.dell.cpsd.paqx.dne.service.delegates;
 
-import com.dell.cpsd.paqx.dne.domain.node.*;
+import com.dell.cpsd.paqx.dne.domain.node.NodeInventory;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
-import com.dell.cpsd.paqx.dne.service.delegates.*;
 import com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants;
 import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
 import com.dell.cpsd.paqx.dne.service.model.NodeInfo;
-import com.dell.cpsd.paqx.dne.service.model.NodeStatus;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.Before;
-import org.junit.*;
+import org.junit.Ignore;
+import org.junit.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class InventoryScaleIOTest {
+public class InventoryVCenterTest {
 
-    private InventoryScaleIO inventoryScaleIO;
+    private InventoryVCenter inventoryVCenter;
     private NodeService nodeService;
     private DelegateExecution delegateExecution;
     private List<NodeInfo> discoveredNodes;
@@ -47,7 +47,7 @@ public class InventoryScaleIOTest {
         nodeInventoryResponse = mock(Object.class);
         nodeInventory = mock(NodeInventory.class);
         repository = mock(DataServiceRepository.class);
-        inventoryScaleIO = new InventoryScaleIO(nodeService, repository);
+        inventoryVCenter = new InventoryVCenter(nodeService, repository);
         discoveredNodes = new ArrayList<NodeInfo>();
         discoveredNode = mock(NodeInfo.class);
         componentEndpointIds = mock(ComponentEndpointIds.class);
@@ -55,45 +55,45 @@ public class InventoryScaleIOTest {
     }
 
     @Ignore @Test
-    public void scaleIoInventoryFailed() throws Exception {
+    public void dataRepoNull() throws Exception {
         try {
-            inventoryScaleIO = new InventoryScaleIO(nodeService, null);
-            inventoryScaleIO.delegateExecute(delegateExecution);
+            inventoryVCenter = new InventoryVCenter(nodeService, null);
+            inventoryVCenter.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.INVENTORY_SCALE_IO_FAILED));
+            assertTrue(error.getErrorCode().equals(DelegateConstants.INVENTORY_VCENTER_FAILED));
         }
     }
 
 
     @Ignore @Test
-    public void scaleIoInventoryNotSaved() throws Exception {
+    public void vCenterInvetoryFailed() throws Exception {
         try {
-            when(repository.getComponentEndpointIds("SCALEIO")).thenReturn(componentEndpointIds);
-            inventoryScaleIO.delegateExecute(delegateExecution);
+            when(repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER")).thenReturn(componentEndpointIds);
+            inventoryVCenter.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.INVENTORY_SCALE_IO_FAILED));
+            assertTrue(error.getErrorCode().equals(DelegateConstants.INVENTORY_VCENTER_FAILED));
         }
     }
 
     @Ignore @Test
-    public void scaleIoInfoNotFound() throws Exception {
+    public void vCenterInfoNotFound() throws Exception {
         try {
             componentEndpointIds = null;
-            when(repository.getComponentEndpointIds("SCALEIO")).thenReturn(componentEndpointIds);
-            inventoryScaleIO.delegateExecute(delegateExecution);
+            when(repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER")).thenReturn(componentEndpointIds);
+            inventoryVCenter.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.SCALE_IO_INFORMATION_NOT_FOUND));
+            assertTrue(error.getErrorCode().equals(DelegateConstants.VCENTER_INFORMATION_NOT_FOUND));
         }
     }
 
     @Ignore @Test
-    public void scaleIoDiscoveryException() throws Exception {
+    public void vCenterInvetoryException() throws Exception {
         try {
-            when(repository.getComponentEndpointIds("SCALEIO")).thenReturn(componentEndpointIds);
+            when(repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER")).thenReturn(componentEndpointIds);
             given(delegateExecution.getProcessInstanceId()).willThrow(new NullPointerException());
-            inventoryScaleIO.delegateExecute(delegateExecution);
+            inventoryVCenter.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.INVENTORY_SCALE_IO_FAILED));
+            assertTrue(error.getErrorCode().equals(DelegateConstants.INVENTORY_VCENTER_FAILED));
         }
     }
 }

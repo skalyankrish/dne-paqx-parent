@@ -5,53 +5,52 @@
  * </p>
  */
 
-package com.dell.cpsd.paqx.dne.service.delegate;
+package com.dell.cpsd.paqx.dne.service.delegates;
 
 import com.dell.cpsd.paqx.dne.service.NodeService;
-import com.dell.cpsd.paqx.dne.service.delegates.*;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
-import com.dell.cpsd.paqx.dne.service.delegates.model.WorkflowResult;
 import com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants;
-import com.dell.cpsd.paqx.dne.service.model.BootDeviceIdracStatus;
 import com.dell.cpsd.paqx.dne.service.model.DiscoveredNode;
 import com.dell.cpsd.paqx.dne.service.model.IdracInfo;
 import com.dell.cpsd.paqx.dne.service.model.IdracNetworkSettingsRequest;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.util.List;
 
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
-import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.WORKFLOW_RESULT;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-public class ConfigureBootDeviceTest {
+public class ConfigIdracIpAddressTest {
 
-    private ConfigureBootDevice configureBootDevice;
+    private ConfigIdracIpAddress configIdracIpAddress;
     private NodeService nodeService;
     private DelegateExecution delegateExecution;
     private List<DiscoveredNode> discoveredNodesResponse;
     private DiscoveredNode discoveredNode;
     private NodeDetail nodeDetail;
     private IdracNetworkSettingsRequest idracNetworkSettingsRequest;
-    private BootDeviceIdracStatus bootDeviceIdracStatus;
-    private WorkflowResult workflowResult;
+    private IdracInfo idracInfo;
     private BaseWorkflowDelegate baseWorkflowDelegate;
 
     @Before
     public void setUp() throws Exception
     {
         nodeService = mock(NodeService.class);
-        configureBootDevice = new ConfigureBootDevice(nodeService);
+        configIdracIpAddress = new ConfigIdracIpAddress(nodeService);
         delegateExecution = mock(DelegateExecution.class);
         nodeDetail = new NodeDetail();
         idracNetworkSettingsRequest = mock(IdracNetworkSettingsRequest.class);
-        bootDeviceIdracStatus = new BootDeviceIdracStatus();
-        workflowResult = mock(WorkflowResult.class);
+        idracInfo = new IdracInfo();
         baseWorkflowDelegate = mock(BaseWorkflowDelegate.class);
         nodeDetail.setId("1");
         nodeDetail.setIdracIpAddress("1");
@@ -61,37 +60,36 @@ public class ConfigureBootDeviceTest {
     }
 
     @Ignore @Test
-    public void testFailedBootDeviceConfig() throws Exception {
+    public void testFailConfig() throws Exception {
         try {
+            idracInfo.setMessage("FAIL");
             when(delegateExecution.getVariable(NODE_DETAIL)).thenReturn(nodeDetail);
-            given(nodeService.bootDeviceIdracStatus(any())).willThrow(new NullPointerException());
-            when(delegateExecution.getVariable(WORKFLOW_RESULT)).thenReturn(workflowResult);
-            configureBootDevice.delegateExecute(delegateExecution);
+            when(nodeService.idracNetworkSettings(any())).thenReturn(idracInfo);
+            configIdracIpAddress.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.CONFIGURE_BOOT_DEVICE_FAILED));
+            assertTrue(error.getErrorCode().equals(DelegateConstants.CONFIGURE_IP_ADDRESS_FAILED));
         }
     }
 
     @Ignore @Test
     public void testSuccess() throws Exception {
-        bootDeviceIdracStatus.setStatus("SUCCESS");
+        idracInfo.setMessage("SUCCESS");
         when(delegateExecution.getVariable(NODE_DETAIL)).thenReturn(nodeDetail);
-        when(nodeService.bootDeviceIdracStatus(any())).thenReturn(bootDeviceIdracStatus);
-        final ConfigureBootDevice c = spy(new ConfigureBootDevice(nodeService));
+        when(nodeService.idracNetworkSettings(any())).thenReturn(idracInfo);
+        final ConfigIdracIpAddress c = spy(new ConfigIdracIpAddress(nodeService));
         c.delegateExecute(delegateExecution);
-        verify(c).updateDelegateStatus("Boot Device Configuration was successful on Node abc");
-        }
+        verify(c).updateDelegateStatus("Configure IP Address on Node abc was successful.");
+    }
 
     @Ignore @Test
     public void testException() throws Exception {
         try {
-            bootDeviceIdracStatus.setStatus("FAIL");
+            idracInfo.setMessage("FAIL");
             when(delegateExecution.getVariable(NODE_DETAIL)).thenReturn(nodeDetail);
             given(nodeService.idracNetworkSettings(any())).willThrow(new NullPointerException());
-            when(delegateExecution.getVariable(WORKFLOW_RESULT)).thenReturn(workflowResult);
-            configureBootDevice.delegateExecute(delegateExecution);
+            configIdracIpAddress.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.CONFIGURE_BOOT_DEVICE_FAILED));
+            assertTrue(error.getErrorCode().equals(DelegateConstants.CONFIGURE_IP_ADDRESS_FAILED));
         }
     }
 }

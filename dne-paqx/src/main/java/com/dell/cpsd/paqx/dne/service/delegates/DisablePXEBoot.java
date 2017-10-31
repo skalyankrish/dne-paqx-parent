@@ -73,7 +73,7 @@ public class DisablePXEBoot extends BaseWorkflowDelegate
 
         if (bootDeviceIdracStatus.getStatus() != null)
         {
-            result.put("bootDeviceIdracStatus", bootDeviceIdracStatus.getStatus());
+            result.put("bootDeviceIdracStatusRequest", bootDeviceIdracStatus.getStatus());
         }
 
         if (bootDeviceIdracStatus.getErrors() != null)
@@ -98,16 +98,16 @@ public class DisablePXEBoot extends BaseWorkflowDelegate
             LOGGER.info("uuid:" + uuid);
             LOGGER.info("ipAddress:" + ipAddress);
 
-            BootDeviceIdracStatus bootDeviceIdracStatus = nodeService.configurePxeBoot(uuid, ipAddress);
-            if ("SUCCESS".equalsIgnoreCase(bootDeviceIdracStatus.getStatus()))
+            BootDeviceIdracStatus bootDeviceIdracStatusRequest = nodeService.configurePxeBoot(uuid, ipAddress);
+            if ("SUCCESS".equalsIgnoreCase(bootDeviceIdracStatusRequest.getStatus()))
             {
-                response.setResults(buildResponseResult(bootDeviceIdracStatus));
+                response.setResults(buildResponseResult(bootDeviceIdracStatusRequest));
                 response.setWorkFlowTaskStatus(Status.SUCCEEDED);
                 return true;
             }
             else
             {
-                response.addError(bootDeviceIdracStatus.getErrors().toString());
+                response.addError(bootDeviceIdracStatusRequest.getErrors().toString());
             }
         }
         catch(Exception e)

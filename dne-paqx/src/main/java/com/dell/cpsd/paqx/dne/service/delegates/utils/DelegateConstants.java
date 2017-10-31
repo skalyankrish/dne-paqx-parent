@@ -22,6 +22,11 @@ public class DelegateConstants
     public static final String HOST_PCI_DEVICE_ID = "HostPCIDeviceId";
     public static final String IOCTL_INI_GUI_STR = "IoctlIniGuidStr";
 
+    //Message IDs
+    public static final String CONFIGURE_BOOT_DEVICE_MESSAGE_ID = "configureBootDeviceResponseReceived";
+
+
+
     public static final String VCENTER_INFORMATION_NOT_FOUND = "VCenter-Information-Missing";
     public static final String INVENTORY_VCENTER_FAILED = "Inventory-VCenter-Failed";
     public static final String INVENTORY_SCALE_IO_FAILED = "Inventory-Scale-IO-Failed";
@@ -48,10 +53,7 @@ public class DelegateConstants
     public static final String VERIFY_NODE_DETAIL_FAILED = "Verify-Node-Detail-Failed";
     public static final String VERIFY_NODES_SELECTED_FAILED = "Verify-Nodes-Selected-Failed";
 
-    public static final String WORKFLOW_RESULT = "WorkflowResult";
     public static final String DELEGATE_STATUS_VARIABLE = "processStatusLogs";
-    public static final String COMPLETED = "Completed";
-    public static final String COMPLETED_WITH_ERRORS = "Complete With Errors";
     public static final String FAILED = "Failed";
     public static final String IN_PROGRESS = "In Progress";
 }

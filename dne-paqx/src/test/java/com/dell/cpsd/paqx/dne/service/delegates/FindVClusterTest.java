@@ -4,34 +4,35 @@
  * </p>
  */
 
-package com.dell.cpsd.paqx.dne.service.delegate;
+package com.dell.cpsd.paqx.dne.service.delegates;
 
 import com.dell.cpsd.paqx.dne.domain.scaleio.ScaleIOData;
 import com.dell.cpsd.paqx.dne.domain.scaleio.ScaleIOProtectionDomain;
 import com.dell.cpsd.paqx.dne.domain.scaleio.ScaleIOStoragePool;
 import com.dell.cpsd.paqx.dne.service.NodeService;
-import com.dell.cpsd.paqx.dne.service.delegates.*;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
-import com.dell.cpsd.paqx.dne.service.delegates.model.WorkflowResult;
 import com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants;
 import com.dell.cpsd.paqx.dne.service.model.IdracNetworkSettingsRequest;
 import com.dell.cpsd.service.common.client.exception.ServiceTimeoutException;
-import com.dell.cpsd.service.engineering.standards.EssValidateStoragePoolResponseMessage;
 import com.dell.cpsd.virtualization.capabilities.api.ClusterInfo;
 import com.dell.cpsd.virtualization.capabilities.api.ValidateVcenterClusterResponseMessage;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.VCENTER_CLUSTER_NAME;
-import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.WORKFLOW_RESULT;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class FindVClusterTest {
 
@@ -43,7 +44,6 @@ public class FindVClusterTest {
     private ScaleIOProtectionDomain scaleIOProtectionDomain;
     private NodeDetail nodeDetail;
     private IdracNetworkSettingsRequest idracNetworkSettingsRequest;
-    private WorkflowResult workflowResult;
     private List<ScaleIOData> scaleIODataList;
     private ScaleIOStoragePool scaleIOStoragePool;
     private ValidateVcenterClusterResponseMessage storageResponseMessage;
@@ -59,7 +59,6 @@ public class FindVClusterTest {
         delegateExecution = mock(DelegateExecution.class);
         nodeDetail = new NodeDetail();
         idracNetworkSettingsRequest = mock(IdracNetworkSettingsRequest.class);
-        workflowResult = mock(WorkflowResult.class);
         clusterInfoList = new ArrayList<ClusterInfo>();
         clusterInfo = new ClusterInfo("abc",1);
         message.add("A");
@@ -93,7 +92,6 @@ public class FindVClusterTest {
             storageResponseMessage = new ValidateVcenterClusterResponseMessage();
             storageResponseMessage.setFailedCluster(message);
             when(nodeService.validateClusters(any())).thenReturn(storageResponseMessage);
-            when(delegateExecution.getVariable(WORKFLOW_RESULT)).thenReturn(workflowResult);
             findVCluster.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
             assertTrue(error.getErrorCode().equals(DelegateConstants.FIND_VCLUSTER_FAILED));

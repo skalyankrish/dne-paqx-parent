@@ -5,28 +5,30 @@
  * </p>
  */
 
-package com.dell.cpsd.paqx.dne.service.delegate;
+package com.dell.cpsd.paqx.dne.service.delegates;
 
 import com.dell.cpsd.paqx.dne.service.NodeService;
-import com.dell.cpsd.paqx.dne.service.delegates.*;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
-import com.dell.cpsd.paqx.dne.service.delegates.model.WorkflowResult;
 import com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants;
 import com.dell.cpsd.paqx.dne.service.model.DiscoveredNode;
 import com.dell.cpsd.paqx.dne.service.model.IdracNetworkSettingsRequest;
 import com.dell.cpsd.paqx.dne.service.model.ObmSettingsResponse;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.util.List;
 
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
-import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.WORKFLOW_RESULT;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ConfigureObmSettingsTest {
 
@@ -39,7 +41,6 @@ public class ConfigureObmSettingsTest {
     private NodeDetail nodeDetail;
     private IdracNetworkSettingsRequest idracNetworkSettingsRequest;
     private ObmSettingsResponse obmSettingsResponse;
-    private WorkflowResult workflowResult;
 
     @Before
     public void setUp() throws Exception
@@ -52,7 +53,6 @@ public class ConfigureObmSettingsTest {
         nodeDetail = new NodeDetail();
         idracNetworkSettingsRequest = mock(IdracNetworkSettingsRequest.class);
         obmSettingsResponse = new ObmSettingsResponse();
-        workflowResult = mock(WorkflowResult.class);
         nodeDetail.setId("1");
         nodeDetail.setIdracIpAddress("1");
         nodeDetail.setIdracGatewayIpAddress("1");
@@ -65,7 +65,6 @@ public class ConfigureObmSettingsTest {
         try {
             when(delegateExecution.getVariable(NODE_DETAIL)).thenReturn(nodeDetail);
             given(nodeService.obmSettingsResponse(any())).willThrow(new NullPointerException());
-            when(delegateExecution.getVariable(WORKFLOW_RESULT)).thenReturn(workflowResult);
             configureObmSettings.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
             assertTrue(error.getErrorCode().equals(DelegateConstants.CONFIGURE_OBM_SETTINGS_FAILED));
@@ -88,7 +87,6 @@ public class ConfigureObmSettingsTest {
             obmSettingsResponse.setStatus("FAIL");
             when(delegateExecution.getVariable(NODE_DETAIL)).thenReturn(nodeDetail);
             when(nodeService.obmSettingsResponse(any())).thenReturn(obmSettingsResponse);
-            when(delegateExecution.getVariable(WORKFLOW_RESULT)).thenReturn(workflowResult);
             configureObmSettings.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
             assertTrue(error.getErrorCode().equals(DelegateConstants.CONFIGURE_OBM_SETTINGS_FAILED));

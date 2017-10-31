@@ -5,10 +5,13 @@
 package com.dell.cpsd.paqx.dne.service.amqp.adapter;
 
 import com.dell.cpsd.ConfigureBootDeviceIdracResponseMessage;
+import com.dell.cpsd.paqx.dne.amqp.callback.AsynchronousNodeServiceCallback;
 import com.dell.cpsd.service.common.client.callback.IServiceCallback;
 import com.dell.cpsd.service.common.client.callback.ServiceResponse;
 import com.dell.cpsd.service.common.client.rpc.ServiceCallbackAdapter;
 import com.dell.cpsd.service.common.client.rpc.ServiceCallbackRegistry;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.runtime.Execution;
 
 /**
  * <p>
@@ -21,10 +24,17 @@ public class ConfigureBootDeviceIdracResponseAdapter
         implements ServiceCallbackAdapter<ConfigureBootDeviceIdracResponseMessage, ServiceResponse<ConfigureBootDeviceIdracResponseMessage>>
 {
     private ServiceCallbackRegistry serviceCallbackRegistry;
+    private RuntimeService runtimeService;
 
-    public ConfigureBootDeviceIdracResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
+    public ConfigureBootDeviceIdracResponseAdapter(final ServiceCallbackRegistry serviceCallbackRegistry)
     {
         this.serviceCallbackRegistry = serviceCallbackRegistry;
+    }
+
+    public ConfigureBootDeviceIdracResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry, RuntimeService runtimeService)
+    {
+        this.serviceCallbackRegistry = serviceCallbackRegistry;
+        this.runtimeService = runtimeService;
     }
 
     @Override
@@ -37,9 +47,22 @@ public class ConfigureBootDeviceIdracResponseAdapter
 
     @Override
     public void consume(IServiceCallback callback,
-            ServiceResponse<ConfigureBootDeviceIdracResponseMessage> configureBootDeviceIdracResponseMessage)
+                        ServiceResponse<ConfigureBootDeviceIdracResponseMessage> configureBootDeviceIdracResponseMessage)
     {
         callback.handleServiceResponse(configureBootDeviceIdracResponseMessage);
+        if (runtimeService != null && callback instanceof AsynchronousNodeServiceCallback)
+        {
+            AsynchronousNodeServiceCallback<?> async = (AsynchronousNodeServiceCallback<?>) callback;
+            if (async.getProcessInstanceId() != null)
+            {
+                Execution execution = runtimeService.createExecutionQuery().processInstanceId(
+                        async.getProcessInstanceId()).activityId(async.getActivityId()).singleResult();
+                if (execution != null)
+                {
+                    runtimeService.messageEventReceived(async.getMessageId(), execution.getId());
+                }
+            }
+        }
     }
 
     @Override

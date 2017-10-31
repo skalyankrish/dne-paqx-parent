@@ -14,11 +14,7 @@
     </bpmn:serviceTask>
     <bpmn:serviceTask id="configureNodeCredentials" name="Configure Node Credentials" camunda:asyncAfter="true" camunda:exclusive="false" camunda:delegateExpression="${configureNodeCredentials}">
       <bpmn:incoming>SequenceFlow_1ndk1e6</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_1cbajfa</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="configureBootDevice" name="Configure Boot Device On Node" camunda:asyncAfter="true" camunda:exclusive="false" camunda:delegateExpression="${configureBootDevice}">
-      <bpmn:incoming>SequenceFlow_1cbajfa</bpmn:incoming>
-      <bpmn:outgoing>SequenceFlow_0wv3mbh</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_0q15rtt</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="findVCenterCluster" name="Find Node&#39;s VCenter Cluster" camunda:asyncAfter="true" camunda:exclusive="false" camunda:delegateExpression="${findVCluster}">
       <bpmn:incoming>SequenceFlow_002o9az</bpmn:incoming>
@@ -53,9 +49,6 @@
     <bpmn:boundaryEvent id="BoundaryEvent_1h8umow" name="Error" camunda:asyncAfter="true" camunda:exclusive="false" attachedToRef="configureNodeCredentials">
       <bpmn:errorEventDefinition camunda:errorCodeVariable="errorCode" camunda:errorMessageVariable="errorMessage" />
     </bpmn:boundaryEvent>
-    <bpmn:boundaryEvent id="BoundaryEvent_0zwdewd" name="Error" camunda:asyncAfter="true" camunda:exclusive="false" attachedToRef="configureBootDevice">
-      <bpmn:errorEventDefinition camunda:errorCodeVariable="errorCode" camunda:errorMessageVariable="errorMessage" />
-    </bpmn:boundaryEvent>
     <bpmn:boundaryEvent id="BoundaryEvent_18ougms" name="Error" camunda:asyncAfter="true" camunda:exclusive="false" attachedToRef="findVCenterCluster">
       <bpmn:errorEventDefinition camunda:errorCodeVariable="errorCode" camunda:errorMessageVariable="errorMessage" />
     </bpmn:boundaryEvent>
@@ -82,7 +75,7 @@
     <bpmn:sequenceFlow id="SequenceFlow_00sgwjw" sourceRef="installEsxi" targetRef="ServiceTask_1uadsre" />
     <bpmn:sequenceFlow id="SequenceFlow_1yaw41q" sourceRef="ServiceTask_1uadsre" targetRef="ServiceTask_1pf3hp9" />
     <bpmn:serviceTask id="findStoragePools" name="Find Node&#39;s Storage Pools" camunda:asyncAfter="true" camunda:exclusive="false" camunda:delegateExpression="${findStoragePools}">
-      <bpmn:incoming>SequenceFlow_0wv3mbh</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1odk2f8</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_002o9az</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:serviceTask id="findProtectionDomain" name="Find Node&#39;s Protection Domain" camunda:asyncAfter="true" camunda:exclusive="false" camunda:delegateExpression="${findProtectionDomain}">
@@ -95,7 +88,6 @@
     <bpmn:boundaryEvent id="findProtectionDomainError" name="Error" camunda:asyncAfter="true" camunda:exclusive="false" attachedToRef="findProtectionDomain">
       <bpmn:errorEventDefinition camunda:errorCodeVariable="errorCode" camunda:errorMessageVariable="errorMessage" />
     </bpmn:boundaryEvent>
-    <bpmn:sequenceFlow id="SequenceFlow_0wv3mbh" sourceRef="configureBootDevice" targetRef="findStoragePools" />
     <bpmn:sequenceFlow id="SequenceFlow_002o9az" sourceRef="findStoragePools" targetRef="findVCenterCluster" />
     <bpmn:sequenceFlow id="SequenceFlow_0we7k6m" sourceRef="findVCenterCluster" targetRef="findProtectionDomain" />
     <bpmn:sequenceFlow id="SequenceFlow_0lgh40j" sourceRef="findProtectionDomain" targetRef="retrieveVCenterCredentials" />
@@ -273,29 +265,77 @@
     <bpmn:sequenceFlow id="SequenceFlow_1s9tre1" sourceRef="disablePXEBoot" targetRef="addNodeToSystemDefinition" />
     <bpmn:sequenceFlow id="SequenceFlow_192loht" sourceRef="addNodeToSystemDefinition" targetRef="notifyNodeDiscoveryToUpdateStatus" />
     <bpmn:sequenceFlow id="SequenceFlow_1wnen9i" sourceRef="notifyNodeDiscoveryToUpdateStatus" targetRef="EndEvent_1ymjmsr" />
-    <bpmn:sequenceFlow id="SequenceFlow_1cbajfa" sourceRef="configureNodeCredentials" targetRef="configureBootDevice" />
+    <bpmn:serviceTask id="configureBootDevice" name="Configure Boot Device" camunda:asyncAfter="true" camunda:exclusive="false" camunda:delegateExpression="${configureBootDevice}">
+      <bpmn:incoming>SequenceFlow_0qn0cak</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_04pwl7k</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1odk2f8</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="BoundaryEvent_0zwdewd" name="Error" camunda:asyncAfter="true" camunda:exclusive="false" attachedToRef="configureBootDevice">
+      <bpmn:errorEventDefinition camunda:errorCodeVariable="errorCode" camunda:errorMessageVariable="errorMessage" />
+    </bpmn:boundaryEvent>
+    <bpmn:subProcess id="configureBootDeviceMessage" name="Request Configure Boot Device">
+      <bpmn:incoming>SequenceFlow_0q15rtt</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_04pwl7k</bpmn:outgoing>
+      <bpmn:startEvent id="StartEvent_106vva6">
+        <bpmn:outgoing>SequenceFlow_1upaefv</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:endEvent id="EndEvent_1isagtr">
+        <bpmn:incoming>SequenceFlow_12gcotm</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="SequenceFlow_1upaefv" sourceRef="StartEvent_106vva6" targetRef="sendConfigureBootDeviceRequest" />
+      <bpmn:sequenceFlow id="SequenceFlow_0dhppn5" sourceRef="sendConfigureBootDeviceRequest" targetRef="receiveConfigureBootDeviceResponse" />
+      <bpmn:sequenceFlow id="SequenceFlow_12gcotm" sourceRef="receiveConfigureBootDeviceResponse" targetRef="EndEvent_1isagtr" />
+      <bpmn:sendTask id="sendConfigureBootDeviceRequest" name="Send Configure Boot Device Request" camunda:delegateExpression="${configureBootDeviceRequest}">
+        <bpmn:incoming>SequenceFlow_1upaefv</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_0dhppn5</bpmn:outgoing>
+      </bpmn:sendTask>
+      <bpmn:receiveTask id="receiveConfigureBootDeviceResponse" name="Receive Configure Boot Device Response" messageRef="Message_0llvgib">
+        <bpmn:incoming>SequenceFlow_0dhppn5</bpmn:incoming>
+        <bpmn:outgoing>SequenceFlow_12gcotm</bpmn:outgoing>
+      </bpmn:receiveTask>
+      <bpmn:boundaryEvent id="sendConfigureBootDeviceError" name="Error" attachedToRef="sendConfigureBootDeviceRequest">
+        <bpmn:outgoing>SequenceFlow_0xli1hi</bpmn:outgoing>
+        <bpmn:errorEventDefinition camunda:errorCodeVariable="errorCode" camunda:errorMessageVariable="errorMessage" />
+      </bpmn:boundaryEvent>
+      <bpmn:endEvent id="EndEvent_1f8cjl5">
+        <bpmn:incoming>SequenceFlow_0xli1hi</bpmn:incoming>
+        <bpmn:errorEventDefinition />
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="SequenceFlow_0xli1hi" sourceRef="sendConfigureBootDeviceError" targetRef="EndEvent_1f8cjl5" />
+    </bpmn:subProcess>
+    <bpmn:boundaryEvent id="configureBootDeviceTimeout" name="Configure Boot Device Request Timeout" cancelActivity="false" attachedToRef="configureBootDeviceMessage">
+      <bpmn:outgoing>SequenceFlow_0qn0cak</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT30M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0q15rtt" sourceRef="configureNodeCredentials" targetRef="configureBootDeviceMessage" />
+    <bpmn:sequenceFlow id="SequenceFlow_0qn0cak" sourceRef="configureBootDeviceTimeout" targetRef="configureBootDevice" />
+    <bpmn:sequenceFlow id="SequenceFlow_04pwl7k" sourceRef="configureBootDeviceMessage" targetRef="configureBootDevice" />
+    <bpmn:sequenceFlow id="SequenceFlow_1odk2f8" sourceRef="configureBootDevice" targetRef="findStoragePools" />
+    <bpmn:boundaryEvent id="messageConfigureBootDeviceError" name="Error" camunda:asyncAfter="true" camunda:exclusive="false" attachedToRef="configureBootDeviceMessage">
+      <bpmn:errorEventDefinition camunda:errorCodeVariable="errorCode" camunda:errorMessageVariable="errorMessage" />
+    </bpmn:boundaryEvent>
   </bpmn:process>
   <bpmn:error id="Error_16ckthf" name="Error_0h07qdi" />
   <bpmn:error id="Error_1c8a3l2" />
+  <bpmn:message id="Message_0llvgib" name="configureBootDeviceResponseReceived" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="addNode">
       <bpmndi:BPMNShape id="StartEvent_1gjhh65_di" bpmnElement="StartEvent_1gjhh65">
-        <dc:Bounds x="-576" y="-174" width="36" height="36" />
+        <dc:Bounds x="-576" y="-380" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="-603" y="-134" width="0" height="12" />
+          <dc:Bounds x="-648" y="-340" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_0atfv08_di" bpmnElement="configureNodeIPAddress">
-        <dc:Bounds x="-608" y="26" width="100" height="80" />
+        <dc:Bounds x="-608" y="-180" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_11o6lx9_di" bpmnElement="configureObmSettiings">
-        <dc:Bounds x="-608" y="158" width="100" height="80" />
+        <dc:Bounds x="-608" y="-48" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_1bws0m8_di" bpmnElement="configureNodeCredentials">
-        <dc:Bounds x="-608" y="290" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="ServiceTask_0rpf810_di" bpmnElement="configureBootDevice">
-        <dc:Bounds x="-608" y="421" width="100" height="80" />
+        <dc:Bounds x="-608" y="84" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_0cqxqkc_di" bpmnElement="findVCenterCluster">
         <dc:Bounds x="-608" y="685" width="100" height="80" />
@@ -313,30 +353,24 @@
         <dc:Bounds x="-608" y="1339" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="ServiceTask_1v5fmfh_di" bpmnElement="verifyNodeInformation">
-        <dc:Bounds x="-608" y="-109" width="100" height="80" />
+        <dc:Bounds x="-608" y="-315" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BoundaryEvent_1dfpwcx_di" bpmnElement="BoundaryEvent_1dfpwcx">
-        <dc:Bounds x="-526" y="88" width="36" height="36" />
+        <dc:Bounds x="-526" y="-118" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="-521" y="128" width="25" height="12" />
+          <dc:Bounds x="-521" y="-78" width="25" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BoundaryEvent_036z2ua_di" bpmnElement="BoundaryEvent_036z2ua">
-        <dc:Bounds x="-526" y="220" width="36" height="36" />
+        <dc:Bounds x="-526" y="14" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="-521" y="260" width="25" height="12" />
+          <dc:Bounds x="-521" y="54" width="25" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BoundaryEvent_1h8umow_di" bpmnElement="BoundaryEvent_1h8umow">
-        <dc:Bounds x="-526" y="352" width="36" height="36" />
+        <dc:Bounds x="-526" y="146" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="-521" y="392" width="25" height="12" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BoundaryEvent_0zwdewd_di" bpmnElement="BoundaryEvent_0zwdewd">
-        <dc:Bounds x="-526" y="483" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="-521" y="523" width="25" height="12" />
+          <dc:Bounds x="-521" y="186" width="25" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BoundaryEvent_18ougms_di" bpmnElement="BoundaryEvent_18ougms">
@@ -370,37 +404,37 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BoundaryEvent_0p9azvj_di" bpmnElement="BoundaryEvent_0p9azvj">
-        <dc:Bounds x="-526" y="-47" width="36" height="36" />
+        <dc:Bounds x="-526" y="-253" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="-521" y="-7" width="25" height="12" />
+          <dc:Bounds x="-521" y="-213" width="25" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="SequenceFlow_1x7cq92_di" bpmnElement="SequenceFlow_1x7cq92">
-        <di:waypoint xsi:type="dc:Point" x="-558" y="-138" />
-        <di:waypoint xsi:type="dc:Point" x="-558" y="-109" />
+        <di:waypoint xsi:type="dc:Point" x="-558" y="-344" />
+        <di:waypoint xsi:type="dc:Point" x="-558" y="-315" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="-543" y="-129.5" width="0" height="12" />
+          <dc:Bounds x="-588" y="-335" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_0d7szj3_di" bpmnElement="SequenceFlow_0d7szj3">
-        <di:waypoint xsi:type="dc:Point" x="-558" y="-29" />
-        <di:waypoint xsi:type="dc:Point" x="-558" y="26" />
+        <di:waypoint xsi:type="dc:Point" x="-558" y="-235" />
+        <di:waypoint xsi:type="dc:Point" x="-558" y="-180" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="-543" y="-7.5" width="0" height="12" />
+          <dc:Bounds x="-588" y="-213" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1l5qe62_di" bpmnElement="SequenceFlow_1l5qe62">
-        <di:waypoint xsi:type="dc:Point" x="-558" y="106" />
-        <di:waypoint xsi:type="dc:Point" x="-558" y="158" />
+        <di:waypoint xsi:type="dc:Point" x="-558" y="-100" />
+        <di:waypoint xsi:type="dc:Point" x="-558" y="-48" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="-543" y="126" width="0" height="12" />
+          <dc:Bounds x="-588" y="-80" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1ndk1e6_di" bpmnElement="SequenceFlow_1ndk1e6">
-        <di:waypoint xsi:type="dc:Point" x="-558" y="238" />
-        <di:waypoint xsi:type="dc:Point" x="-558" y="290" />
+        <di:waypoint xsi:type="dc:Point" x="-558" y="32" />
+        <di:waypoint xsi:type="dc:Point" x="-558" y="84" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="-543" y="258" width="0" height="12" />
+          <dc:Bounds x="-588" y="52" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_1tab4go_di" bpmnElement="SequenceFlow_1tab4go">
@@ -442,13 +476,6 @@
           <dc:Bounds x="-520" y="918" width="25" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0wv3mbh_di" bpmnElement="SequenceFlow_0wv3mbh">
-        <di:waypoint xsi:type="dc:Point" x="-558" y="501" />
-        <di:waypoint xsi:type="dc:Point" x="-558" y="553" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="-543" y="521" width="0" height="12" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_002o9az_di" bpmnElement="SequenceFlow_002o9az">
         <di:waypoint xsi:type="dc:Point" x="-558" y="633" />
         <di:waypoint xsi:type="dc:Point" x="-558" y="685" />
@@ -825,11 +852,116 @@
           <dc:Bounds x="-543" y="3990" width="0" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="SequenceFlow_1cbajfa_di" bpmnElement="SequenceFlow_1cbajfa">
-        <di:waypoint xsi:type="dc:Point" x="-558" y="370" />
+      <bpmndi:BPMNShape id="ServiceTask_0rpf810_di" bpmnElement="configureBootDevice">
+        <dc:Bounds x="-608" y="421" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_0zwdewd_di" bpmnElement="BoundaryEvent_0zwdewd">
+        <dc:Bounds x="-526" y="483" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-521" y="523" width="25" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_10rmwo7_di" bpmnElement="configureBootDeviceMessage" isExpanded="true">
+        <dc:Bounds x="-777" y="214" width="438" height="170" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_106vva6_di" bpmnElement="StartEvent_106vva6">
+        <dc:Bounds x="-753" y="268" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-780" y="308" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_1isagtr_di" bpmnElement="EndEvent_1isagtr">
+        <dc:Bounds x="-395" y="268" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-422" y="308" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1upaefv_di" bpmnElement="SequenceFlow_1upaefv">
+        <di:waypoint xsi:type="dc:Point" x="-717" y="286" />
+        <di:waypoint xsi:type="dc:Point" x="-675" y="286" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-741" y="265" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0dhppn5_di" bpmnElement="SequenceFlow_0dhppn5">
+        <di:waypoint xsi:type="dc:Point" x="-575" y="286" />
+        <di:waypoint xsi:type="dc:Point" x="-536" y="286" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-600" y="265" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_12gcotm_di" bpmnElement="SequenceFlow_12gcotm">
+        <di:waypoint xsi:type="dc:Point" x="-436" y="286" />
+        <di:waypoint xsi:type="dc:Point" x="-395" y="286" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-460" y="265" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BoundaryEvent_0zj29p1_di" bpmnElement="configureBootDeviceTimeout">
+        <dc:Bounds x="-795" y="366" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-882" y="372" width="78" height="36" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0q15rtt_di" bpmnElement="SequenceFlow_0q15rtt">
+        <di:waypoint xsi:type="dc:Point" x="-558" y="164" />
+        <di:waypoint xsi:type="dc:Point" x="-558" y="214" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-588" y="183" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="SendTask_16ass3x_di" bpmnElement="sendConfigureBootDeviceRequest">
+        <dc:Bounds x="-675" y="246" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ReceiveTask_1nltlcd_di" bpmnElement="receiveConfigureBootDeviceResponse">
+        <dc:Bounds x="-536" y="246" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0qn0cak_di" bpmnElement="SequenceFlow_0qn0cak">
+        <di:waypoint xsi:type="dc:Point" x="-777" y="402" />
+        <di:waypoint xsi:type="dc:Point" x="-777" y="461" />
+        <di:waypoint xsi:type="dc:Point" x="-608" y="461" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-807" y="425.5" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_04pwl7k_di" bpmnElement="SequenceFlow_04pwl7k">
+        <di:waypoint xsi:type="dc:Point" x="-558" y="384" />
         <di:waypoint xsi:type="dc:Point" x="-558" y="421" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="-543" y="389.5" width="0" height="12" />
+          <dc:Bounds x="-588" y="396.5" width="90" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1odk2f8_di" bpmnElement="SequenceFlow_1odk2f8">
+        <di:waypoint xsi:type="dc:Point" x="-558" y="501" />
+        <di:waypoint xsi:type="dc:Point" x="-558" y="553" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-543" y="521" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BoundaryEvent_02gqnsp_di" bpmnElement="messageConfigureBootDeviceError">
+        <dc:Bounds x="-357" y="366" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-351" y="406" width="25" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryEvent_1wsxw94_di" bpmnElement="sendConfigureBootDeviceError">
+        <dc:Bounds x="-593" y="308" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-587" y="348" width="25" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_134su2f_di" bpmnElement="EndEvent_1f8cjl5">
+        <dc:Bounds x="-395" y="328" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-377" y="367.52794411177643" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0xli1hi_di" bpmnElement="SequenceFlow_0xli1hi">
+        <di:waypoint xsi:type="dc:Point" x="-559" y="332" />
+        <di:waypoint xsi:type="dc:Point" x="-525" y="346" />
+        <di:waypoint xsi:type="dc:Point" x="-395" y="346" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="-542" y="318" width="0" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>

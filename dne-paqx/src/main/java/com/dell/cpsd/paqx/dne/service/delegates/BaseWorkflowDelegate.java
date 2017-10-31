@@ -12,9 +12,7 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.DELEGATE_STATUS_VARIABLE;
@@ -74,11 +72,6 @@ public abstract class BaseWorkflowDelegate implements JavaDelegate
     }
 
     public void updateDelegateStatus(String statusString) {
-
-//        DateTime dt = new DateTime();
-//        DateTimeFormatter fmt = DateTimeFormat.forPattern("MM-dd-yy HH:mm:ss ");
-//        String dateString = fmt.print(dt);
-//        String updateString = dateString + statusString;
         delegateStatus.add(statusString);
     }
 
