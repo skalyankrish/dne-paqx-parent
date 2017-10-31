@@ -26,7 +26,7 @@ import com.dell.cpsd.service.engineering.standards.EssValidateStoragePoolRespons
 public class ValidateStoragePoolResponseAdapter
         implements ServiceCallbackAdapter<EssValidateStoragePoolResponseMessage, ServiceResponse<EssValidateStoragePoolResponseMessage>>
 {
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public ValidateStoragePoolResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

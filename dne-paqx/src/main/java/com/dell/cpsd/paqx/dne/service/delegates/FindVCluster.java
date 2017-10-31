@@ -23,7 +23,7 @@ public class FindVCluster extends BaseWorkflowDelegate
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FindVCluster.class);
 
-    private NodeService nodeService;
+    private final NodeService nodeService;
 
     @Autowired
     public FindVCluster(NodeService nodeService)

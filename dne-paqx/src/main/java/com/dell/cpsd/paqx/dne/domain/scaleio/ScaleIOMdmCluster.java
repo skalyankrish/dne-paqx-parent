@@ -58,15 +58,15 @@ public class ScaleIOMdmCluster
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "mdmCluster", orphanRemoval = true)
-    private List<ScaleIOSDSElementInfo> slaveElementInfo = new ArrayList<>();
+    private final List<ScaleIOSDSElementInfo> slaveElementInfo = new ArrayList<>();
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "mdmCluster", orphanRemoval = true)
-    private List<ScaleIOSDSElementInfo> tiebreakerElementInfo = new ArrayList<>();
+    private final List<ScaleIOSDSElementInfo> tiebreakerElementInfo = new ArrayList<>();
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "mdmCluster", orphanRemoval = true)
-    private List<ScaleIOSDSElementInfo> masterElementInfo = new ArrayList<>();
+    private final List<ScaleIOSDSElementInfo> masterElementInfo = new ArrayList<>();
 
     public ScaleIOMdmCluster()
     {

@@ -32,7 +32,7 @@ public class ConfigureObmSettings extends BaseWorkflowDelegate
     /**
      * The <code>NodeService</code> instance
      */
-    private NodeService nodeService;
+    private final NodeService nodeService;
 
     /**
      * The obm services to set

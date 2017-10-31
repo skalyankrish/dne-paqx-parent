@@ -15,9 +15,9 @@ package com.dell.cpsd.paqx.dne.service.model;
 */
 public class NodeInfo
 {
-    private String       symphonyUuid;
-    private NodeStatus   nodeStatus;
-    private String       serialNumber;
+    private final String     symphonyUuid;
+    private final NodeStatus nodeStatus;
+    private final String     serialNumber;
 
     public NodeInfo(String symphonyUuid, NodeStatus nodeStatus, String serialNumber)
     {

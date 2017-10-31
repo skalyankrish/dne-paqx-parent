@@ -56,11 +56,11 @@ public abstract class ScaleIOSDSElementInfo
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sdsElementInfo", orphanRemoval = true)
-    private List<ScaleIOIP> managementIPs = new ArrayList<>();
+    private final List<ScaleIOIP> managementIPs = new ArrayList<>();
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sdsElementInfo", orphanRemoval = true)
-    private List<ScaleIOIP> ips = new ArrayList<>();
+    private final List<ScaleIOIP> ips = new ArrayList<>();
 
     @ManyToOne(cascade = CascadeType.ALL)
     private ScaleIOMdmCluster mdmCluster;

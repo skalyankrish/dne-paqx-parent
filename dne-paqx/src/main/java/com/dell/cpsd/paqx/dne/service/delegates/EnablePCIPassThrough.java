@@ -6,13 +6,9 @@
 
 package com.dell.cpsd.paqx.dne.service.delegates;
 
-import com.dell.cpsd.paqx.dne.domain.vcenter.PciDevice;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
-import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
-import com.dell.cpsd.virtualization.capabilities.api.Credentials;
-import com.dell.cpsd.virtualization.capabilities.api.EnablePCIPassthroughRequestMessage;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Objects;
 
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.HOSTNAME;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
@@ -50,32 +43,6 @@ public class EnablePCIPassThrough extends BaseWorkflowDelegate
     {
         this.nodeService = nodeService;
         this.repository = repository;
-    }
-
-    private EnablePCIPassthroughRequestMessage getEnablePCIPassthroughRequestMessage(
-            final ComponentEndpointIds componentEndpointIds, final String hostname, final String hostPCIDeviceId)
-    {
-        final EnablePCIPassthroughRequestMessage requestMessage = new EnablePCIPassthroughRequestMessage();
-        requestMessage.setCredentials(new Credentials(componentEndpointIds.getEndpointUrl(), null, null));
-        requestMessage.setComponentEndpointIds(new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(
-                componentEndpointIds.getComponentUuid(), componentEndpointIds.getEndpointUuid(),
-                componentEndpointIds.getCredentialUuid()));
-        requestMessage.setHostname(hostname);
-        requestMessage.setHostPciDeviceId(hostPCIDeviceId);
-        return requestMessage;
-    }
-
-    private String filterDellPercPciDeviceId(final List<PciDevice> pciDeviceList) throws IllegalStateException
-    {
-        final PciDevice requiredPciDevice = pciDeviceList.stream().filter(
-                obj -> Objects.nonNull(obj) && obj.getDeviceName().matches(DELL_PCI_REGEX)).findFirst().orElse(null);
-
-        if (requiredPciDevice == null)
-        {
-            return PCI_BUS_DEVICE_ID;
-        }
-
-        return requiredPciDevice.getId();
     }
 
     @Override

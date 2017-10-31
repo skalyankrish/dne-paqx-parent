@@ -27,7 +27,7 @@ public class FindDiscoveredNodes extends BaseWorkflowDelegate
     /*
      * The <code>NodeService</code> instance
      */
-    private NodeService         nodeService;
+    private final NodeService nodeService;
 
     @Autowired
     public FindDiscoveredNodes(NodeService nodeService)

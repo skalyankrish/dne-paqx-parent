@@ -31,7 +31,7 @@ public class ConfigureBootDevice extends BaseWorkflowDelegate
     /**
      * The <code>NodeService</code> instance
      */
-    private NodeService nodeService;
+    private final NodeService nodeService;
 
     @Autowired
     public ConfigureBootDevice(NodeService nodeService)

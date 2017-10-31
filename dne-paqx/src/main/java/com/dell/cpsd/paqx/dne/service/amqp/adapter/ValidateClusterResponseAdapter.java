@@ -23,7 +23,7 @@ import com.dell.cpsd.virtualization.capabilities.api.ValidateVcenterClusterRespo
 public class ValidateClusterResponseAdapter
         implements ServiceCallbackAdapter<ValidateVcenterClusterResponseMessage, ServiceResponse<ValidateVcenterClusterResponseMessage>>
 {
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public ValidateClusterResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

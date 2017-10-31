@@ -23,7 +23,7 @@ public class ChangeIdracCredentialsResponseAdapter implements
     /*
      * The ServiceCallbackRegistry instance.
      */
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     /**
      * ChangeIdracCredentialsResponseAdapter constructor.

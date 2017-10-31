@@ -54,7 +54,7 @@ public class ScaleIOSDC
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "SCALEIO_SDC_VOLUMES", joinColumns = {@JoinColumn(name = "SDC_UUID")}, inverseJoinColumns = {
             @JoinColumn(name = "SDC_VOLUME_UUID")})
-    private Set<ScaleIOSDCVolume> scaleIOSDCVolumes = new HashSet<>();
+    private final Set<ScaleIOSDCVolume> scaleIOSDCVolumes = new HashSet<>();
 
     @ManyToOne(cascade = CascadeType.ALL)
     private ScaleIOData scaleIOData;

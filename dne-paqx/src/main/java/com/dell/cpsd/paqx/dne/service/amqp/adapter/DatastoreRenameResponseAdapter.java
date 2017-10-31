@@ -26,7 +26,7 @@ import com.dell.cpsd.virtualization.capabilities.api.DatastoreRenameResponseMess
 public class DatastoreRenameResponseAdapter
         implements ServiceCallbackAdapter<DatastoreRenameResponseMessage, ServiceResponse<DatastoreRenameResponseMessage>>
 {
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public DatastoreRenameResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

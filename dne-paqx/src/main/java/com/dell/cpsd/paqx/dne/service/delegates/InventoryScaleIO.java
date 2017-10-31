@@ -48,7 +48,7 @@ public class InventoryScaleIO extends BaseWorkflowDelegate
     {
         LOGGER.info("Execute Inventory ScaleIO");
 
-        ComponentEndpointIds componentEndpointIds = null;
+        ComponentEndpointIds componentEndpointIds;
         try
         {
             componentEndpointIds = repository.getComponentEndpointIds("SCALEIO-CLUSTER");
@@ -69,7 +69,7 @@ public class InventoryScaleIO extends BaseWorkflowDelegate
             throw new BpmnError(SCALE_IO_INFORMATION_NOT_FOUND, "Scale IO Endpoints not found.");
         }
 
-        boolean success = true;
+        boolean success;
         try
         {
             success = this.nodeService.requestDiscoverScaleIo(componentEndpointIds,

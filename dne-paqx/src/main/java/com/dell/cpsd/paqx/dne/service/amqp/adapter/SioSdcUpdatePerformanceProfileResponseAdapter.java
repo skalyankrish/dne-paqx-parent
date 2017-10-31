@@ -20,7 +20,7 @@ import com.dell.cpsd.storage.capabilities.api.SioSdcUpdatePerformanceProfileResp
 public class SioSdcUpdatePerformanceProfileResponseAdapter implements
         ServiceCallbackAdapter<SioSdcUpdatePerformanceProfileResponseMessage, ServiceResponse<SioSdcUpdatePerformanceProfileResponseMessage>>
 {
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public SioSdcUpdatePerformanceProfileResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

@@ -20,7 +20,7 @@ import com.dell.cpsd.virtualization.capabilities.api.RemoteCommandExecutionRespo
 public class RemoteCommandExecutionResponseAdapter
         implements ServiceCallbackAdapter<RemoteCommandExecutionResponseMessage, ServiceResponse<RemoteCommandExecutionResponseMessage>>
 {
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public RemoteCommandExecutionResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

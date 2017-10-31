@@ -35,7 +35,7 @@ public class FindProtectionDomain extends BaseWorkflowDelegate
         {
             Thread.sleep(WAIT_TIME);
         }
-        catch(Exception e){}
+        catch(InterruptedException e){}
         LOGGER.info("Successfully completed retrieving Protection Domain");
     }
 }

@@ -22,7 +22,7 @@ import com.dell.cpsd.service.common.client.rpc.ServiceCallbackRegistry;
  */
 public class NodesListedResponseAdapter implements ServiceCallbackAdapter<NodesListed, ServiceResponse<NodesListed>>
 {
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public NodesListedResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

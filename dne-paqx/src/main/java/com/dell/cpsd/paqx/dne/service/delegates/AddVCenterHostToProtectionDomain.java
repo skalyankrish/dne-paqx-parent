@@ -10,11 +10,6 @@ import com.dell.cpsd.paqx.dne.domain.Job;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
-import com.dell.cpsd.service.engineering.standards.DeviceAssignment;
-import com.dell.cpsd.storage.capabilities.api.DeviceInfo;
-import com.dell.cpsd.storage.capabilities.api.HostToProtectionDomain;
-import com.dell.cpsd.storage.capabilities.api.SdsIp;
-import com.dell.cpsd.storage.capabilities.api.SdsIpDetails;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,12 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
 
@@ -44,7 +33,7 @@ public class AddVCenterHostToProtectionDomain extends BaseWorkflowDelegate
     /**
      * The <code>NodeService</code> instance
      */
-    private NodeService nodeService;
+    private final NodeService nodeService;
 
     private final DataServiceRepository repository;
 
@@ -53,28 +42,6 @@ public class AddVCenterHostToProtectionDomain extends BaseWorkflowDelegate
     {
         this.nodeService = nodeService;
         this.repository = repository;
-    }
-
-    /**
-     * set Host to protection domain
-     *
-     * @param protectionDomain
-     * @param name
-     * @param sdsIpList
-     * @param deviceInfoList
-     * @return
-     */
-    private HostToProtectionDomain setHostToProtectionDomain(String protectionDomain, String name, List<SdsIp> sdsIpList,
-            final List<DeviceInfo> deviceInfoList) {
-        /**
-         * Creating the request message
-         */
-        HostToProtectionDomain hostToProtectionDomain = new HostToProtectionDomain();
-        hostToProtectionDomain.setProtectionDomainId(protectionDomain);
-        hostToProtectionDomain.setName(name);
-        hostToProtectionDomain.setSdsIpList(sdsIpList);
-        hostToProtectionDomain.setDeviceInfoList(deviceInfoList);
-        return hostToProtectionDomain;
     }
 
     /**
@@ -92,33 +59,6 @@ public class AddVCenterHostToProtectionDomain extends BaseWorkflowDelegate
             name = (job.getInputParams().getEsxiManagementIpAddress() + "-ESX");
         }
         return name;
-    }
-
-    /**
-     * Create Sds Ip list from input
-     * @param job
-     * @return
-     */
-    private List<SdsIp> createSdsIps(Job job) {
-        String ScaleIoData1IP = job.getInputParams().getScaleIoData1SvmIpAddress();
-        String ScaleIoData2IP = job.getInputParams().getScaleIoData2SvmIpAddress();
-
-        SdsIp sdsIp1 = new SdsIp();
-        SdsIpDetails sdsIpDetails1 = new SdsIpDetails();
-        sdsIpDetails1.setIp(ScaleIoData1IP);
-        sdsIpDetails1.setRole(SdsIpDetails.Role.ALL);
-        sdsIp1.setSdsIpDetails(sdsIpDetails1);
-
-        SdsIp sdsIp2 = new SdsIp();
-        SdsIpDetails sdsIpDetails2 = new SdsIpDetails();
-        sdsIpDetails2.setIp(ScaleIoData2IP);
-        sdsIpDetails2.setRole(SdsIpDetails.Role.ALL);
-        sdsIp2.setSdsIpDetails(sdsIpDetails2);
-
-        List<SdsIp> sdsIpList = new ArrayList<>();
-        sdsIpList.add(0,sdsIp1);
-        sdsIpList.add(1,sdsIp2);
-        return sdsIpList;
     }
 
     @Override

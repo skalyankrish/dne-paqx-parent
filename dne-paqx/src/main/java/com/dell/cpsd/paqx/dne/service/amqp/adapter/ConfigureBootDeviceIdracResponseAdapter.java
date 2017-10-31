@@ -20,7 +20,7 @@ import com.dell.cpsd.service.common.client.rpc.ServiceCallbackRegistry;
 public class ConfigureBootDeviceIdracResponseAdapter
         implements ServiceCallbackAdapter<ConfigureBootDeviceIdracResponseMessage, ServiceResponse<ConfigureBootDeviceIdracResponseMessage>>
 {
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public ConfigureBootDeviceIdracResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

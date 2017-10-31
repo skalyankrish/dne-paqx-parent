@@ -9,10 +9,6 @@ package com.dell.cpsd.paqx.dne.service.delegates;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
-import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
-import com.dell.cpsd.virtualization.capabilities.api.Credentials;
-import com.dell.cpsd.virtualization.capabilities.api.HostPowerOperationRequestMessage;
-import com.dell.cpsd.virtualization.capabilities.api.PowerOperationRequest;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,21 +41,6 @@ public class RebootHost extends BaseWorkflowDelegate
     {
         this.nodeService = nodeService;
         this.repository = repository;
-    }
-
-    private HostPowerOperationRequestMessage getHostPowerOperationRequestMessage(
-            final ComponentEndpointIds componentEndpointIds, final String hostname)
-    {
-        final HostPowerOperationRequestMessage requestMessage = new HostPowerOperationRequestMessage();
-        final PowerOperationRequest powerOperationRequest = new PowerOperationRequest();
-        powerOperationRequest.setPowerOperation(PowerOperationRequest.PowerOperation.REBOOT);
-        powerOperationRequest.setHostName(hostname);
-        requestMessage.setPowerOperationRequest(powerOperationRequest);
-        requestMessage.setCredentials(new Credentials(componentEndpointIds.getEndpointUrl(), null, null));
-        requestMessage.setComponentEndpointIds(new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(
-                componentEndpointIds.getComponentUuid(), componentEndpointIds.getEndpointUuid(),
-                componentEndpointIds.getCredentialUuid()));
-        return requestMessage;
     }
 
     @Override

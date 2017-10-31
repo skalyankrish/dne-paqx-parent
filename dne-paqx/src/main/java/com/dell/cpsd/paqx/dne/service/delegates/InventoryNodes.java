@@ -43,7 +43,7 @@ public class InventoryNodes extends BaseWorkflowDelegate
     /*
      * Node Service instance used to find and validate Storage pool entries
      */
-    private NodeService nodeService;
+    private final NodeService nodeService;
 
     /*
      * Reference to H2 repository

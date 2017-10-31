@@ -51,18 +51,6 @@ public class InstallEsxi extends BaseWorkflowDelegate
     }
 
     /*
-    * Auto generates the hostname using the ESXI Management IP Address.
-    */
-    private String generateHostname(final String esxiManagementIpAddress)
-    {
-        StringBuilder builder = new StringBuilder();
-        builder.append("vCenterHost");
-        builder.append("-");
-        builder.append(esxiManagementIpAddress.replaceAll("\\.", "-"));
-        return builder.toString();
-    }
-
-    /*
     * Builds the host fully qualified domain name (FQDN) from
     * the hostname and domain name, where the domain name is
     * retrieved from the database.

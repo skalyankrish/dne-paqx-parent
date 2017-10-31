@@ -21,7 +21,7 @@ public class ValidateProtectionDomainResponseAdapter implements
         ServiceCallbackAdapter<EssValidateProtectionDomainsResponseMessage, ServiceResponse<EssValidateProtectionDomainsResponseMessage>>
 {
 
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public ValidateProtectionDomainResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

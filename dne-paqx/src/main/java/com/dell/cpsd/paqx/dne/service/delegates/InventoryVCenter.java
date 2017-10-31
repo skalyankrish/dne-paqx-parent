@@ -48,7 +48,7 @@ public class InventoryVCenter extends BaseWorkflowDelegate
     {
         LOGGER.info("Execute Inventory VCenter");
 
-        ComponentEndpointIds componentEndpointIds = null;
+        ComponentEndpointIds componentEndpointIds;
         try
         {
             componentEndpointIds = repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER");
@@ -69,7 +69,7 @@ public class InventoryVCenter extends BaseWorkflowDelegate
             throw new BpmnError(VCENTER_INFORMATION_NOT_FOUND, "VCenter Endpoints not found.");
         }
 
-        boolean success = true;
+        boolean success;
         try
         {
             success = this.nodeService.requestDiscoverVCenter(componentEndpointIds,

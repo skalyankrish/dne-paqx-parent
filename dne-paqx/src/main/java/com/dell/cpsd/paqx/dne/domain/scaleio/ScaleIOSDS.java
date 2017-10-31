@@ -56,10 +56,10 @@ public class ScaleIOSDS
 
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "sds")
-    private List<ScaleIORoleIP> roleIPs = new ArrayList<>();
+    private final List<ScaleIORoleIP> roleIPs = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "sds")
-    private List<ScaleIODevice> devices = new ArrayList<>();
+    private final List<ScaleIODevice> devices = new ArrayList<>();
 
     public ScaleIOSDS()
     {

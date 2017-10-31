@@ -20,7 +20,7 @@ import com.dell.cpsd.service.common.client.rpc.ServiceCallbackRegistry;
 public class ConfigurePxeBootResponseAdapter
         implements ServiceCallbackAdapter<ConfigurePxeBootResponseMessage, ServiceResponse<ConfigurePxeBootResponseMessage>>
 {
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public ConfigurePxeBootResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

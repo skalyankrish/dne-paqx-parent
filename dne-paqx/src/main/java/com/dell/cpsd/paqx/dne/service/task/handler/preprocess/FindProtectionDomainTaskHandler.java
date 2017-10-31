@@ -73,7 +73,7 @@ public class FindProtectionDomainTaskHandler extends BaseTaskHandler implements 
     /**
      * The <code>NodeService</code> instance
      */
-    private NodeService nodeService;
+    private final NodeService nodeService;
 
     private final DataServiceRepository repository;
 
@@ -304,9 +304,11 @@ public class FindProtectionDomainTaskHandler extends BaseTaskHandler implements 
         for (Host host : hosts)
         {
             String scaleIoName = scaleIOSDS.getName();
-            if (scaleIoName.endsWith("-ESX"))
+
+            String suffix="-ESX";
+            if (scaleIoName.endsWith(suffix))
             {
-                scaleIoName = scaleIoName.substring(0, scaleIoName.length() - 4);
+                scaleIoName = scaleIoName.substring(0, scaleIoName.length() - suffix.length());
             }
 
             String hostName = host.getName();

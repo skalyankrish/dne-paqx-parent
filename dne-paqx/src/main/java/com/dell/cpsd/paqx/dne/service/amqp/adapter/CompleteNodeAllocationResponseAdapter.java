@@ -23,7 +23,7 @@ public class CompleteNodeAllocationResponseAdapter implements
     /*
      * The ServiceCallbackRegistry instance.
      */
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     /**
      * CompleteNodeAllocationResponseAdapter constructor.

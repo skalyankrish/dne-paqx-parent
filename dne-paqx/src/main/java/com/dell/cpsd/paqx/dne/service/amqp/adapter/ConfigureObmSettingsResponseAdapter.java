@@ -20,7 +20,7 @@ import com.dell.cpsd.service.common.client.rpc.ServiceCallbackRegistry;
 public class ConfigureObmSettingsResponseAdapter
         implements ServiceCallbackAdapter<SetObmSettingsResponseMessage, ServiceResponse<SetObmSettingsResponseMessage>>
 {
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public ConfigureObmSettingsResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

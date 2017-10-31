@@ -44,10 +44,10 @@ import java.util.stream.Collectors;
 public class CamundaWorkflowServiceImpl implements ICamundaWorkflowService
 {
 
-    private RuntimeService runtimeService;
-    private RepositoryService repositoryService;
-    private HistoryService historyService;
-    private IdGenerator idGenerator;
+    private final RuntimeService    runtimeService;
+    private final RepositoryService repositoryService;
+    private final HistoryService    historyService;
+    private       IdGenerator       idGenerator;
 
 
     private static final Log LOGGER = LogFactory.getLog(CamundaWorkflowServiceImpl.class);
@@ -84,7 +84,7 @@ public class CamundaWorkflowServiceImpl implements ICamundaWorkflowService
             return null;
         }
 
-        Status workflowStatus = null;
+        Status workflowStatus;
 
         String processInstanceId = null;
         String processDefinitionId = null;
@@ -137,9 +137,7 @@ public class CamundaWorkflowServiceImpl implements ICamundaWorkflowService
                     processInstanceId).list();
             if (subProcesses != null && subProcesses.size() > 0)
             {
-                subProcesses.stream().forEach(subProcess -> {
-                    subprocessIdsMap.put(subProcess.getProcessInstanceId(), subProcess.getProcessDefinitionId());
-                });
+                subProcesses.forEach(subProcess -> subprocessIdsMap.put(subProcess.getProcessInstanceId(), subProcess.getProcessDefinitionId()));
             }
 
             List<HistoricProcessInstance> historicSubProcesses = historyService.createHistoricProcessInstanceQuery()
@@ -147,17 +145,14 @@ public class CamundaWorkflowServiceImpl implements ICamundaWorkflowService
                                                                                        processInstanceId).list();
             if (historicSubProcesses != null && historicSubProcesses.size() > 0)
             {
-                historicSubProcesses.forEach(historicSubProcess -> {
-                    subprocessIdsMap.put(historicSubProcess.getId(), historicSubProcess.getProcessDefinitionId());
-                });
+                historicSubProcesses.forEach(historicSubProcess -> subprocessIdsMap.put(historicSubProcess.getId(), historicSubProcess.getProcessDefinitionId()));
             }
 
             if (subprocessIdsMap.size() > 0)
             {
-                subprocessIdsMap.entrySet().forEach(entry -> {
-                    BpmnModelInstance subBpmnModelInstance = repositoryService.getBpmnModelInstance(entry.getValue());
-                    Status subProcessStatus = getWorkflowStatusByProcessInstanceId(jobId, entry.getKey(),
-                                                                                   subBpmnModelInstance);
+                subprocessIdsMap.forEach((key, value) -> {
+                    BpmnModelInstance subBpmnModelInstance = repositoryService.getBpmnModelInstance(value);
+                    Status subProcessStatus = getWorkflowStatusByProcessInstanceId(jobId, key, subBpmnModelInstance);
                     if (subProcessStatus != null)
                     {
                         currentStatus.getSubProcesses().add(subProcessStatus);
@@ -206,9 +201,7 @@ public class CamundaWorkflowServiceImpl implements ICamundaWorkflowService
                 final Map<String, Object> properties = new HashMap<>();
                 if (details != null && !details.isEmpty())
                 {
-                    details.stream().forEach(detail -> {
-                        properties.put(detail.getName(), detail.getValue());
-                    });
+                    details.forEach(detail -> properties.put(detail.getName(), detail.getValue()));
                 }
                 if (properties.size() > 0)
                 {
@@ -276,7 +269,7 @@ public class CamundaWorkflowServiceImpl implements ICamundaWorkflowService
         final String parentId = historicProcessInstance.getId();
         Set<Activity> ret = new LinkedHashSet<>();
 
-        String activityName = null;
+        String activityName;
         for (HistoricActivityInstance hai : historicActivityInstances)
         {
             // skip some processes

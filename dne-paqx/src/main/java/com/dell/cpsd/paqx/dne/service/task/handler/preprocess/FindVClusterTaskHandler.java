@@ -33,7 +33,7 @@ public class FindVClusterTaskHandler extends BaseTaskHandler implements IWorkflo
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(FindVClusterTaskHandler.class);
 
-    private NodeService nodeService;
+    private final NodeService nodeService;
 
     public FindVClusterTaskHandler(NodeService nodeService)
     {

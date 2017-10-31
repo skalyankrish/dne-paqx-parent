@@ -28,7 +28,7 @@ public class FindStoragePools extends BaseWorkflowDelegate
     /*
      * Node Service instance used to find and validate Storage pool entries
      */
-    private NodeService nodeService;
+    private final NodeService nodeService;
 
     /**
      * Construct an instance based on nodeservice reference

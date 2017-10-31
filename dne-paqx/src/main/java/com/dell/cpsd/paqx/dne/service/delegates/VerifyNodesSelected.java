@@ -20,10 +20,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,7 +34,7 @@ public class VerifyNodesSelected extends BaseWorkflowDelegate
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(VerifyNodesSelected.class);
 
-    private NodeService nodeService;
+    private final NodeService nodeService;
 
     @Autowired
     public VerifyNodesSelected(final NodeService nodeService)
@@ -64,7 +62,7 @@ public class VerifyNodesSelected extends BaseWorkflowDelegate
             List<DiscoveredNodeInfo> discoveredNodes = nodeService.listDiscoveredNodeInfo();
             Set<String> serviceTags = new HashSet<>();
             if (CollectionUtils.isNotEmpty(discoveredNodes)) {
-                discoveredNodes.forEach(dn -> { serviceTags.add(dn.getSerialNumber()); });
+                discoveredNodes.forEach(dn -> serviceTags.add(dn.getSerialNumber()));
             }
             List<NodeDetail> missing = nodeDetails.stream().filter(nodeDetail -> !serviceTags.contains(nodeDetail.getServiceTag())).collect(Collectors.toList());
             if (CollectionUtils.isNotEmpty(missing)) {

@@ -12,9 +12,7 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.DELEGATE_STATUS_VARIABLE;
@@ -25,8 +23,8 @@ import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.D
 public abstract class BaseWorkflowDelegate implements JavaDelegate
 {
 
-    private static final Log LOGGER = LogFactory.getLog(BaseWorkflowDelegate.class);
-    private List<String> delegateStatus = new CopyOnWriteArrayList<>();
+    private static final Log          LOGGER         = LogFactory.getLog(BaseWorkflowDelegate.class);
+    private final        List<String> delegateStatus = new CopyOnWriteArrayList<>();
 
     @Override
     public void execute(final DelegateExecution delegateExecution)

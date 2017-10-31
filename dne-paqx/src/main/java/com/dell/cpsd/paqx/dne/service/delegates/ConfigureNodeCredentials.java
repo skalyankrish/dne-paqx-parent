@@ -31,7 +31,7 @@ public class ConfigureNodeCredentials extends BaseWorkflowDelegate
     /*
      * The <code>NodeService</code> instance
      */
-    private NodeService nodeService;
+    private final NodeService nodeService;
 
     /**
      * ChangeIdracCredentialsTaskHandler constructor.

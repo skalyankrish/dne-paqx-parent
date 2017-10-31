@@ -24,7 +24,7 @@ public class NodeExpansionResponse {
     private List<TaskResponse> workflowTasksResponseList;
     private Map<String, TaskResponse> workflowTasksResponseMap;
 
-    private Set<LinkRepresentation> links = new HashSet<>();
+    private final Set<LinkRepresentation> links = new HashSet<>();
 
 
     public NodeExpansionResponse() {

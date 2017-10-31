@@ -25,9 +25,9 @@ public class DneLoggingManager
     /*
      * The message resource bundle used for logging.
      */
-    private static ResourceBundle MESSAGE_BUNDLE = ResourceBundle.getBundle(DneMessageBundle.class.getName());
+    private static final ResourceBundle MESSAGE_BUNDLE = ResourceBundle.getBundle(DneMessageBundle.class.getName());
 
-    private static LoggingManager LOGGING_MANAGER = new LoggingManager();
+    private static final LoggingManager LOGGING_MANAGER = new LoggingManager();
 
     
     /**

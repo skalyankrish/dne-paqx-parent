@@ -8,10 +8,6 @@ package com.dell.cpsd.paqx.dne.service.delegates;
 
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
-import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
-import com.dell.cpsd.virtualization.capabilities.api.Credentials;
-import com.dell.cpsd.virtualization.capabilities.api.HostMaintenanceModeRequestMessage;
-import com.dell.cpsd.virtualization.capabilities.api.MaintenanceModeRequest;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,20 +80,5 @@ public abstract class AbstractHostMaintenanceMode extends BaseWorkflowDelegate
 */
         LOGGER.info(taskName + " was successful.");
         updateDelegateStatus(taskName + " was successful.");
-    }
-
-    protected HostMaintenanceModeRequestMessage getHostMaintenanceModeRequestMessage(
-            final ComponentEndpointIds componentEndpointIds, final String hostname, final boolean maintenanceModeEnable)
-    {
-        final HostMaintenanceModeRequestMessage requestMessage = new HostMaintenanceModeRequestMessage();
-        final MaintenanceModeRequest maintenanceModeRequest = new MaintenanceModeRequest();
-        maintenanceModeRequest.setMaintenanceModeEnable(maintenanceModeEnable);
-        maintenanceModeRequest.setHostName(hostname);
-        requestMessage.setMaintenanceModeRequest(maintenanceModeRequest);
-        requestMessage.setCredentials(new Credentials(componentEndpointIds.getEndpointUrl(), null, null));
-        requestMessage.setComponentEndpointIds(new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(
-                componentEndpointIds.getComponentUuid(), componentEndpointIds.getEndpointUuid(),
-                componentEndpointIds.getCredentialUuid()));
-        return requestMessage;
     }
 }

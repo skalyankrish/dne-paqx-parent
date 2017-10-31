@@ -6,7 +6,6 @@
 package com.dell.cpsd.paqx.dne.service.delegates;
 
 import com.dell.cpsd.paqx.dne.service.NodeService;
-import com.dell.cpsd.virtualization.capabilities.api.ListEsxiCredentialDetailsRequestMessage;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,17 +66,4 @@ public class RetrieveDefaultESXiCredentials extends BaseWorkflowDelegate
         delegateExecution.setVariable(ESXI_CREDENTIAL_DETAILS, esXiCredentialDetails);
 */
     }
-
-    private ListEsxiCredentialDetailsRequestMessage getListDefaultCredentialsRequestMessage()
-    {
-        final ListEsxiCredentialDetailsRequestMessage requestMessage = new ListEsxiCredentialDetailsRequestMessage();
-        requestMessage.setComponentElementType(
-                ListEsxiCredentialDetailsRequestMessage.ComponentElementType.COMMON_SERVER);
-        requestMessage.setEndpointElementType(
-                ListEsxiCredentialDetailsRequestMessage.EndpointElementType.COMMON_DELL_POWEREDGE_ESXI_HOST_EP);
-        requestMessage.setCredentialName(ListEsxiCredentialDetailsRequestMessage.CredentialName.ESXI_HOST_DEFAULT);
-
-        return requestMessage;
-    }
-
 }

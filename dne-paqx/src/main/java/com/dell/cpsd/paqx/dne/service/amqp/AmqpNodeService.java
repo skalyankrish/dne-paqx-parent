@@ -195,7 +195,7 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
     /*
      * The logger instance
      */
-    private static ILogger LOGGER = DneLoggingManager.getLogger(ServiceConfig.class);
+    private static final ILogger LOGGER = DneLoggingManager.getLogger(ServiceConfig.class);
 
     /*
      * The <code>DelegatingMessageConsumer</code>
@@ -928,7 +928,7 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
         {
             LOGGER.error("Exception in boot order sequence: ", ex);
             bootDeviceIdracStatus.setStatus(ConfigurePxeBootResponseMessage.Status.FAILED.toString());
-            bootDeviceIdracStatus.setErrors(Arrays.asList(ex.getMessage()));
+            bootDeviceIdracStatus.setErrors(Collections.singletonList(ex.getMessage()));
         }
 
         return bootDeviceIdracStatus;

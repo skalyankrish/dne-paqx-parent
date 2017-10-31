@@ -20,7 +20,7 @@ import com.dell.cpsd.virtualization.capabilities.api.ConfigureVmNetworkSettingsR
 public class ConfigureVmNetworkSettingsResponseAdapter implements
         ServiceCallbackAdapter<ConfigureVmNetworkSettingsResponseMessage, ServiceResponse<ConfigureVmNetworkSettingsResponseMessage>>
 {
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public ConfigureVmNetworkSettingsResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

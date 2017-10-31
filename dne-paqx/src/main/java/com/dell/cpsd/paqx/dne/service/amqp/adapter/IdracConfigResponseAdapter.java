@@ -31,7 +31,7 @@ import com.dell.cpsd.service.common.client.rpc.ServiceCallbackRegistry;
 public class IdracConfigResponseAdapter
         implements ServiceCallbackAdapter<IdracNetworkSettingsResponseMessage, ServiceResponse<IdracNetworkSettingsResponseMessage>>
 {
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public IdracConfigResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

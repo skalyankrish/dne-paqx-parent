@@ -8,12 +8,7 @@ package com.dell.cpsd.paqx.dne.service.delegates;
 
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
-import com.dell.cpsd.paqx.dne.service.delegates.model.ESXiCredentialDetails;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
-import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
-import com.dell.cpsd.virtualization.capabilities.api.ClusterOperationRequest;
-import com.dell.cpsd.virtualization.capabilities.api.ClusterOperationRequestMessage;
-import com.dell.cpsd.virtualization.capabilities.api.Credentials;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,28 +40,6 @@ public class AddHostToVCenter extends BaseWorkflowDelegate
     {
         this.nodeService = nodeService;
         this.repository = repository;
-    }
-
-    private ClusterOperationRequestMessage getClusterOperationRequestMessage(
-            final ComponentEndpointIds componentEndpointIds, final String hostname, final String clusterId,
-            final ESXiCredentialDetails esxiCredentialDetails)
-    {
-        final ClusterOperationRequestMessage requestMessage = new ClusterOperationRequestMessage();
-
-        requestMessage.setCredentials(new Credentials(componentEndpointIds.getEndpointUrl(), null, null));
-        requestMessage.setComponentEndpointIds(new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(
-                componentEndpointIds.getComponentUuid(), componentEndpointIds.getEndpointUuid(),
-                componentEndpointIds.getCredentialUuid()));
-        final ClusterOperationRequest clusterOperationRequest = new ClusterOperationRequest();
-        clusterOperationRequest.setHostName(hostname);
-        clusterOperationRequest.setComponentEndpointIds(
-                new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(
-                        esxiCredentialDetails.getComponentUuid(), esxiCredentialDetails.getEndpointUuid(),
-                        esxiCredentialDetails.getCredentialUuid()));
-        clusterOperationRequest.setClusterOperation(ClusterOperationRequest.ClusterOperation.ADD_HOST);
-        clusterOperationRequest.setClusterID(clusterId);
-        requestMessage.setClusterOperationRequest(clusterOperationRequest);
-        return requestMessage;
     }
 
     @Override

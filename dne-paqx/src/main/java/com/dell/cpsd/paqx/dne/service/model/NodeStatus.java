@@ -11,7 +11,7 @@ public enum NodeStatus {
     FAILED("FAILED"),
     RESERVED("RESERVED");
 
-    private String stateMessage;
+    private final String stateMessage;
     NodeStatus(String stateMsg) {
         stateMessage = stateMsg;
     }

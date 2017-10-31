@@ -19,10 +19,7 @@ import com.dell.cpsd.paqx.dne.service.task.handler.BaseTaskHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Task responsible for configuring obm settings.
@@ -43,7 +40,7 @@ public class ConfigureObmSettingsTaskHandler extends BaseTaskHandler implements 
     /**
      * The <code>NodeService</code> instance
      */
-    private NodeService nodeService;
+    private final NodeService nodeService;
 
     /**
      * The obm services to set

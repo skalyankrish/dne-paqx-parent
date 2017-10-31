@@ -26,7 +26,7 @@ import com.dell.cpsd.virtualization.capabilities.api.VCenterUpdateSoftwareAccept
 public class VCenterUpdateSoftwareAcceptanceResponseAdapter implements
         ServiceCallbackAdapter<VCenterUpdateSoftwareAcceptanceResponseMessage, ServiceResponse<VCenterUpdateSoftwareAcceptanceResponseMessage>>
 {
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public VCenterUpdateSoftwareAcceptanceResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

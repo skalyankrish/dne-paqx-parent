@@ -21,11 +21,11 @@ import java.util.Map;
 public class TaskResponse
 {
 
-    private String              workFlowTaskName;
-    private Status              workFlowTaskStatus;
-    private List<String>        errors;
-    private List<String>        warnings;
-    private Map<String, String> results;
+    private       String              workFlowTaskName;
+    private       Status              workFlowTaskStatus;
+    private final List<String>        errors;
+    private final List<String>        warnings;
+    private       Map<String, String> results;
 
     public TaskResponse()
     {

@@ -46,7 +46,7 @@ public class ScaleIOProtectionDomain
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "protectionDomain", orphanRemoval = true)
-    private List<ScaleIOFaultSet> faultSets = new ArrayList<>();
+    private final List<ScaleIOFaultSet> faultSets = new ArrayList<>();
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "protectionDomain", orphanRemoval = true)
@@ -54,7 +54,7 @@ public class ScaleIOProtectionDomain
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "protectionDomain", orphanRemoval = true)
-    private List<ScaleIOStoragePool> storagePools = new ArrayList<>();
+    private final List<ScaleIOStoragePool> storagePools = new ArrayList<>();
 
     @LazyCollection(LazyCollectionOption.FALSE)
     @ManyToOne(cascade = CascadeType.ALL)

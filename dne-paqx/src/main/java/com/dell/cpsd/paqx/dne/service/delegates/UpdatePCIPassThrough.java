@@ -6,16 +6,9 @@
 
 package com.dell.cpsd.paqx.dne.service.delegates;
 
-import com.dell.cpsd.paqx.dne.domain.Job;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
-import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
-import com.dell.cpsd.paqx.dne.service.model.DeployScaleIoVmTaskResponse;
-import com.dell.cpsd.paqx.dne.service.model.EnablePciPassThroughTaskResponse;
-import com.dell.cpsd.paqx.dne.service.model.InstallEsxiTaskResponse;
-import com.dell.cpsd.virtualization.capabilities.api.Credentials;
-import com.dell.cpsd.virtualization.capabilities.api.UpdatePCIPassthruSVMRequestMessage;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,20 +40,6 @@ public class UpdatePCIPassThrough extends BaseWorkflowDelegate
     {
         this.nodeService = nodeService;
         this.repository = repository;
-    }
-
-    private UpdatePCIPassthruSVMRequestMessage getUpdatePCIPassthruSVMRequestMessage(final String hostname, final String hostPciDeviceId,
-            final String newVMName, final ComponentEndpointIds componentEndpointIds)
-    {
-        final UpdatePCIPassthruSVMRequestMessage requestMessage = new UpdatePCIPassthruSVMRequestMessage();
-        requestMessage.setHostname(hostname);
-        requestMessage.setHostPciDeviceId(hostPciDeviceId);
-        requestMessage.setVmName(newVMName);
-        requestMessage.setCredentials(new Credentials(componentEndpointIds.getEndpointUrl(), null, null));
-        requestMessage.setComponentEndpointIds(
-                new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(componentEndpointIds.getComponentUuid(),
-                        componentEndpointIds.getEndpointUuid(), componentEndpointIds.getCredentialUuid()));
-        return requestMessage;
     }
 
     @Override
@@ -103,95 +82,5 @@ public class UpdatePCIPassThrough extends BaseWorkflowDelegate
 
         LOGGER.info(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
         updateDelegateStatus(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
-    }
-
-    private class Validate
-    {
-        private final Job                  job;
-        private       ComponentEndpointIds componentEndpointIds;
-        private       String               hostname;
-        private       String               hostPciDeviceId;
-        private       String               newVMName;
-
-        Validate(final Job job)
-        {
-            this.job = job;
-        }
-
-        Validate invoke()
-        {
-            componentEndpointIds = repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER");
-
-            if (componentEndpointIds == null)
-            {
-                throw new IllegalStateException("No VCenter components found.");
-            }
-
-            final InstallEsxiTaskResponse installEsxiTaskResponse = (InstallEsxiTaskResponse) job.getTaskResponseMap().get("installEsxi");
-
-            if (installEsxiTaskResponse == null)
-            {
-                throw new IllegalStateException("No Install ESXi task response found");
-            }
-
-            hostname = installEsxiTaskResponse.getHostname();
-
-            if (hostname == null)
-            {
-                throw new IllegalStateException("Host name is null");
-            }
-
-            final EnablePciPassThroughTaskResponse enablePciPassThroughTaskResponse = (EnablePciPassThroughTaskResponse) job
-                    .getTaskResponseMap().get("enablePciPassthroughHost");
-
-            if (enablePciPassThroughTaskResponse == null)
-            {
-                throw new IllegalStateException("Enable PCI Task Response is null");
-            }
-
-            hostPciDeviceId = enablePciPassThroughTaskResponse.getHostPciDeviceId();
-
-            if (hostPciDeviceId == null)
-            {
-                throw new IllegalStateException("Host PCI Device ID is null");
-            }
-
-            final DeployScaleIoVmTaskResponse deployScaleIoVmTaskResponse = (DeployScaleIoVmTaskResponse) job.getTaskResponseMap()
-                    .get("deploySVM");
-
-            if (deployScaleIoVmTaskResponse == null)
-            {
-                throw new IllegalStateException("Deploy ScaleIO VM Task Response is null");
-            }
-
-            newVMName = deployScaleIoVmTaskResponse.getNewVMName();
-
-            if (newVMName == null)
-            {
-                throw new IllegalStateException("New Virtual Machine name is null");
-            }
-
-            return this;
-        }
-
-        ComponentEndpointIds getComponentEndpointIds()
-        {
-            return componentEndpointIds;
-        }
-
-        String getHostname()
-        {
-            return hostname;
-        }
-
-        String getHostPciDeviceId()
-        {
-            return hostPciDeviceId;
-        }
-
-        String getNewVMName()
-        {
-            return newVMName;
-        }
     }
 }

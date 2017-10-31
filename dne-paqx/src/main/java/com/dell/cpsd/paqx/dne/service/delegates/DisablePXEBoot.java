@@ -44,7 +44,7 @@ public class DisablePXEBoot extends BaseWorkflowDelegate
     /**
      * The <code>NodeService</code> instance
      */
-    private NodeService nodeService;
+    private final NodeService nodeService;
 
     /**
      *  SetBootOrderAndDisablePXETaskHandler constructor.

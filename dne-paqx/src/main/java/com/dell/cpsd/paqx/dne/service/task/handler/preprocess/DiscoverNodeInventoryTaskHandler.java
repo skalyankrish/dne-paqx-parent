@@ -40,7 +40,7 @@ public class DiscoverNodeInventoryTaskHandler extends BaseTaskHandler implements
     /*
      * Node Service instance used to find and validate Storage pool entries
      */
-    private NodeService nodeService;
+    private final NodeService nodeService;
 
     /*
      * Reference to H2 repository

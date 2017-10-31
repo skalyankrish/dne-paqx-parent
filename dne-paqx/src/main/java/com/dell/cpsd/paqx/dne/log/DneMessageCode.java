@@ -27,7 +27,7 @@ public enum DneMessageCode
     /*
      * The path to the resource bundle
      */
-    private static ResourceBundle BUNDLE = ResourceBundle.getBundle(DneMessageBundle.class.getName());
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(DneMessageBundle.class.getName());
 
     /*
      * The error code.

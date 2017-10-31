@@ -26,7 +26,7 @@ import com.dell.cpsd.service.common.client.rpc.ServiceCallbackRegistry;
 public class NodeInventoryResponseMessageAdapter
         implements ServiceCallbackAdapter<NodeInventoryResponseMessage, ServiceResponse<NodeInventoryResponseMessage>>
 {
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public NodeInventoryResponseMessageAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

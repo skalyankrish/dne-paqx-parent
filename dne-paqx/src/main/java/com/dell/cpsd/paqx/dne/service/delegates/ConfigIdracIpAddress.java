@@ -31,7 +31,7 @@ public class ConfigIdracIpAddress extends BaseWorkflowDelegate
     /*
      * The <code>NodeService</code> instance
      */
-    private NodeService nodeService;
+    private final NodeService nodeService;
 
     @Autowired
     public ConfigIdracIpAddress(NodeService nodeService)

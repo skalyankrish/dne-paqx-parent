@@ -6,16 +6,9 @@
 
 package com.dell.cpsd.paqx.dne.service.delegates;
 
-import com.dell.cpsd.paqx.dne.domain.scaleio.ScaleIOData;
-import com.dell.cpsd.paqx.dne.domain.scaleio.ScaleIOMdmCluster;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
-import com.dell.cpsd.paqx.dne.service.delegates.model.ESXiCredentialDetails;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
-import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
-import com.dell.cpsd.virtualization.capabilities.api.Credentials;
-import com.dell.cpsd.virtualization.capabilities.api.SoftwareVIBConfigureRequest;
-import com.dell.cpsd.virtualization.capabilities.api.SoftwareVIBConfigureRequestMessage;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
 
@@ -57,84 +46,6 @@ public class ConfigureScaleIOVIB extends BaseWorkflowDelegate
     {
         this.nodeService = nodeService;
         this.repository = repository;
-    }
-
-    private SoftwareVIBConfigureRequestMessage getSoftwareVIBConfigureRequestMessage(
-            final ComponentEndpointIds vCenterComponentEndpointIds, final String hostname,
-            final ESXiCredentialDetails esxiHostComponentEndpointIds, final String ioctlIniGuidStr) throws Exception
-    {
-        final SoftwareVIBConfigureRequestMessage requestMessage = new SoftwareVIBConfigureRequestMessage();
-        requestMessage.setCredentials(new Credentials(vCenterComponentEndpointIds.getEndpointUrl(), null, null));
-        requestMessage.setComponentEndpointIds(new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(
-                vCenterComponentEndpointIds.getComponentUuid(), vCenterComponentEndpointIds.getEndpointUuid(),
-                vCenterComponentEndpointIds.getCredentialUuid()));
-
-        final SoftwareVIBConfigureRequest softwareVIBConfigureRequest = new SoftwareVIBConfigureRequest();
-        softwareVIBConfigureRequest.setHostName(hostname);
-        softwareVIBConfigureRequest.setModuleName(SOFTWARE_VIB_MODULE);
-        softwareVIBConfigureRequest.setModuleOptions(buildModuleOptions(ioctlIniGuidStr));
-        softwareVIBConfigureRequest.setComponentEndpointIds(
-                new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(
-                        esxiHostComponentEndpointIds.getComponentUuid(), esxiHostComponentEndpointIds.getEndpointUuid(),
-                        esxiHostComponentEndpointIds.getCredentialUuid()));
-        requestMessage.setSoftwareVIBConfigureRequest(softwareVIBConfigureRequest);
-        return requestMessage;
-    }
-
-    private String buildModuleOptions(final String ioctlIniGuidStr) throws Exception
-    {
-        try
-        {
-            final ScaleIOData scaleIOData = repository.getScaleIoData();
-
-            if (scaleIOData == null)
-            {
-                throw new Exception("ScaleIO Data is null");
-            }
-
-            final Set<String> mdmIpList = new HashSet<>();
-
-            final ScaleIOMdmCluster scaleIOMdmCluster = scaleIOData.getMdmCluster();
-            if (scaleIOMdmCluster != null)
-            {
-                // Scan the master element info the ips
-                scaleIOMdmCluster.getMasterElementInfo().stream().filter(Objects::nonNull).forEach(
-                        scaleIOSDSElementInfo -> scaleIOSDSElementInfo.getIps().forEach(scaleIOIP -> {
-                            if (!scaleIOIP.getSdsElementInfo().getRole().equalsIgnoreCase("TieBreaker"))
-                            {
-                                mdmIpList.add(scaleIOIP.getIp());
-                            }
-                        }));
-
-                // Scan the slave element info for ips
-                scaleIOMdmCluster.getSlaveElementInfo().stream().filter(Objects::nonNull).forEach(
-                        scaleIOSDSElementInfo -> scaleIOSDSElementInfo.getIps().forEach(scaleIOIP -> {
-                            if (!scaleIOIP.getSdsElementInfo().getRole().equalsIgnoreCase("TieBreaker"))
-                            {
-                                mdmIpList.add(scaleIOIP.getIp());
-                            }
-                        }));
-            }
-
-            final StringBuilder builder = new StringBuilder();
-            builder.append(IOCTL_INI_GUID_STRING);
-            builder.append(EQUALS_STRING);
-
-            LOGGER.info("IoctlIniGuidStr is [{}]", ioctlIniGuidStr);
-
-            builder.append(ioctlIniGuidStr);
-            builder.append(SPACE_STRING);
-            builder.append(IOCTL_MDM_IP_STRING);
-            builder.append(EQUALS_STRING);
-            builder.append(String.join(COMMA_DELIMITER, mdmIpList));
-
-            return builder.toString();
-
-        }
-        catch (Exception exception)
-        {
-            throw new Exception("Exception occurred", exception);
-        }
     }
 
     @Override

@@ -20,7 +20,7 @@ public class Node implements Serializable {
         this.name = n;
     }
 
-    String name;
+    private String name;
     public Node(String n) {
         name = n;
     }

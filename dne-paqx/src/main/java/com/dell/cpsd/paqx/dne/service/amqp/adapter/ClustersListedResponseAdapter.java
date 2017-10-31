@@ -19,7 +19,7 @@ import com.dell.cpsd.virtualization.capabilities.api.DiscoverClusterResponseInfo
  */
 public class ClustersListedResponseAdapter implements ServiceCallbackAdapter<DiscoverClusterResponseInfoMessage, ServiceResponse<DiscoverClusterResponseInfoMessage>>
 {
-    private ServiceCallbackRegistry serviceCallbackRegistry;
+    private final ServiceCallbackRegistry serviceCallbackRegistry;
 
     public ClustersListedResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry)
     {

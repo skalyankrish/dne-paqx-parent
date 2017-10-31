@@ -9,10 +9,6 @@ package com.dell.cpsd.paqx.dne.service.delegates;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
-import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
-import com.dell.cpsd.virtualization.capabilities.api.Credentials;
-import com.dell.cpsd.virtualization.capabilities.api.SoftwareVIBRequest;
-import com.dell.cpsd.virtualization.capabilities.api.SoftwareVIBRequestMessage;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +18,6 @@ import org.springframework.stereotype.Component;
 
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.HOSTNAME;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
-import static java.util.Collections.singletonList;
 
 @Component
 @Scope("prototype")
@@ -62,22 +57,6 @@ public class InstallScaleIoVib extends BaseWorkflowDelegate
         this.nodeService = nodeService;
         this.repository = repository;
         this.sdcVibRemoteUrl = sdcVibRemoteUrl;
-    }
-
-    private SoftwareVIBRequestMessage getSoftwareVIBRequestMessage(final ComponentEndpointIds componentEndpointIds,
-                                                                   final String hostname)
-    {
-        final SoftwareVIBRequestMessage requestMessage = new SoftwareVIBRequestMessage();
-        final SoftwareVIBRequest softwareVIBRequest = new SoftwareVIBRequest();
-        softwareVIBRequest.setVibOperation(SoftwareVIBRequest.VibOperation.INSTALL);
-        softwareVIBRequest.setHostName(hostname);
-        softwareVIBRequest.setVibUrls(singletonList(sdcVibRemoteUrl));
-        requestMessage.setSoftwareVibInstallRequest(softwareVIBRequest);
-        requestMessage.setCredentials(new Credentials(componentEndpointIds.getEndpointUrl(), null, null));
-        requestMessage.setComponentEndpointIds(new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(
-                componentEndpointIds.getComponentUuid(), componentEndpointIds.getEndpointUuid(),
-                componentEndpointIds.getCredentialUuid()));
-        return requestMessage;
     }
 
     @Override
