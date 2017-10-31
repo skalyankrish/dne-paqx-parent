@@ -89,7 +89,7 @@ public class AddNodeService extends BaseService implements IAddNodeService
     private String sdcVibUrl;
 
     private static final long DEPLOY_SVM_WAIT_TIME              = TimeUnit.SECONDS.toMillis(30L);
-    private static final long CHANGE_SVM_CREDENTIALS_WAIT_TIME  = TimeUnit.SECONDS.toMillis(60L);
+    private static final long CHANGE_SVM_CREDENTIALS_WAIT_TIME  = TimeUnit.SECONDS.toMillis(75L);
     private static final long SDC_PERF_PROFILE_UPDATE_WAIT_TIME = TimeUnit.SECONDS.toMillis(15L);
     private static final long ESXI_HOST_PING_TIMEOUT            = TimeUnit.SECONDS.toMillis(240L);
 
