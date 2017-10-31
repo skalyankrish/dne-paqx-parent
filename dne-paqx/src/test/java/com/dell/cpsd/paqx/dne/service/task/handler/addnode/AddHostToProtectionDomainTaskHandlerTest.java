@@ -5,6 +5,7 @@ import com.dell.cpsd.paqx.dne.domain.WorkflowTask;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.model.*;
+import com.dell.cpsd.service.engineering.standards.DeviceAssignment;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +13,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -66,9 +69,14 @@ public class AddHostToProtectionDomainTaskHandlerTest
 
     private static final String protectionDomainId = "756edc5b00000000";
 
+    private static final String protectionDomainName = "protectionDomainName1";
+
     private static final String scaleIoData1SvmIpAddress = "192.168.152.24";
 
     private static final String scaleIoData2SvmIpAddress = "192.168.160.24";
+
+    private Map<String, DeviceAssignment> deviceAssignmentpool =  new HashMap<>();
+
 
     private static final String endpointUrl = "10.10.20.30";
 
@@ -78,6 +86,10 @@ public class AddHostToProtectionDomainTaskHandlerTest
     public void setUp() throws Exception
     {
         this.handler = spy(new AddHostToProtectionDomainTaskHandler(this.service, this.repository));
+        deviceAssignmentpool.put("Device1",new DeviceAssignment("Device1","serialNumber1","logicalName1",
+                "deviceName1","storagePoolId1","storagePoolName1"));
+        deviceAssignmentpool.put("Device2",new DeviceAssignment("Device2","serialNumber2","logicalName2",
+                "deviceName2","storagePoolId1","storagePoolName1"));
     }
 
     @Test
@@ -86,9 +98,11 @@ public class AddHostToProtectionDomainTaskHandlerTest
         doReturn(this.response).when(this.handler).initializeResponse(this.job);
         doReturn(this.inputParams).when(this.job).getInputParams();
         when(this.inputParams.getProtectionDomainId()).thenReturn(this.protectionDomainId);
+        when(this.inputParams.getProtectionDomainName()).thenReturn(this.protectionDomainName);
         when(this.inputParams.getEsxiManagementHostname()).thenReturn(this.esxiManagementHostname);
         when(this.inputParams.getScaleIoData1SvmIpAddress()).thenReturn(this.scaleIoData1SvmIpAddress);
         when(this.inputParams.getScaleIoData2SvmIpAddress()).thenReturn(this.scaleIoData2SvmIpAddress);
+        when(this.inputParams.getDeviceToDeviceStoragePool()).thenReturn(this.deviceAssignmentpool);
         doReturn(this.componentEndpointIds).when(this.repository).getComponentEndpointIds(anyString());
         when(this.componentEndpointIds.getEndpointUrl()).thenReturn(this.endpointUrl);
         when(this.service.requestAddHostToProtectionDomain(any())).thenReturn(true);
@@ -97,6 +111,9 @@ public class AddHostToProtectionDomainTaskHandlerTest
 
         assertThat(result, is(true));
         verify(this.response).setWorkFlowTaskStatus(Status.SUCCEEDED);
+        verify(this.response).setProtectionDomainId("756edc5b00000000");
+        verify(this.response).setProtectionDomainName("protectionDomainName1");
+        verify(this.response).setStoragePoolDetails(deviceAssignmentpool);
         verify(this.response, never()).addError(anyString());
     }
 
@@ -106,9 +123,11 @@ public class AddHostToProtectionDomainTaskHandlerTest
         doReturn(this.response).when(this.handler).initializeResponse(this.job);
         doReturn(this.inputParams).when(this.job).getInputParams();
         when(this.inputParams.getProtectionDomainId()).thenReturn(this.protectionDomainId);
+        when(this.inputParams.getProtectionDomainName()).thenReturn(this.protectionDomainName);
         when(this.inputParams.getEsxiManagementIpAddress()).thenReturn(this.esxiManagementIpAddress);
         when(this.inputParams.getScaleIoData1SvmIpAddress()).thenReturn(this.scaleIoData1SvmIpAddress);
         when(this.inputParams.getScaleIoData2SvmIpAddress()).thenReturn(this.scaleIoData2SvmIpAddress);
+        when(this.inputParams.getDeviceToDeviceStoragePool()).thenReturn(this.deviceAssignmentpool);
         doReturn(this.componentEndpointIds).when(this.repository).getComponentEndpointIds(anyString());
         when(this.componentEndpointIds.getEndpointUrl()).thenReturn(this.endpointUrl);
         when(this.service.requestAddHostToProtectionDomain(any())).thenReturn(true);
@@ -117,6 +136,9 @@ public class AddHostToProtectionDomainTaskHandlerTest
 
         assertThat(result, is(true));
         verify(this.response).setWorkFlowTaskStatus(Status.SUCCEEDED);
+        verify(this.response).setProtectionDomainId("756edc5b00000000");
+        verify(this.response).setProtectionDomainName("protectionDomainName1");
+        verify(this.response).setStoragePoolDetails(deviceAssignmentpool);
         verify(this.response, never()).addError(anyString());
     }
 

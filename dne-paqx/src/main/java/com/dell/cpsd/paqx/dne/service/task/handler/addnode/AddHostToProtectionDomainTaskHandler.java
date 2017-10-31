@@ -10,9 +10,9 @@ import com.dell.cpsd.paqx.dne.domain.IWorkflowTaskHandler;
 import com.dell.cpsd.paqx.dne.domain.Job;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
+import com.dell.cpsd.paqx.dne.service.model.AddHostToProtectionDomainResponse;
 import com.dell.cpsd.paqx.dne.service.model.NodeExpansionRequest;
 import com.dell.cpsd.paqx.dne.service.model.Status;
-import com.dell.cpsd.paqx.dne.service.model.TaskResponse;
 import com.dell.cpsd.paqx.dne.service.task.handler.BaseTaskHandler;
 import com.dell.cpsd.service.engineering.standards.DeviceAssignment;
 import com.dell.cpsd.storage.capabilities.api.AddHostToProtectionDomainRequestMessage;
@@ -62,7 +62,7 @@ public class AddHostToProtectionDomainTaskHandler extends BaseTaskHandler implem
     public boolean executeTask(final Job job)
     {
         LOGGER.info("Execute AddHostToProtectionDomain task");
-        TaskResponse response = initializeResponse(job);
+        AddHostToProtectionDomainResponse response = initializeResponse(job);
 
         try{
             AddHostToProtectionDomainRequestMessage requestMessage = new AddHostToProtectionDomainRequestMessage();
@@ -72,6 +72,7 @@ public class AddHostToProtectionDomainTaskHandler extends BaseTaskHandler implem
              */
             final NodeExpansionRequest inputParams = job.getInputParams();
             final String protectionDomainId = inputParams.getProtectionDomainId();
+            final Map<String, DeviceAssignment> deviceToDeviceStoragePoolAssignment = inputParams.getDeviceToDeviceStoragePool();
 
             if (protectionDomainId == null)
             {
@@ -88,7 +89,7 @@ public class AddHostToProtectionDomainTaskHandler extends BaseTaskHandler implem
              */
             List<SdsIp> sdsIpList = createSdsIps(job);
 
-            List<DeviceInfo> deviceInfoList = createDeviceInfoList(job);
+            List<DeviceInfo> deviceInfoList = createDeviceInfoList(deviceToDeviceStoragePoolAssignment);
 
             final com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds componentEndpointIds = repository.getComponentEndpointIds("SCALEIO-CLUSTER");
 
@@ -100,7 +101,7 @@ public class AddHostToProtectionDomainTaskHandler extends BaseTaskHandler implem
             componentEndpoints.setComponentUuid(componentEndpointIds.getComponentUuid());
             componentEndpoints.setCredentialUuid(componentEndpointIds.getCredentialUuid());
 
-            HostToProtectionDomain hostToProtectionDomain = setHostToProtectionDomain(protectionDomainId, name, sdsIpList, deviceInfoList);
+            HostToProtectionDomain hostToProtectionDomain = createHostToProtectionDomain(protectionDomainId, name, sdsIpList, deviceInfoList);
 
             /**
              * Adding the endpoint url
@@ -119,7 +120,9 @@ public class AddHostToProtectionDomainTaskHandler extends BaseTaskHandler implem
                 throw new IllegalStateException("Request add host to protection domain failed");
             }
             response.setWorkFlowTaskStatus(Status.SUCCEEDED);
-
+            response.setProtectionDomainId(protectionDomainId);
+            response.setProtectionDomainName(inputParams.getProtectionDomainName());
+            response.setStoragePoolDetails(deviceToDeviceStoragePoolAssignment);
             return true;
         }
         catch(Exception e)
@@ -140,8 +143,8 @@ public class AddHostToProtectionDomainTaskHandler extends BaseTaskHandler implem
      * @param deviceInfoList
      * @return
      */
-    private HostToProtectionDomain setHostToProtectionDomain(String protectionDomain, String name, List<SdsIp> sdsIpList,
-            final List<DeviceInfo> deviceInfoList) {
+    private HostToProtectionDomain createHostToProtectionDomain(String protectionDomain, String name, List<SdsIp> sdsIpList, final List<DeviceInfo> deviceInfoList)
+    {
         /**
          * Creating the request message
          */
@@ -197,10 +200,9 @@ public class AddHostToProtectionDomainTaskHandler extends BaseTaskHandler implem
         return sdsIpList;
     }
 
-    private List<DeviceInfo> createDeviceInfoList(Job job) {
+    private List<DeviceInfo> createDeviceInfoList(Map<String, DeviceAssignment> deviceToDeviceStoragePoolAssignment) {
 
         List<DeviceInfo> returnVal=null;
-        Map<String, DeviceAssignment> deviceToDeviceStoragePoolAssignment = job.getInputParams().getDeviceToDeviceStoragePool();
 
         if (deviceToDeviceStoragePoolAssignment != null)
         {
@@ -211,5 +213,13 @@ public class AddHostToProtectionDomainTaskHandler extends BaseTaskHandler implem
                     .map(ddspa -> new DeviceInfo(ddspa.getLogicalName(), ddspa.getStoragePoolId(), null)).collect(Collectors.toList());
         }
         return returnVal;
+    }
+
+    @Override
+    public AddHostToProtectionDomainResponse initializeResponse(Job job)
+    {
+        final AddHostToProtectionDomainResponse response = new AddHostToProtectionDomainResponse();
+        setupResponse(job, response);
+        return response;
     }
 }
