@@ -22,6 +22,8 @@ import com.dell.cpsd.paqx.dne.service.model.Status;
 import com.dell.cpsd.paqx.dne.service.model.TaskResponse;
 import com.dell.cpsd.paqx.dne.service.model.ValidateProtectionDomainResponse;
 import com.dell.cpsd.paqx.dne.service.task.handler.BaseTaskHandler;
+import com.dell.cpsd.service.common.client.exception.ServiceExecutionException;
+import com.dell.cpsd.service.common.client.exception.ServiceTimeoutException;
 import com.dell.cpsd.service.engineering.standards.EssValidateProtectionDomainsRequestMessage;
 import com.dell.cpsd.service.engineering.standards.EssValidateProtectionDomainsResponseMessage;
 import com.dell.cpsd.service.engineering.standards.NodeData;
@@ -135,28 +137,11 @@ public class FindProtectionDomainTaskHandler extends BaseTaskHandler implements 
             }
             else
             {
-                //Create a New Protection Domain
-                final ComponentEndpointIds componentEndpointIds = repository.getComponentEndpointIds(COMPONENT_TYPE);
-
-                if (componentEndpointIds == null)
-                {
-                    LOGGER.error("No Component Endpoint Ids Found for ScaleIO Cluster");
-                    throw new IllegalStateException("No Component Endpoint Ids Found for ScaleIO Cluster");
-                }
-
-                final CreateProtectionDomainRequestMessage createProtectionDomainRequestMessage = new CreateProtectionDomainRequestMessage();
-                final String protectionDomainName = buildCreateProtectionDomainRequestMessage(componentEndpointIds,
-                        createProtectionDomainRequestMessage);
-
-                final String protectionDomainId = nodeService.createProtectionDomain(createProtectionDomainRequestMessage);
-
-                if (StringUtils.isEmpty(protectionDomainId))
-                {
-                    throw new IllegalStateException("Unable to Create Protection Domain with name: " + protectionDomainName);
-                }
-
-                response.setProtectionDomainName(protectionDomainName);
-                response.setProtectionDomainId(protectionDomainId);
+                //createProtectionDomain(job, response, scaleIo); //Disabled creation of new protection domain ESTS-136904
+                LOGGER.error("No protection domain found. Creation of protection domain is not required.");
+                response.addError("No valid protection domain found.");
+                response.setWorkFlowTaskStatus(Status.FAILED);
+                return false;
             }
 
             response.setWorkFlowTaskStatus(Status.SUCCEEDED);
@@ -171,6 +156,36 @@ public class FindProtectionDomainTaskHandler extends BaseTaskHandler implements 
 
         response.setWorkFlowTaskStatus(Status.FAILED);
         return false;
+    }
+
+    private void createProtectionDomain(Job job, FindProtectionDomainTaskResponse response, ScaleIOData scaleIo) throws ServiceTimeoutException, ServiceExecutionException {
+        //Create a New Protection Domain
+        final ComponentEndpointIds componentEndpointIds = repository.getComponentEndpointIds(COMPONENT_TYPE);
+
+        if (componentEndpointIds == null)
+        {
+            LOGGER.error("No Component Endpoint Ids Found for ScaleIO Cluster");
+            throw new IllegalStateException("No Component Endpoint Ids Found for ScaleIO Cluster");
+        }
+
+        final CreateProtectionDomainRequestMessage createProtectionDomainRequestMessage = new CreateProtectionDomainRequestMessage();
+        final String protectionDomainName = buildCreateProtectionDomainRequestMessage(componentEndpointIds,
+                createProtectionDomainRequestMessage);
+
+        final String protectionDomainId = nodeService.createProtectionDomain(createProtectionDomainRequestMessage);
+
+        if (StringUtils.isEmpty(protectionDomainId))
+        {
+            throw new IllegalStateException("Unable to Create Protection Domain with name: " + protectionDomainName);
+        }
+
+        //save the protection domain in H2 database so that it is available in the next task in the workflow
+        ScaleIOProtectionDomain newScaleIOProtectionDomain = repository.createProtectionDomain(job.getId().toString(),protectionDomainId, protectionDomainName);
+        scaleIo.addProtectionDomain(newScaleIOProtectionDomain);
+
+        response.setResults(buildResponseResult(protectionDomainId,protectionDomainName));
+        response.setProtectionDomainName(protectionDomainName);
+        response.setProtectionDomainId(protectionDomainId);
     }
 
     private String buildCreateProtectionDomainRequestMessage(final ComponentEndpointIds componentEndpointIds,
@@ -234,7 +249,7 @@ public class FindProtectionDomainTaskHandler extends BaseTaskHandler implements 
         validateProtectionDomainResponse
                 .setProtectionDomainName(protectionDomainNameList.size() == 1 ? protectionDomainList.get(0).getName() : protectionDomainId);
         validateProtectionDomainResponse.setProtectionDomainId(protectionDomainId);
-        response.setResults(buildResponseResult(validateProtectionDomainResponse));
+        response.setResults(buildResponseResult(validateProtectionDomainResponse.getProtectionDomainId(), validateProtectionDomainResponse.getProtectionDomainName()));
         response.setProtectionDomainId(validateProtectionDomainResponse.getProtectionDomainId());
         response.setProtectionDomainName(validateProtectionDomainResponse.getProtectionDomainName());
     }
@@ -277,22 +292,11 @@ public class FindProtectionDomainTaskHandler extends BaseTaskHandler implements 
         scaleIODataServers.add(scaleIODataServer);
     }
 
-    private Map<String, String> buildResponseResult(ValidateProtectionDomainResponse validateProtectionDomainResponse)
+    private Map<String, String> buildResponseResult(String protectionDomainId, String protectionDomainName)
     {
         final Map<String, String> result = new HashMap<>();
-
-        if (validateProtectionDomainResponse != null)
-        {
-            if (validateProtectionDomainResponse.getProtectionDomainName() != null)
-            {
-                result.put("protectionDomainName", validateProtectionDomainResponse.getProtectionDomainName());
-            }
-
-            if (validateProtectionDomainResponse.getProtectionDomainId() != null)
-            {
-                result.put("protectionDomainId", validateProtectionDomainResponse.getProtectionDomainId());
-            }
-        }
+        result.put("protectionDomainName", protectionDomainName);
+        result.put("protectionDomainId", protectionDomainId);
 
         return result;
     }

@@ -178,21 +178,12 @@ public class FindProtectionDomainTaskHandlerTest
     {
         doReturn(this.findProtectionDomainTaskResponse).when(this.handler).initializeResponse(any());
         doReturn(Collections.emptyList()).when(this.essValidateProtectionDomainsResponseMessage).getValidProtectionDomains();
-        doReturn(this.componentEndpointIds).when(this.repository).getComponentEndpointIds(anyString());
-        doReturn("1.2.3.4").when(this.componentEndpointIds).getEndpointUrl();
-        doReturn("component-id-1").when(this.componentEndpointIds).getComponentUuid();
-        doReturn("endpoint-id-1").when(this.componentEndpointIds).getEndpointUuid();
-        doReturn("credential-id-1").when(this.componentEndpointIds).getCredentialUuid();
-        doReturn(this.protectionDomainId).when(this.nodeService).createProtectionDomain(any());
 
         final boolean result = this.handler.executeTask(this.job);
 
-        assertTrue(result);
-        verify(this.findProtectionDomainTaskResponse).setWorkFlowTaskStatus(Status.SUCCEEDED);
-        verify(this.findProtectionDomainTaskResponse, never()).addError(anyString());
-        ArgumentCaptor<String> setProtectionDomainIdCaptor = ArgumentCaptor.forClass(String.class);
-        verify(this.findProtectionDomainTaskResponse).setProtectionDomainId(setProtectionDomainIdCaptor.capture());
-        verify(this.findProtectionDomainTaskResponse).setProtectionDomainName(anyString());
+        assertFalse(result);
+        verify(this.findProtectionDomainTaskResponse).setWorkFlowTaskStatus(Status.FAILED);
+        verify(this.findProtectionDomainTaskResponse).addError(anyString());
     }
 
     @Test
@@ -200,12 +191,6 @@ public class FindProtectionDomainTaskHandlerTest
     {
         doReturn(this.findProtectionDomainTaskResponse).when(this.handler).initializeResponse(any());
         doReturn(Collections.emptyList()).when(this.essValidateProtectionDomainsResponseMessage).getValidProtectionDomains();
-        doReturn(this.componentEndpointIds).when(this.repository).getComponentEndpointIds(anyString());
-        doReturn("1.2.3.4").when(this.componentEndpointIds).getEndpointUrl();
-        doReturn("component-id-1").when(this.componentEndpointIds).getComponentUuid();
-        doReturn("endpoint-id-1").when(this.componentEndpointIds).getEndpointUuid();
-        doReturn("credential-id-1").when(this.componentEndpointIds).getCredentialUuid();
-        doReturn(null).when(this.nodeService).createProtectionDomain(any());
 
         final boolean result = this.handler.executeTask(this.job);
 
@@ -221,7 +206,6 @@ public class FindProtectionDomainTaskHandlerTest
     {
         doReturn(this.findProtectionDomainTaskResponse).when(this.handler).initializeResponse(any());
         doReturn(Collections.emptyList()).when(this.essValidateProtectionDomainsResponseMessage).getValidProtectionDomains();
-        doReturn(null).when(this.repository).getComponentEndpointIds(anyString());
 
         final boolean result = this.handler.executeTask(this.job);
 

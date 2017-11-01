@@ -117,5 +117,7 @@ public interface DataServiceRepository
 
     ScaleIOStoragePool createStoragePool(String proptectionDomainId, String storagePoolId, String storagePoolName);
 
+    ScaleIOProtectionDomain createProtectionDomain(String jobId, String protectionDomainId, String protectionDomainName);
+
     boolean cleanInMemoryDatabase();
 }

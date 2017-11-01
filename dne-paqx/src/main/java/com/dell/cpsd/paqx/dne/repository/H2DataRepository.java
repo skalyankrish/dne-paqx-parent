@@ -818,6 +818,31 @@ public class H2DataRepository implements DataServiceRepository
 
     @Override
     @Transactional
+    public ScaleIOProtectionDomain createProtectionDomain(String jobId, String protectionDomainId, String protectionDomainName)
+    {
+        ScaleIOData scaleIOData = getScaleIoDataByJobId(jobId);
+
+        try
+        {
+            final ScaleIOProtectionDomain protectionDomain = new ScaleIOProtectionDomain(protectionDomainId, protectionDomainName, "Active");
+            scaleIOData.addProtectionDomain(protectionDomain);
+
+            entityManager.merge(protectionDomain);
+
+            entityManager.flush();
+
+            return protectionDomain;
+
+        }
+        catch (Exception e)
+        {
+            LOG.error("Error creating protection domain. ", e);
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional
     public ScaleIOStoragePool createStoragePool(String proptectionDomainId, String storagePoolId, String storagePoolName)
     {
         final TypedQuery<ScaleIOProtectionDomain> protectionDomainTypedQuery = entityManager
