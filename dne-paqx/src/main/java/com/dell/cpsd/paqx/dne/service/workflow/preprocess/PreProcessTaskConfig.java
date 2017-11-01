@@ -30,6 +30,7 @@ public class PreProcessTaskConfig {
         final Map<String, Step> workflowSteps = new HashMap<>();
 
         addWorkflowSteps(workflowSteps,
+                "cleanInMemoryDatabase",
                 "listScaleIoComponents",
                 "listVCenterComponents",
                 "discoverScaleIo",

@@ -116,4 +116,6 @@ public interface DataServiceRepository
     Map<String, String> getScaleIoNetworkNames(Map<String, String> switchNames);
 
     ScaleIOStoragePool createStoragePool(String proptectionDomainId, String storagePoolId, String storagePoolName);
+
+    boolean cleanInMemoryDatabase();
 }

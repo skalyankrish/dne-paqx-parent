@@ -816,7 +816,6 @@ public class H2DataRepository implements DataServiceRepository
         return query.getResultList();
     }
 
-
     @Override
     @Transactional
     public ScaleIOStoragePool createStoragePool(String proptectionDomainId, String storagePoolId, String storagePoolName)
@@ -839,12 +838,27 @@ public class H2DataRepository implements DataServiceRepository
             entityManager.merge(protectionDomain);
 
             entityManager.flush();
-
         }
         catch (Exception e)
         {
             LOG.error("Error creating storage pool record. ", e);
         }
         return storagePool;
+    }
+
+    @Override
+    @Transactional
+    public boolean cleanInMemoryDatabase()
+    {
+        final TypedQuery<DneJob> query = entityManager.createQuery("select dne from DneJob as dne", DneJob.class);
+
+        List<DneJob> dneJobs = query.getResultList();
+        if (!CollectionUtils.isEmpty(dneJobs))
+        {
+            entityManager.remove(dneJobs.get(0));
+            entityManager.flush();
+        }
+
+        return true;
     }
 }
