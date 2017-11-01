@@ -41,11 +41,6 @@ pipeline {
                 doCheckout()
             }
         }
-        stage('Fortify Scan') {
-            steps {
-                runFortifyScan()
-            }
-        }
         stage("Build") {
             steps {
                 script {
@@ -65,6 +60,11 @@ pipeline {
         stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: '**/*.rpm', fingerprint: true 
+            }
+        }
+        stage('Fortify Scan') {
+            steps {
+                runFortifyScan()
             }
         }
         stage('Upload to Repo') {
