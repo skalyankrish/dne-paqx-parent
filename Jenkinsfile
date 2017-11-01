@@ -52,6 +52,11 @@ pipeline {
                 }
             }
         }
+        stage('Fortify Scan') {
+            steps {
+                runFortifyScan()
+            }
+        }
         stage('Record Test Results') {
             steps {
                 junit '**/target/*-reports/*.xml'
@@ -60,11 +65,6 @@ pipeline {
         stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: '**/*.rpm', fingerprint: true 
-            }
-        }
-        stage('Fortify Scan') {
-            steps {
-                runFortifyScan()
             }
         }
         stage('Upload to Repo') {
