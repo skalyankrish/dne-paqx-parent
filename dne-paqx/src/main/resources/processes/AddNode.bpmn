@@ -299,7 +299,7 @@
       </bpmn:boundaryEvent>
       <bpmn:endEvent id="EndEvent_1f8cjl5">
         <bpmn:incoming>SequenceFlow_0xli1hi</bpmn:incoming>
-        <bpmn:errorEventDefinition />
+
       </bpmn:endEvent>
       <bpmn:sequenceFlow id="SequenceFlow_0xli1hi" sourceRef="sendConfigureBootDeviceError" targetRef="EndEvent_1f8cjl5" />
     </bpmn:subProcess>
