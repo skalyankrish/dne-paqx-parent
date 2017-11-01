@@ -52,6 +52,7 @@ public class DelegateConstants
     public static final String ADD_HOST_TO_DV_SWITCH_FAILED = "Add-Host-To-DV-Switch-Failed";
     public static final String VERIFY_NODE_DETAIL_FAILED = "Verify-Node-Detail-Failed";
     public static final String VERIFY_NODES_SELECTED_FAILED = "Verify-Nodes-Selected-Failed";
+    public static final String SEND_CONFIGURE_BOOT_DEVICE_FAILED = "Send-Configure-Boot-Device-Failed";
 
     public static final String DELEGATE_STATUS_VARIABLE = "processStatusLogs";
     public static final String FAILED = "Failed";

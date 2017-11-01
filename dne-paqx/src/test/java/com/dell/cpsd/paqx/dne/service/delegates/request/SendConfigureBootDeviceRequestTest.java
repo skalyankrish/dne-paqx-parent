@@ -70,7 +70,7 @@ public class SendConfigureBootDeviceRequestTest
             sendConfigureBootDeviceRequest.delegateExecute(delegateExecution);
             fail("An exception was expected.");
         } catch (BpmnError error) {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.CONFIGURE_BOOT_DEVICE_FAILED));
+            assertTrue(error.getErrorCode().equals(DelegateConstants.SEND_CONFIGURE_BOOT_DEVICE_FAILED));
             assertTrue(error.getMessage().equals("Failed to send the request for to Configure Boot Device on Node abc"));
         }
 
