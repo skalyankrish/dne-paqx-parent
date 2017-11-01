@@ -295,6 +295,9 @@ public class DiscoveryInfoToVCenterDomainTransformer
             }
             else if (model.contains("R7")){
                 returnVal.setType(TWO_RACK_UNIT);
+            } else {
+                //Set to empty string
+                returnVal.setType("");
             }
         }
 

@@ -300,23 +300,35 @@ public class FindProtectionDomainTaskHandler extends BaseTaskHandler implements 
     private String getHostType(ScaleIOSDS scaleIOSDS, List<Host> hosts)
     {
         String type = null;
+        String hostDomain = repository.getDomainName(); //getting the host domain
+
+        String scaleIoName = scaleIOSDS.getName();
+        if (scaleIoName.endsWith("-ESX"))
+        {
+            scaleIoName = scaleIoName.substring(0, scaleIoName.length() - 4);
+        }
 
         for (Host host : hosts)
         {
-            String scaleIoName = scaleIOSDS.getName();
-            if (scaleIoName.endsWith("-ESX"))
-            {
-                scaleIoName = scaleIoName.substring(0, scaleIoName.length() - 4);
-            }
-
             String hostName = host.getName();
             if (scaleIoName.equals(hostName))
             {
                 type = host.getType();
+                break;
             }
             else
             {
-                LOGGER.warn("ScaleIO Sds name does not match with Host name");
+                //Try to find appending the domain
+                String scaleIoNameWithDomain = scaleIoName + "." + hostDomain;
+                if (scaleIoNameWithDomain.equals(hostName))
+                {
+                    type = host.getType();
+                    break;
+                }
+                else
+                {
+                    LOGGER.warn("ScaleIO Sds name does not match with Host name");
+                }
             }
         }
 

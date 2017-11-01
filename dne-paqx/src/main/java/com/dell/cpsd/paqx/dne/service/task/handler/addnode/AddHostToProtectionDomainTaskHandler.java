@@ -162,12 +162,21 @@ public class AddHostToProtectionDomainTaskHandler extends BaseTaskHandler implem
      * @param job
      * @return
      */
-    private String getSdsName(Job job) {
+    private String getSdsName(Job job)
+    {
         String name = null;
-        if (job.getInputParams().getEsxiManagementHostname() != null){
-            name = (job.getInputParams().getEsxiManagementHostname() + "-ESX");
+        if (job.getInputParams().getEsxiManagementHostname() != null)
+        {
+            String hostDomain = repository.getDomainName();
+            String esxiManagementHostname = job.getInputParams().getEsxiManagementHostname();
+            if (!esxiManagementHostname.contains(hostDomain))
+            {
+                esxiManagementHostname = esxiManagementHostname + "." + hostDomain;
+            }
+            name = (esxiManagementHostname + "-ESX");
         }
-        else if (job.getInputParams().getEsxiManagementIpAddress() != null){
+        else if (job.getInputParams().getEsxiManagementIpAddress() != null)
+        {
             name = (job.getInputParams().getEsxiManagementIpAddress() + "-ESX");
         }
         return name;

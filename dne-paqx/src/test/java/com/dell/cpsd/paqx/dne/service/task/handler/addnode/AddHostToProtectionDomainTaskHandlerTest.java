@@ -1,3 +1,4 @@
+
 package com.dell.cpsd.paqx.dne.service.task.handler.addnode;
 
 import com.dell.cpsd.paqx.dne.domain.Job;
@@ -10,12 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -67,6 +65,8 @@ public class AddHostToProtectionDomainTaskHandlerTest
 
     private static final String esxiManagementHostname = "fpr1-h17.lab.vce.com";
 
+    private static final String hostDomain = "lab.vce.com";
+
     private static final String protectionDomainId = "756edc5b00000000";
 
     private static final String protectionDomainName = "protectionDomainName1";
@@ -104,6 +104,7 @@ public class AddHostToProtectionDomainTaskHandlerTest
         when(this.inputParams.getScaleIoData2SvmIpAddress()).thenReturn(this.scaleIoData2SvmIpAddress);
         when(this.inputParams.getDeviceToDeviceStoragePool()).thenReturn(this.deviceAssignmentpool);
         doReturn(this.componentEndpointIds).when(this.repository).getComponentEndpointIds(anyString());
+        doReturn(this.hostDomain).when(this.repository).getDomainName();
         when(this.componentEndpointIds.getEndpointUrl()).thenReturn(this.endpointUrl);
         when(this.service.requestAddHostToProtectionDomain(any())).thenReturn(true);
 
@@ -174,6 +175,7 @@ public class AddHostToProtectionDomainTaskHandlerTest
         when(this.inputParams.getScaleIoData1SvmIpAddress()).thenReturn(this.scaleIoData1SvmIpAddress);
         when(this.inputParams.getScaleIoData2SvmIpAddress()).thenReturn(this.scaleIoData2SvmIpAddress);
         doReturn(nullComponentEndpointIds).when(this.repository).getComponentEndpointIds(anyString());
+        doReturn(this.hostDomain).when(this.repository).getDomainName();
 
         boolean result = this.handler.executeTask(this.job);
 
