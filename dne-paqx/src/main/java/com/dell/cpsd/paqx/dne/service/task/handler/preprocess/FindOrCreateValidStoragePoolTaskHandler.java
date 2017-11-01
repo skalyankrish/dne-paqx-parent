@@ -14,6 +14,7 @@ import com.dell.cpsd.paqx.dne.domain.scaleio.ScaleIOStoragePool;
 import com.dell.cpsd.paqx.dne.domain.vcenter.HostStorageDevice;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
+import com.dell.cpsd.paqx.dne.service.model.FindProtectionDomainTaskResponse;
 import com.dell.cpsd.paqx.dne.service.model.FindScaleIOResponse;
 import com.dell.cpsd.paqx.dne.service.model.Status;
 import com.dell.cpsd.paqx.dne.service.model.TaskResponse;
@@ -145,21 +146,14 @@ public class FindOrCreateValidStoragePoolTaskHandler extends BaseTaskHandler imp
             final Map<String, Map<String, HostStorageDevice>> hostToStorageDeviceMap, final List<ScaleIOProtectionDomain> protectionDomains,
             final Job job) throws ServiceTimeoutException, ServiceExecutionException
     {
-        final TaskResponse findProtectionDomainTaskResponse = job.getTaskResponseMap().get("findProtectionDomain");
+        final FindProtectionDomainTaskResponse findProtectionDomainTaskResponse = (FindProtectionDomainTaskResponse)job.getTaskResponseMap().get("findProtectionDomain");
 
         if (findProtectionDomainTaskResponse == null)
         {
             throw new IllegalStateException("No Find Protection Domain task response found");
         }
 
-        final Map<String, String> findProtectionDomainTaskResponseResults = findProtectionDomainTaskResponse.getResults();
-
-        if (findProtectionDomainTaskResponseResults == null)
-        {
-            throw new IllegalStateException("No Find Protection Domain task response results found");
-        }
-
-        final String protectionDomainId = findProtectionDomainTaskResponseResults.get("protectionDomainId");
+        final String protectionDomainId = findProtectionDomainTaskResponse.getProtectionDomainId();
 
         if (StringUtils.isEmpty(protectionDomainId))
         {
