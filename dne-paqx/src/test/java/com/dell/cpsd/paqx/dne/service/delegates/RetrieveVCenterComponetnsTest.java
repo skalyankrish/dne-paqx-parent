@@ -45,14 +45,15 @@ public class RetrieveVCenterComponetnsTest {
     }
 
     @Ignore @Test
-    public void testFailedException() throws Exception
+    public void testException() throws Exception
     {
         try {
-            nodeService = null;
+            given(nodeService.requestVCenterComponents()).willThrow(new NullPointerException());
             retrieveVCenterComponents.delegateExecute(delegateExecution);
         } catch (BpmnError error)
         {
             assertTrue(error.getErrorCode().equals(DelegateConstants.RETRIEVE_VCENTER_COMPONENTS_FAILED));
+            assertTrue(error.getMessage().contains("An Unexpected Exception occurred while retrieving VCenter Components."));
         }
     }
 
@@ -60,11 +61,12 @@ public class RetrieveVCenterComponetnsTest {
     public void testFailed() throws Exception
     {
         try {
-            when(nodeService.requestVCenterComponents()).thenReturn(false);
+            nodeService = null;
             retrieveVCenterComponents.delegateExecute(delegateExecution);
         } catch (BpmnError error)
         {
             assertTrue(error.getErrorCode().equals(DelegateConstants.RETRIEVE_VCENTER_COMPONENTS_FAILED));
+            assertTrue(error.getMessage().contains("VCenter Components were not retrieved."));
         }
     }
 
@@ -76,17 +78,4 @@ public class RetrieveVCenterComponetnsTest {
         c.delegateExecute(delegateExecution);
         verify(c).updateDelegateStatus("VCenter Components were retrieved successfully.");
     }
-
-    @Ignore @Test
-    public void testException() throws Exception
-    {
-        try {
-            given(nodeService.requestVCenterComponents()).willThrow(new NullPointerException());
-            retrieveVCenterComponents.delegateExecute(delegateExecution);
-        } catch (BpmnError error)
-        {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.RETRIEVE_VCENTER_COMPONENTS_FAILED));
-        }
-    }
-
 }

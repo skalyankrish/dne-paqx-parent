@@ -68,6 +68,7 @@ public class ConfigureObmSettingsTest {
             configureObmSettings.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
             assertTrue(error.getErrorCode().equals(DelegateConstants.CONFIGURE_OBM_SETTINGS_FAILED));
+            assertTrue(error.getMessage().contains("An Unexpected Exception occurred while attempting to Configure the Obm Settings on Node abc"));
         }
     }
 
@@ -90,6 +91,7 @@ public class ConfigureObmSettingsTest {
             configureObmSettings.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
             assertTrue(error.getErrorCode().equals(DelegateConstants.CONFIGURE_OBM_SETTINGS_FAILED));
+            assertTrue(error.getMessage().equalsIgnoreCase("Obm Settings on Node abc were not configured."));
         }
     }
 }

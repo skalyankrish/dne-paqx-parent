@@ -38,24 +38,18 @@ public class ConfigureBootDeviceTest {
     public void setUp() throws Exception
     {
         asynchronousNodeService = mock(AsynchronousNodeService.class);
-
         configureBootDevice = new ConfigureBootDevice(asynchronousNodeService);
-
         delegateExecution = mock(DelegateExecution.class);
-
         bootDeviceIdracStatus = mock(BootDeviceIdracStatus.class);
         when(bootDeviceIdracStatus.getStatus()). thenReturn("SUCCESS");
-
         asynchronousNodeServiceCallback = mock(AsynchronousNodeServiceCallback.class);
         when(asynchronousNodeServiceCallback.isDone()).thenReturn(true);
-
         nodeDetail = new NodeDetail();
         nodeDetail.setId("1");
         nodeDetail.setIdracIpAddress("1");
         nodeDetail.setIdracGatewayIpAddress("1");
         nodeDetail.setIdracSubnetMask("1");
         nodeDetail.setServiceTag("abc");
-
         when(delegateExecution.getVariable(NODE_DETAIL)).thenReturn(nodeDetail);
         when(delegateExecution.getVariable(CONFIGURE_BOOT_DEVICE_MESSAGE_ID)).thenReturn(asynchronousNodeServiceCallback);
     }

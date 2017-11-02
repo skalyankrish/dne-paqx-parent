@@ -25,8 +25,7 @@ import java.util.List;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.DISCOVERED_NODES;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class InventoryNodesTest {
 
@@ -36,6 +35,7 @@ public class InventoryNodesTest {
     private DelegateExecution delegateExecution;
     private List<NodeInfo> discoveredNodes;
     private NodeInfo discoveredNode;
+    private NodeInfo discoveredNode2;
     private Object nodeInventoryResponse;
     private NodeInventory nodeInventory;
     private DataServiceRepository repository;
@@ -51,9 +51,10 @@ public class InventoryNodesTest {
         nodeInventory = mock(NodeInventory.class);
         repository = mock(DataServiceRepository.class);
         discoveredNodes = new ArrayList<NodeInfo>();
-        discoveredNode = mock(NodeInfo.class);
         discoveredNode = new NodeInfo("1", NodeStatus.DISCOVERED.DISCOVERED);
+        discoveredNode2 = new NodeInfo("2", NodeStatus.DISCOVERED.DISCOVERED);
         discoveredNodes.add(discoveredNode);
+        discoveredNodes.add(discoveredNode2);
     }
 
     @Ignore @Test
@@ -65,47 +66,17 @@ public class InventoryNodesTest {
         } catch (BpmnError error)
         {
             assertTrue(error.getErrorCode().equals(DelegateConstants.NO_DISCOVERED_NODES));
+            assertTrue(error.getMessage().contains("There are no nodes currently discovered in Rack HD"));
         }
     }
 
-    @Ignore @Test
-    public void nodeInventoryNotSaved() throws Exception
-    {
-        try {
-            when(delegateExecution.getVariable(DISCOVERED_NODES)).thenReturn(discoveredNodes);
-            when(nodeService.listNodeInventory("1")).thenReturn(nodeInventoryResponse);
-            when(repository.saveNodeInventory(nodeInventory)).thenReturn(false);
-
-            inventoryNodes.delegateExecute(delegateExecution);
-        } catch (BpmnError error)
-        {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.NO_DISCOVERED_NODES));
-        }
-    }
-
-    @Ignore @Test
-    public void noDiscoveredNodes() throws Exception
-    {
-        try {
-            when(repository.saveNodeInventory(nodeInventory)).thenReturn(true);
-            inventoryNodes.delegateExecute(delegateExecution);
-        } catch (BpmnError error)
-        {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.NO_DISCOVERED_NODES));
-        }
-    }
-
-    @Ignore @Test
+    /*@Ignore @Test
     public void nodeDiscoveryException() throws Exception
     {
-        try {
-            when(delegateExecution.getVariable(DISCOVERED_NODES)).thenReturn(discoveredNodes);
-            when(nodeService.listNodeInventory("1")).thenReturn(nodeInventoryResponse);
-            given(repository.saveNodeInventory(nodeInventory)).willThrow(new NullPointerException());
-            inventoryNodes.delegateExecute(delegateExecution);
-        } catch (BpmnError error)
-        {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.NO_DISCOVERED_NODES));
-        }
-    }
+        when(delegateExecution.getVariable(DISCOVERED_NODES)).thenReturn(discoveredNodes);
+        when(nodeService.listNodeInventory("1")).thenReturn(nodeInventoryResponse);
+        given(repository.saveNodeInventory(nodeInventory)).willThrow(new NullPointerException());
+        inventoryNodes.delegateExecute(delegateExecution);
+        verify(delegateExecution, times(1)).setVariable(any(), any());
+    }*/
 }

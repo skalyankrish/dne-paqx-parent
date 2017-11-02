@@ -52,20 +52,20 @@ public class FindVClusterTest {
     List<String> message = new ArrayList<>();
 
     @Before
-    public void setUp() throws Exception
-    {
+    public void setUp() throws Exception {
         nodeService = mock(NodeService.class);
         findVCluster = new FindVCluster(nodeService);
         delegateExecution = mock(DelegateExecution.class);
         nodeDetail = new NodeDetail();
         idracNetworkSettingsRequest = mock(IdracNetworkSettingsRequest.class);
         clusterInfoList = new ArrayList<ClusterInfo>();
-        clusterInfo = new ClusterInfo("abc",1);
+        clusterInfo = new ClusterInfo("abc", 1);
         message.add("A");
         message.add("B");
     }
 
-    @Ignore @Test
+    @Ignore
+    @Test
     public void setFindScaleIOException() throws Exception {
         try {
             clusterInfoList.add(clusterInfo);
@@ -74,19 +74,22 @@ public class FindVClusterTest {
             findVCluster.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
             assertTrue(error.getErrorCode().equals(DelegateConstants.FIND_VCLUSTER_FAILED));
+            assertTrue(error.getMessage().contains("An Unexpected exception occurred trying to retrieve the list of Clusters."));
         }
     }
 
-    @Ignore @Test
+    @Ignore
+    @Test
     public void validClusters() throws Exception {
         storageResponseMessage = new ValidateVcenterClusterResponseMessage();
         storageResponseMessage.setClusters(message);
         when(nodeService.validateClusters(any())).thenReturn(storageResponseMessage);
         findVCluster.delegateExecute(delegateExecution);
         verify(delegateExecution, times(1)).setVariable(VCENTER_CLUSTER_NAME, "A");
-        }
+    }
 
-    @Ignore @Test
+    @Ignore
+    @Test
     public void invalidClusters() throws Exception {
         try {
             storageResponseMessage = new ValidateVcenterClusterResponseMessage();
@@ -95,6 +98,7 @@ public class FindVClusterTest {
             findVCluster.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
             assertTrue(error.getErrorCode().equals(DelegateConstants.FIND_VCLUSTER_FAILED));
+            assertTrue(error.getMessage().contains("Find VCenter Cluster Failed. Reason: A B"));
         }
     }
 }
