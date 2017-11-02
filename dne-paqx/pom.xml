@@ -173,10 +173,18 @@
 
         <!-- Test Dependencies -->
         <dependency>
-            <groupId>com.dell.cpsd.common.messaging</groupId>
+            <groupId>com.dell.cpsd</groupId>
             <artifactId>common-testing</artifactId>
-            <version>1.4-SNAPSHOT</version>
+            <version>2.2.0-SNAPSHOT</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.dell.cpsd</groupId>
+            <artifactId>common-testing</artifactId>
+            <version>2.2.0-SNAPSHOT</version>
+            <scope>test</scope>
+            <type>test-jar</type>
         </dependency>
 
         <!-- Unit test dependencies -->
@@ -244,11 +252,6 @@
             <artifactId>gson</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
-            <version>2.3.0</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -387,6 +390,18 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco-maven-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -1,0 +1,19 @@
+# Copyright (c) 2017 Dell Inc. or its subsidiaries. All Rights Reserved.
+# Dell EMC Confidential/Proprietary Information
+
+version: '2'
+
+services:
+
+  amqp:
+    image: docker-dev-local.art.local/library/rabbitmq:3-management
+    environment:
+      - RABBITMQ_ERLANG_COOKIE
+    ports:
+      - "15672"
+      - "5672"
+    expose:
+      - "5672"
+
+  consul:
+    image: registry.hub.docker.com/library/consul:0.7.5

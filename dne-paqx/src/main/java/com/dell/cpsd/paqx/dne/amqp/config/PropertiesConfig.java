@@ -5,7 +5,10 @@
 package com.dell.cpsd.paqx.dne.amqp.config;
 
 import com.dell.cpsd.common.rabbitmq.config.RabbitMQPropertiesConfig;
+import com.dell.cpsd.paqx.dne.service.IExternalConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
@@ -27,5 +30,49 @@ import org.springframework.context.annotation.PropertySources;
         @PropertySource(value = "file:${PASSPHRASES}", ignoreResourceNotFound = true)})
 @Qualifier("rabbitPropertiesConfig")
 public class PropertiesConfig extends RabbitMQPropertiesConfig {
+
+    @Autowired
+    private IExternalConfig externalConfig;
+
+    @Bean
+    @Override
+    public String rabbitHostname()
+    {
+        return externalConfig.getRabbitHostname();
+    }
+
+    @Bean
+    @Override
+    public Integer rabbitPort()
+    {
+        return externalConfig.getRabbitPort();
+    }
+
+    @Bean
+    @Override
+    public Boolean isSslEnabled() {
+        return externalConfig.isSslEnabled();
+    }
+
+    @Bean
+    @Override
+    public String tlsVersion() {
+        return externalConfig.getTlsVersion();
+    }
+
+    @Bean
+    @Override
+    public String rabbitUsername()
+    {
+        return externalConfig.getRabbitUsername();
+    }
+
+    @Bean
+    @Override
+    public String rabbitPassword()
+    {
+        return externalConfig.getRabbitPassword();
+    }
+
 }
 

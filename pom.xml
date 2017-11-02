@@ -67,6 +67,14 @@
             </dependency>
 
             <dependency>
+                <groupId>com.dell.cpsd.paqx.dne</groupId>
+                <artifactId>dne-paqx</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+                <type>test-jar</type>
+            </dependency>
+
+            <dependency>
                 <groupId>com.dell.cpsd</groupId>
                 <artifactId>common-dependencies</artifactId>
                 <version>1.2-SNAPSHOT</version>
