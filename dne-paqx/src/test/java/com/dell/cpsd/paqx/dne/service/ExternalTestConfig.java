@@ -33,7 +33,7 @@ public class ExternalTestConfig implements IExternalConfig
     @Override
     public Integer getRabbitPort()
     {
-        return 5672;
+        return RABBIT_INSECURE_PORT;
     }
 
     @Override

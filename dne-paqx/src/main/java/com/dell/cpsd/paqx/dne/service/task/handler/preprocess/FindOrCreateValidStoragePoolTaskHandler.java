@@ -17,7 +17,6 @@ import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
 import com.dell.cpsd.paqx.dne.service.model.FindProtectionDomainTaskResponse;
 import com.dell.cpsd.paqx.dne.service.model.FindScaleIOResponse;
 import com.dell.cpsd.paqx.dne.service.model.Status;
-import com.dell.cpsd.paqx.dne.service.model.TaskResponse;
 import com.dell.cpsd.paqx.dne.service.task.handler.BaseTaskHandler;
 import com.dell.cpsd.paqx.dne.util.NodeInventoryParsingUtil;
 import com.dell.cpsd.service.common.client.exception.ServiceExecutionException;

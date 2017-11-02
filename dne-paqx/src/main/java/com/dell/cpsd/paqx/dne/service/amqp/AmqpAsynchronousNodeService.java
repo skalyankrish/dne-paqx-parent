@@ -21,7 +21,6 @@ import com.dell.cpsd.service.common.client.callback.IServiceCallback;
 import com.dell.cpsd.service.common.client.callback.ServiceError;
 import com.dell.cpsd.service.common.client.callback.ServiceResponse;
 import com.dell.cpsd.service.common.client.exception.ServiceExecutionException;
-import com.dell.cpsd.service.common.client.exception.ServiceTimeoutException;
 import com.dell.cpsd.service.common.client.log.SCCLMessageCode;
 import com.dell.cpsd.service.common.client.manager.AbstractServiceCallbackManager;
 import com.dell.cpsd.service.common.client.rpc.DelegatingMessageConsumer;
@@ -113,7 +112,6 @@ public class AmqpAsynchronousNodeService extends AbstractServiceCallbackManager 
      * @param serviceRequestCallback
      * @param <RES>
      * @return
-     * @throws ServiceTimeoutException
      * @throws ServiceExecutionException
      */
     protected <RES extends ServiceResponse<?>> AsynchronousNodeServiceCallback<RES> processRequest(final String processInstanceId,

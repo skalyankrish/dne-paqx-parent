@@ -46,7 +46,7 @@ public abstract class BaseWorkflowDelegate implements JavaDelegate
         postExecute(delegateExecution);
     }
 
-    public abstract void delegateExecute(final DelegateExecution delegateExecution);
+    public abstract void delegateExecute(DelegateExecution delegateExecution);
 
     /**
      * PreExecute functionality to allow for updating status information before execution.
