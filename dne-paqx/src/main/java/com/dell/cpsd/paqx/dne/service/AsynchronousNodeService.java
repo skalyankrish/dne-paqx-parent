@@ -23,12 +23,12 @@ import com.dell.cpsd.service.common.client.exception.ServiceExecutionException;
  */
 public interface AsynchronousNodeService
 {
-    public <T extends ServiceResponse<?>> AsynchronousNodeServiceCallback<?> bootDeviceIdracStatusRequest(final String processId,
-                                                                                                          final String activityId,
-                                                                                                          final String messageId,
-                                                                                                          final ConfigureBootDeviceIdracRequest configureBootDeviceIdracRequest);
+    <T extends ServiceResponse<?>> AsynchronousNodeServiceCallback<?> bootDeviceIdracStatusRequest(String processId,
+                                                                                                          String activityId,
+                                                                                                          String messageId,
+                                                                                                          ConfigureBootDeviceIdracRequest configureBootDeviceIdracRequest);
 
-    public BootDeviceIdracStatus bootDeviceIdracStatusResponse(final AsynchronousNodeServiceCallback<?> serviceCallback)
+    BootDeviceIdracStatus bootDeviceIdracStatusResponse(AsynchronousNodeServiceCallback<?> serviceCallback)
             throws ServiceExecutionException;
 
 

@@ -36,7 +36,7 @@ public class ExternalConfig implements IExternalConfig
     @Override
     public Integer getRabbitPort()
     {
-        return (Integer)this.environment.getProperty("remote.dell.amqp.rabbitPort", Integer.class, Integer.valueOf(5672));
+        return (Integer)this.environment.getProperty("remote.dell.amqp.rabbitPort", Integer.class, Integer.valueOf(RABBIT_INSECURE_PORT));
     }
 
     @Override

@@ -12,6 +12,10 @@
         <groupId>com.dell.cpsd.paqx.dne</groupId>
         <version>1.1-SNAPSHOT</version>
     </parent>
+    
+    <properties>
+        <skipITs>true</skipITs>
+    </properties>
 
     <licenses>
         <license>

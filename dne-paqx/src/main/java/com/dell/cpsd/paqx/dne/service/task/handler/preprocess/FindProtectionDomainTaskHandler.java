@@ -307,9 +307,11 @@ public class FindProtectionDomainTaskHandler extends BaseTaskHandler implements 
         String hostDomain = repository.getDomainName(); //getting the host domain
 
         String scaleIoName = scaleIOSDS.getName();
-        if (scaleIoName.endsWith("-ESX"))
+
+        String scaleIONameSuffix="-ESX";
+        if (scaleIoName.endsWith(scaleIONameSuffix))
         {
-            scaleIoName = scaleIoName.substring(0, scaleIoName.length() - 4);
+            scaleIoName = scaleIoName.substring(0, scaleIoName.length() - scaleIONameSuffix.length());
         }
 
         for (Host host : hosts)

@@ -10,7 +10,6 @@ import com.dell.cpsd.paqx.dne.domain.Job;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
-import com.dell.cpsd.service.engineering.standards.DeviceAssignment;
 import com.dell.cpsd.storage.capabilities.api.DeviceInfo;
 import com.dell.cpsd.storage.capabilities.api.HostToProtectionDomain;
 import com.dell.cpsd.storage.capabilities.api.SdsIp;
@@ -25,9 +24,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
 

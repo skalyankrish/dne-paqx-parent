@@ -8,7 +8,6 @@ package com.dell.cpsd.paqx.dne.rest;
 import com.dell.cpsd.hdp.capability.registry.client.lookup.config.CapabilityRegistryLookupManagerConfig;
 import com.dell.cpsd.paqx.dne.amqp.config.AsynchronousNodeServiceConfig;
 import com.dell.cpsd.paqx.dne.amqp.config.ServiceConfig;
-import com.dell.cpsd.paqx.dne.service.AsynchronousNodeService;
 import org.h2.tools.Server;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

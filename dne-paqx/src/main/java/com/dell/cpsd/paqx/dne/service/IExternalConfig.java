@@ -12,6 +12,8 @@ package com.dell.cpsd.paqx.dne.service;
  */
 public interface IExternalConfig
 {
+    Integer RABBIT_INSECURE_PORT=5672;
+
     String getRabbitHostname();
 
     Boolean isSslEnabled();

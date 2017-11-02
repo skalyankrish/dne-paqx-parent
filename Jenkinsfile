@@ -44,9 +44,9 @@ pipeline {
                 script {
                     withCredentials([string(credentialsId: 'rabbitmg-user-password', variable: 'RABBITMQ_USER')]) {
                         if (env.BRANCH_NAME ==~ /master|stable\/.*/) {
-                            sh "mvn clean deploy -Dmaven.repo.local=.repo -DskipDocker=false -PbuildDockerImageOnJenkins -Ddocker.registry=${params.dockerRegistry} -DdockerImage.tag=${params.dockerImageTag} -DdeleteDockerImages=${params.dockerImagesDel} -Drabbitusername=${RABBITMQ_USER} -Drabbitpassword=${RABBITMQ_USER}"
+                            sh "mvn clean deploy -Dmaven.repo.local=.repo -DskipDocker=false -DskipITs=false -PbuildDockerImageOnJenkins -Ddocker.registry=${params.dockerRegistry} -DdockerImage.tag=${params.dockerImageTag} -DdeleteDockerImages=${params.dockerImagesDel} -Drabbitusername=${RABBITMQ_USER} -Drabbitpassword=${RABBITMQ_USER}"
                         } else {
-                            sh "mvn clean install -Dmaven.repo.local=.repo -DskipDocker=false -PbuildDockerImageOnJenkins -Ddocker.registry=${params.dockerRegistry} -DdockerImage.tag=${params.dockerImageTag} -DdeleteDockerImages=${params.dockerImagesDel} -Drabbitusername=${RABBITMQ_USER} -Drabbitpassword=${RABBITMQ_USER}"
+                            sh "mvn clean install -Dmaven.repo.local=.repo -DskipDocker=false -DskipITs=false -PbuildDockerImageOnJenkins -Ddocker.registry=${params.dockerRegistry} -DdockerImage.tag=${params.dockerImageTag} -DdeleteDockerImages=${params.dockerImagesDel} -Drabbitusername=${RABBITMQ_USER} -Drabbitpassword=${RABBITMQ_USER}"
                         }
                     }
                 }

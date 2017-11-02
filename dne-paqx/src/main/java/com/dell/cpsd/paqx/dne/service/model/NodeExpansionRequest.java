@@ -34,7 +34,7 @@ public class NodeExpansionRequest
     private String protectionDomainName;
     private String protectionDomainId;
 
-    Map<String, DeviceAssignment> deviceToDeviceStoragePool;
+    private Map<String, DeviceAssignment> deviceToDeviceStoragePool;
 
     public NodeExpansionRequest()
     {
