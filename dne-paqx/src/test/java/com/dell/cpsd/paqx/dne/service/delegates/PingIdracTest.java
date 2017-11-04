@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -38,7 +39,7 @@ public class PingIdracTest {
         nodeService = mock(NodeService.class);
         pingIdrac = new PingIdrac(10);
         delegateExecution = mock(DelegateExecution.class);
-        nodeDetail = new NodeDetail();
+        nodeDetail = mock(NodeDetail.class);//new NodeDetail();
         idracNetworkSettingsRequest = mock(IdracNetworkSettingsRequest.class);
         nodeDetail.setId("1");
         nodeDetail.setIdracIpAddress("1");
@@ -54,6 +55,7 @@ public class PingIdracTest {
             pingIdrac.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
             assertTrue(error.getErrorCode().equals(DelegateConstants.PING_IP_ADDRESS_FAILED));
+            assertTrue(error.getMessage().contains("Node abc IP Address was not able to be contacted."));
         }
     }
 }

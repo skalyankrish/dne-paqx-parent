@@ -47,7 +47,6 @@ public class VerifyNodeDetail extends BaseWorkflowDelegate
         if (StringUtils.isBlank(nodeDetail.getServiceTag())) {
             missingFields.add("serviceTag");
         }
-        /*
         if (StringUtils.isBlank(nodeDetail.getIdracIpAddress())) {
             missingFields.add("idracIpAddress");
         }
@@ -66,14 +65,11 @@ public class VerifyNodeDetail extends BaseWorkflowDelegate
         if (StringUtils.isBlank(nodeDetail.getEsxiManagementSubnetMask())) {
             missingFields.add("esxiManagementSubnetMask");
         }
-        if (StringUtils.isBlank(nodeDetail.getEsxiManagementHostname()) {
+        if (StringUtils.isBlank(nodeDetail.getEsxiManagementHostname())) {
             missingFields.add("esxiManagementHostname");
         }
         if (StringUtils.isBlank(nodeDetail.getScaleIoData1SvmIpAddress())) {
             missingFields.add("scaleIoDataSvmIpAddress");
-        }
-        if (StringUtils.isBlank(nodeDetail.getScaleIoData1KernelIpAddress())) {
-            missingFields.add("scaleIoData1KernelIpAddress");
         }
         if (StringUtils.isBlank(nodeDetail.getScaleIoSvmData1SubnetMask())) {
             missingFields.add("scaleIoSvmData1SubnetMask");
@@ -96,9 +92,9 @@ public class VerifyNodeDetail extends BaseWorkflowDelegate
         if (StringUtils.isBlank(nodeDetail.getScaleIoSvmManagementSubnetMask())) {
             missingFields.add("scaleIoSvmManagementSubnetMask");
         }
-        if (StringUtils.isBlank(nodeDetail.getHostname())) {
-            missingFields.add("hostname");
-        }
+        //if (StringUtils.isBlank(nodeDetail.getHostname())) {
+        //    missingFields.add("hostname");
+        //}
         if (StringUtils.isBlank(nodeDetail.getClusterName())) {
             missingFields.add("clusterName");
         }
@@ -108,10 +104,9 @@ public class VerifyNodeDetail extends BaseWorkflowDelegate
         if (StringUtils.isBlank(nodeDetail.getvMotionManagementSubnetMask())) {
             missingFields.add("vMotionManagementSubnetMask");
         }
-        if (StringUtils.isBlank(nodeDetail.getProtectionDomain())) {
-            missingFields.add("protectionDomain");
-        }
-*/
+        //if (StringUtils.isBlank(nodeDetail.getProtectionDomain())) {
+        //    missingFields.add("protectionDomain");
+        //}
         if (CollectionUtils.isNotEmpty(missingFields)) {
             final String message = "Node details are incomplete!  Please update Node details with the following information and try again.  Missing values for " + StringUtils.join(missingFields, ", ") + ".";
             LOGGER.error(message);

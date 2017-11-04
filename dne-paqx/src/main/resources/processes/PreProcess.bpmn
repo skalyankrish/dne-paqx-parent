@@ -12,7 +12,7 @@
       <bpmn:incoming>SequenceFlow_0tv1vs3</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_13a3p0g</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:endEvent id="EndEvent_1cl1kmi">
+    <bpmn:endEvent id="EndEvent_1cl1kmi" camunda:asyncBefore="true">
       <bpmn:incoming>SequenceFlow_0zxr1q6</bpmn:incoming>
       <bpmn:incoming>SequenceFlow_13a3p0g</bpmn:incoming>
     </bpmn:endEvent>

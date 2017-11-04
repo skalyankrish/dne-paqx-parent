@@ -8,6 +8,8 @@ package com.dell.cpsd.paqx.dne.service.delegates;
 
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
+import com.dell.cpsd.paqx.dne.service.model.ChangeIdracCredentialsResponse;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.INSTALL_ESXI_FAILED;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
 
 @Component
@@ -52,7 +55,7 @@ public class ConfigureNodeCredentials extends BaseWorkflowDelegate
         final String taskMessage = "Configure Node Credentials";
         NodeDetail nodeDetail = (NodeDetail) delegateExecution.getVariable(NODE_DETAIL);
 
-        /*final String symphonuUuid = nodeDetail.getId();
+        final String symphonuUuid = nodeDetail.getId();
         ChangeIdracCredentialsResponse responseMessage = null;
         try
         {
@@ -73,7 +76,7 @@ public class ConfigureNodeCredentials extends BaseWorkflowDelegate
             updateDelegateStatus(taskMessage + " on Node " + nodeDetail.getServiceTag() + " failed!");
             throw new BpmnError(INSTALL_ESXI_FAILED,
                                 taskMessage + " on Node " + nodeDetail.getServiceTag() + " failed!");
-        }*/
+        }
         LOGGER.info(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
         updateDelegateStatus(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
 

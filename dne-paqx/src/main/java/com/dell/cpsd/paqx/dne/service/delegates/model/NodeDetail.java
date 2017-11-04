@@ -146,12 +146,12 @@ public class NodeDetail implements Serializable
         this.scaleIoData1KernelIpAddress = scaleIoData1KernelIpAddress;
     }
 
-    public String getscaleIoSvmData1SubnetMask()
+    public String getScaleIoSvmData1SubnetMask()
     {
         return scaleIoSvmData1SubnetMask;
     }
 
-    public void setscaleIoSvmData1SubnetMask(final String scaleIoSvmData1SubnetMask)
+    public void setScaleIoSvmData1SubnetMask(final String scaleIoSvmData1SubnetMask)
     {
         this.scaleIoSvmData1SubnetMask = scaleIoSvmData1SubnetMask;
     }
@@ -176,12 +176,12 @@ public class NodeDetail implements Serializable
         this.scaleIoData2KernelIpAddress = scaleIoData2KernelIpAddress;
     }
 
-    public String getscaleIoSvmData2SubnetMask()
+    public String getScaleIoSvmData2SubnetMask()
     {
         return scaleIoSvmData2SubnetMask;
     }
 
-    public void setscaleIoSvmData2SubnetMask(final String scaleIoSvmData2SubnetMask)
+    public void setScaleIoSvmData2SubnetMask(final String scaleIoSvmData2SubnetMask)
     {
         this.scaleIoSvmData2SubnetMask = scaleIoSvmData2SubnetMask;
     }

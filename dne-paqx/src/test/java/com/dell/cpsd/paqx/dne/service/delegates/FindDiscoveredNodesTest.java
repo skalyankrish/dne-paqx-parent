@@ -50,6 +50,7 @@ public class FindDiscoveredNodesTest {
         } catch (BpmnError error)
         {
             assertTrue(error.getErrorCode().equals(DelegateConstants.NO_DISCOVERED_NODES));
+            assertTrue(error.getMessage().contains("An Unexpected exception occurred trying to retrieve the list of Discovered Nodes."));
         }
     }
 
@@ -61,6 +62,7 @@ public class FindDiscoveredNodesTest {
             findDiscoveredNodes.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
             assertTrue(error.getErrorCode().equals(DelegateConstants.NO_DISCOVERED_NODES));
+            assertTrue(error.getMessage().contains("There are no nodes currently discovered in Rack HD"));
         }
     }
 

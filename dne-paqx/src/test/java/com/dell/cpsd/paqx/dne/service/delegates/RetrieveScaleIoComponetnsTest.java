@@ -43,7 +43,7 @@ public class RetrieveScaleIoComponetnsTest {
     }
 
     @Ignore @Test
-    public void testFailedException() throws Exception
+    public void testFailed() throws Exception
     {
         try {
             nodeService = null;
@@ -51,28 +51,8 @@ public class RetrieveScaleIoComponetnsTest {
         } catch (BpmnError error)
         {
             assertTrue(error.getErrorCode().equals(DelegateConstants.RETRIEVE_SCALE_IO_COMPONENTS_FAILED));
+            assertTrue(error.getMessage().contains("Scale IO Components were not retrieved."));
         }
-    }
-
-    @Ignore @Test
-    public void testFailed() throws Exception
-    {
-        try {
-            when(nodeService.requestScaleIoComponents()).thenReturn(false);
-            retrieveScaleIoComponents.delegateExecute(delegateExecution);
-        } catch (BpmnError error)
-        {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.RETRIEVE_SCALE_IO_COMPONENTS_FAILED));
-        }
-    }
-
-    @Ignore @Test
-    public void testSuccess() throws Exception
-    {
-        when(nodeService.requestScaleIoComponents()).thenReturn(true);
-        final RetrieveScaleIoComponents c = spy(new RetrieveScaleIoComponents(nodeService));
-        c.delegateExecute(delegateExecution);
-        verify(c).updateDelegateStatus("Scale IO Components were retrieved successfully.");
     }
 
     @Ignore @Test
@@ -84,6 +64,16 @@ public class RetrieveScaleIoComponetnsTest {
         } catch (BpmnError error)
         {
             assertTrue(error.getErrorCode().equals(DelegateConstants.RETRIEVE_SCALE_IO_COMPONENTS_FAILED));
+            assertTrue(error.getMessage().contains("An Unexpected Exception occurred while retrieving Scale IO Components."));
         }
+    }
+
+    @Ignore @Test
+    public void testSuccess() throws Exception
+    {
+        when(nodeService.requestScaleIoComponents()).thenReturn(true);
+        final RetrieveScaleIoComponents c = spy(new RetrieveScaleIoComponents(nodeService));
+        c.delegateExecute(delegateExecution);
+        verify(c).updateDelegateStatus("Scale IO Components were retrieved successfully.");
     }
 }

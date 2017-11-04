@@ -26,7 +26,7 @@ import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.S
 
 @Component
 @Scope("prototype")
-@Qualifier("configureBootDevice")
+@Qualifier("sendConfigureBootDeviceRequest")
 public class SendConfigureBootDeviceRequest extends BaseWorkflowDelegate
 {
     /**

@@ -68,6 +68,7 @@ public class ConfigIdracIpAddressTest {
             configIdracIpAddress.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
             assertTrue(error.getErrorCode().equals(DelegateConstants.CONFIGURE_IP_ADDRESS_FAILED));
+            assertTrue(error.getMessage().contains("Configure IP Address on Node abc failed!"));
         }
     }
 
@@ -90,6 +91,7 @@ public class ConfigIdracIpAddressTest {
             configIdracIpAddress.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
             assertTrue(error.getErrorCode().equals(DelegateConstants.CONFIGURE_IP_ADDRESS_FAILED));
+            assertTrue(error.getMessage().contains("Configure IP Address on Node abc failed!"));
         }
     }
 }

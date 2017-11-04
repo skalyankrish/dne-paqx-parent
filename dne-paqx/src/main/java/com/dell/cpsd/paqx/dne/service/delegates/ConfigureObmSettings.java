@@ -6,8 +6,13 @@
 
 package com.dell.cpsd.paqx.dne.service.delegates;
 
+import com.dell.cpsd.ObmConfig;
+import com.dell.cpsd.SetObmSettingsRequestMessage;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
+import com.dell.cpsd.paqx.dne.service.model.ObmSettingsResponse;
+import java.util.Arrays;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.CONFIGURE_OBM_SETTINGS_FAILED;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
 
 @Component
@@ -53,7 +59,7 @@ public class ConfigureObmSettings extends BaseWorkflowDelegate
 
         NodeDetail nodeDetail = (NodeDetail) delegateExecution.getVariable(NODE_DETAIL);
 
-     /*   ObmSettingsResponse obmSettingsResponse = null;
+        ObmSettingsResponse obmSettingsResponse = null;
         try
         {
             String uuid = nodeDetail.getId();
@@ -86,7 +92,7 @@ public class ConfigureObmSettings extends BaseWorkflowDelegate
             updateDelegateStatus("Obm Settings on Node " + nodeDetail.getServiceTag() + " were not configured.");
             throw new BpmnError(CONFIGURE_OBM_SETTINGS_FAILED,
                                 "Obm Settings on Node " + nodeDetail.getServiceTag() + " were not configured.");
-        }*/
+        }
         LOGGER.info("Obm Settings on Node " + nodeDetail.getServiceTag() + " were configured successfully.");
         updateDelegateStatus("Obm Settings on Node " + nodeDetail.getServiceTag() + " were configured successfully.");
 

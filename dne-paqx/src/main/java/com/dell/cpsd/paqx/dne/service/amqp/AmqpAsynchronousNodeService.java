@@ -101,7 +101,7 @@ public class AmqpAsynchronousNodeService extends AbstractServiceCallbackManager 
  */
     private void initCallbacks()
     {
-        this.consumer.addAdapter(new ConfigureBootDeviceIdracResponseAdapter(this, this.runtimeService));
+//        this.consumer.addAdapter(new ConfigureBootDeviceIdracResponseAdapter(this, this.runtimeService));
     }
 
     /**

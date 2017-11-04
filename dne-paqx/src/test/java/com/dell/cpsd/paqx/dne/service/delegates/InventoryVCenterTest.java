@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class InventoryVCenterTest {
 
@@ -50,50 +50,64 @@ public class InventoryVCenterTest {
         inventoryVCenter = new InventoryVCenter(nodeService, repository);
         discoveredNodes = new ArrayList<NodeInfo>();
         discoveredNode = mock(NodeInfo.class);
-        componentEndpointIds = mock(ComponentEndpointIds.class);
+        componentEndpointIds = new ComponentEndpointIds("abc","abc","abc", "abc");
 
     }
 
     @Ignore @Test
-    public void dataRepoNull() throws Exception {
+    public void vcInventoryFailed() throws Exception {
         try {
             inventoryVCenter = new InventoryVCenter(nodeService, null);
             inventoryVCenter.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
             assertTrue(error.getErrorCode().equals(DelegateConstants.INVENTORY_VCENTER_FAILED));
-        }
-    }
-
-
-    @Ignore @Test
-    public void vCenterInvetoryFailed() throws Exception {
-        try {
-            when(repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER")).thenReturn(componentEndpointIds);
-            inventoryVCenter.delegateExecute(delegateExecution);
-        } catch (BpmnError error) {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.INVENTORY_VCENTER_FAILED));
+            assertTrue(error.getMessage().contains("An Unexpected Exception occurred attempting to inventory VCenter."));
         }
     }
 
     @Ignore @Test
-    public void vCenterInfoNotFound() throws Exception {
+    public void scaleIoInventoryNotSaved() throws Exception {
         try {
-            componentEndpointIds = null;
-            when(repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER")).thenReturn(componentEndpointIds);
+            when(repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER")).thenReturn(null);
             inventoryVCenter.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
             assertTrue(error.getErrorCode().equals(DelegateConstants.VCENTER_INFORMATION_NOT_FOUND));
+            assertTrue(error.getMessage().contains("VCenter Endpoints not found."));
         }
     }
 
     @Ignore @Test
-    public void vCenterInvetoryException() throws Exception {
+    public void scaleIoDiscoveryException() throws Exception {
         try {
             when(repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER")).thenReturn(componentEndpointIds);
             given(delegateExecution.getProcessInstanceId()).willThrow(new NullPointerException());
             inventoryVCenter.delegateExecute(delegateExecution);
         } catch (BpmnError error) {
             assertTrue(error.getErrorCode().equals(DelegateConstants.INVENTORY_VCENTER_FAILED));
+            assertTrue(error.getMessage().contains("An Unexpected Exception occurred attempting to inventory VCenter."));
         }
+    }
+
+    @Ignore @Test
+    public void scaleIoDiscoveryFailed() throws Exception {
+        try {
+            when(repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER")).thenReturn(componentEndpointIds);
+            when(delegateExecution.getProcessInstanceId()).thenReturn("1");
+            when(nodeService.requestDiscoverVCenter(any(), any())).thenReturn(false);
+            inventoryVCenter.delegateExecute(delegateExecution);
+        } catch (BpmnError error) {
+            assertTrue(error.getErrorCode().equals(DelegateConstants.INVENTORY_VCENTER_FAILED));
+            assertTrue(error.getMessage().contains("Inventory request for VCenter Failed."));
+        }
+    }
+
+    @Ignore @Test
+    public void scaleIoDiscoverySuccess() throws Exception {
+        when(repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER")).thenReturn(componentEndpointIds);
+        when(delegateExecution.getProcessInstanceId()).thenReturn("1");
+        when(nodeService.requestDiscoverVCenter(any(), any())).thenReturn(true);
+        final InventoryVCenter c = spy(new InventoryVCenter(nodeService, repository));
+        c.delegateExecute(delegateExecution);
+        verify(c).updateDelegateStatus("Inventory request for VCenter completed successfully.");
     }
 }
