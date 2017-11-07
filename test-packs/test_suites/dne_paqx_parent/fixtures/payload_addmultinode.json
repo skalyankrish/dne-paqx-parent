@@ -1,0 +1,27 @@
+[
+  {
+    "clusterName": "string",
+    "esxiManagementGatewayIpAddress": "string",
+    "esxiManagementHostname": "string",
+    "esxiManagementIpAddress": "string",
+    "esxiManagementSubnetMask": "string",
+    "hostname": "string",
+    "id": "string",
+    "idracGatewayIpAddress": "string",
+    "idracIpAddress": "string",
+    "idracSubnetMask": "string",
+    "protectionDomain": "string",
+    "scaleIoData1KernelAndSvmSubnetMask": "string",
+    "scaleIoData1KernelIpAddress": "string",
+    "scaleIoData1SvmIpAddress": "string",
+    "scaleIoData2KernelAndSvmSubnetMask": "string",
+    "scaleIoData2KernelIpAddress": "string",
+    "scaleIoData2SvmIpAddress": "string",
+    "scaleIoSvmManagementGatewayAddress": "string",
+    "scaleIoSvmManagementIpAddress": "string",
+    "scaleIoSvmManagementSubnetMask": "string",
+    "serviceTag": "string",
+    "vMotionManagementIpAddress": "string",
+    "vMotionManagementSubnetMask": "string"
+  }
+]
