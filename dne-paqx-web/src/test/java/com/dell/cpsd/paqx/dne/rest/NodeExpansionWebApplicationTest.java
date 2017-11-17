@@ -127,7 +127,7 @@ public class NodeExpansionWebApplicationTest
     @Test
     public void testGetNodes() throws  Exception{
         String uuidStr = UUID.randomUUID().toString();
-        DiscoveredNode node = new DiscoveredNode(uuidStr, com.dell.cpsd.DiscoveredNode.AllocationStatus.ADDED);
+        DiscoveredNode node = new DiscoveredNode(uuidStr, com.dell.cpsd.DiscoveredNode.AllocationStatus.ADDED, "testserial" , "testproduct", "testvendor");
         Mockito.when(nodeService.listDiscoveredNodes()).thenReturn(Collections.singletonList(node));
         MvcResult result = this.mockMvc.perform(get("/dne/nodes"))
                 .andExpect(status().isOk()).andReturn();

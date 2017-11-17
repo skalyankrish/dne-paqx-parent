@@ -5,19 +5,14 @@
 
 package com.dell.cpsd.paqx.dne.service.amqp;
 
+import com.dell.cpsd.*;
 import com.dell.cpsd.ChangeIdracCredentialsResponseMessage;
 import com.dell.cpsd.CompleteNodeAllocationResponseMessage;
-import com.dell.cpsd.ConfigureBootDeviceIdracError;
-import com.dell.cpsd.ConfigureBootDeviceIdracResponseMessage;
 import com.dell.cpsd.ConfigurePxeBootError;
 import com.dell.cpsd.ConfigurePxeBootRequestMessage;
 import com.dell.cpsd.ConfigurePxeBootResponseMessage;
-import com.dell.cpsd.EsxiInstallationInfo;
-import com.dell.cpsd.InstallESXiResponseMessage;
 import com.dell.cpsd.NodeAllocationInfo;
 import com.dell.cpsd.NodeAllocationInfo.AllocationStatus;
-import com.dell.cpsd.NodeInventoryResponseMessage;
-import com.dell.cpsd.NodesListed;
 import com.dell.cpsd.paqx.dne.amqp.producer.DneProducer;
 import com.dell.cpsd.paqx.dne.domain.scaleio.ScaleIOData;
 import com.dell.cpsd.paqx.dne.domain.scaleio.ScaleIOStoragePool;
@@ -27,7 +22,6 @@ import com.dell.cpsd.paqx.dne.repository.H2DataRepository;
 import com.dell.cpsd.paqx.dne.service.model.BootDeviceIdracStatus;
 import com.dell.cpsd.paqx.dne.service.model.ChangeIdracCredentialsResponse;
 import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
-import com.dell.cpsd.paqx.dne.service.model.ConfigureBootDeviceIdracRequest;
 import com.dell.cpsd.paqx.dne.service.model.DiscoveredNode;
 import com.dell.cpsd.paqx.dne.service.model.IdracInfo;
 import com.dell.cpsd.paqx.dne.service.model.IdracNetworkSettingsRequest;
@@ -201,10 +195,19 @@ public class AmqpNodeServiceTest
 
     private List<com.dell.cpsd.DiscoveredNode> buildNodeList(String uuid)
     {
-        com.dell.cpsd.DiscoveredNode discoveredNode = new com.dell.cpsd.DiscoveredNode(uuid,
-                com.dell.cpsd.DiscoveredNode.AllocationStatus.DISCOVERED);
-        com.dell.cpsd.DiscoveredNode addedNode = new com.dell.cpsd.DiscoveredNode(UUID.randomUUID().toString(),
-                com.dell.cpsd.DiscoveredNode.AllocationStatus.ADDED);
+        com.dell.cpsd.DiscoveredNode discoveredNode = new com.dell.cpsd.DiscoveredNode();
+        discoveredNode.setConvergedUuid(uuid);
+        discoveredNode.setAllocationStatus(com.dell.cpsd.DiscoveredNode.AllocationStatus.DISCOVERED);
+        discoveredNode.setSerial("testserial");
+        discoveredNode.setProduct("testproduct");
+        discoveredNode.setVendor("test_Dell Inc");
+
+        com.dell.cpsd.DiscoveredNode addedNode = new com.dell.cpsd.DiscoveredNode();
+        addedNode.setConvergedUuid(UUID.randomUUID().toString());
+        addedNode.setAllocationStatus(com.dell.cpsd.DiscoveredNode.AllocationStatus.ADDED);
+        addedNode.setSerial("testserial");
+        addedNode.setProduct("testproduct");
+        addedNode.setVendor("test_Dell Inc");
 
         List<com.dell.cpsd.DiscoveredNode> nodeList = new ArrayList<>();
         nodeList.add(discoveredNode);
@@ -254,63 +257,31 @@ public class AmqpNodeServiceTest
 
         NodesListed listed = new NodesListed(messageProperties, buildNodeList(convergedUuid1));
 
-        NodeInventoryResponseMessage nodeInventoryResponseMessage = new NodeInventoryResponseMessage(messageProperties,
-                buildNodeInventory());
         AmqpNodeService nodeService = new AmqpNodeService(consumer, dneProducer, "replyToMe", repository, null, null, null)
         {
             @Override
             protected ServiceResponse<?> processRequest(long timeout, ServiceRequestCallback serviceRequestCallback)
             {
                 StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+
                 if (stackTraceElements[2].getMethodName().equalsIgnoreCase("listDiscoveredNodes"))
                 {
-                    return new ServiceResponse<>(serviceRequestCallback.getRequestId(), listed, "test");
+                    ServiceResponse response = new  ServiceResponse<>(serviceRequestCallback.getRequestId(), listed, "test");
+
+                    return  response;
                 }
-                if (stackTraceElements[2].getMethodName().equalsIgnoreCase("listNodeInventory"))
-                {
-                    return new ServiceResponse<>(serviceRequestCallback.getRequestId(), nodeInventoryResponseMessage, "test");
-                }
+
                 return null;
-
             }
-
-            ;
         };
 
-        when(repository.saveNodeInventory(any())).thenReturn(true);
-        when(repository.saveDiscoveredNodeInfo(any())).thenReturn(true);
-
         assertEquals(1, nodeService.listDiscoveredNodeInfo().size());
-        assertEquals("ABCDEFG", nodeService.listDiscoveredNodeInfo().get(0).getSerialNumber());
-        assertEquals("DellNode730", nodeService.listDiscoveredNodeInfo().get(0).getProduct());
-
+        assertEquals("testserial", nodeService.listDiscoveredNodeInfo().get(0).getSerialNumber());
+        assertEquals("testproduct", nodeService.listDiscoveredNodeInfo().get(0).getProduct());
     }
 
-    private Object buildNodeInventory()
-    {
-        String DMI_FIELD = "dmi";
-        String SOURCE_FIELD = "source";
-        String DATA_FIELD = "data";
-        String SYSTEM_INFO_FIELD = "System Information";
-        String SERIAL_NUM_FIELD = "Serial Number";
-        String PRODUCT_FIELD = "Product Name";
-        String FAMILY_FIELD = "Family";
 
-        Map<String, String> sysInfoData = new HashMap<>();
-        sysInfoData.put(SERIAL_NUM_FIELD, "ABCDEFG");
-        sysInfoData.put(PRODUCT_FIELD, "DellNode730");
-        sysInfoData.put(FAMILY_FIELD, "family");
-        Map<String, Map<String, String>> sysInfo = new HashMap<>();
-        sysInfo.put(SYSTEM_INFO_FIELD, sysInfoData);
-
-        Map<String, Object> source = new HashMap<>();
-        source.put(DATA_FIELD, sysInfo);
-        source.put(SOURCE_FIELD, DMI_FIELD);
-        List<Object> retList = new ArrayList<>();
-        retList.add(source);
-        return retList;
-    }
-
+    /**
     /**
      * Test that the the listClusters method can handle a timeout.
      *
@@ -364,7 +335,7 @@ public class AmqpNodeServiceTest
                         "replyToMe");
 
                 DiscoverClusterResponseInfoMessage responseInfoMessage = new DiscoverClusterResponseInfoMessage(messageProperties,
-                        responseInfo, DiscoverClusterResponseInfoMessage.Status.SUCCESS);
+                        responseInfo, DiscoverClusterResponseInfoMessage.Status.SUCCESS, "");
                 serviceCallback.handleServiceResponse(new ServiceResponse<>(requestId, responseInfoMessage, null));
             }
         };
@@ -470,7 +441,7 @@ public class AmqpNodeServiceTest
     }
 
     /**
-     * Test that the notifyNodeAllocationComplete method executes successfully.
+     * Test that the notifyNodeAllocationStatus method executes successfully.
      *
      * @throws ServiceTimeoutException
      * @throws ServiceExecutionException
@@ -500,14 +471,75 @@ public class AmqpNodeServiceTest
             }
         };
 
-        Boolean responseInfo = nodeService.notifyNodeAllocationComplete("elementIdentifier");
+        Boolean responseInfo = nodeService.notifyNodeAllocationStatus("elementIdentifier","Completed");
 
         Assert.assertEquals(true, responseInfo);
         Mockito.verify(dneProducer, Mockito.times(1)).publishCompleteNodeAllocation(any());
     }
 
+    @Test
+    public void testNotifyNodeAllocationStartedSuccess() throws ServiceTimeoutException, ServiceExecutionException
+    {
+        DelegatingMessageConsumer consumer = new DefaultMessageConsumer();
+        DneProducer dneProducer = mock(DneProducer.class);
+
+        AmqpNodeService nodeService = new AmqpNodeService(consumer, dneProducer, "replyToMe", null, null, null, null)
+        {
+            @Override
+            protected void waitForServiceCallback(ServiceCallback serviceCallback, String requestId, long timeout)
+                    throws ServiceTimeoutException
+            {
+                com.dell.cpsd.MessageProperties messageProperties = new com.dell.cpsd.MessageProperties();
+                messageProperties.setCorrelationId(UUID.randomUUID().toString());
+
+                NodeAllocationInfo nodeAllocationInfo = new NodeAllocationInfo("elementIdentifier", "nodeIdentifier",
+                        AllocationStatus.PROVISIONING_IN_PROGRESS);
+
+                StartNodeAllocationResponseMessage responseMessage = new StartNodeAllocationResponseMessage(messageProperties,
+                        StartNodeAllocationResponseMessage.Status.SUCCESS, nodeAllocationInfo, Collections.emptyList());
+
+                serviceCallback.handleServiceResponse(new ServiceResponse<>(requestId, responseMessage, null));
+            }
+        };
+
+        Boolean responseInfo = nodeService.notifyNodeAllocationStatus("elementIdentifier","Started");
+
+        Assert.assertEquals(true, responseInfo);
+        Mockito.verify(dneProducer, Mockito.times(1)).publishStartedNodeAllocation(any());
+    }
+
+    @Test
+    public void testNotifyNodeAllocationStartedFailed() throws ServiceTimeoutException, ServiceExecutionException
+    {
+        DelegatingMessageConsumer consumer = new DefaultMessageConsumer();
+        DneProducer dneProducer = mock(DneProducer.class);
+
+        AmqpNodeService nodeService = new AmqpNodeService(consumer, dneProducer, "replyToMe", null, null, null, null)
+        {
+            @Override
+            protected void waitForServiceCallback(ServiceCallback serviceCallback, String requestId, long timeout)
+                    throws ServiceTimeoutException
+            {
+                com.dell.cpsd.MessageProperties messageProperties = new com.dell.cpsd.MessageProperties();
+                messageProperties.setCorrelationId(UUID.randomUUID().toString());
+
+                NodeAllocationInfo nodeAllocationInfo = new NodeAllocationInfo("elementIdentifier", "nodeIdentifier",
+                        AllocationStatus.PROVISIONING_FAILED);
+
+                FailNodeAllocationResponseMessage responseMessage = new FailNodeAllocationResponseMessage(messageProperties,
+                        FailNodeAllocationResponseMessage.Status.SUCCESS, nodeAllocationInfo, Collections.emptyList());
+
+                serviceCallback.handleServiceResponse(new ServiceResponse<>(requestId, responseMessage, null));
+            }
+        };
+
+        Boolean responseInfo = nodeService.notifyNodeAllocationStatus("elementIdentifier","failed");
+
+        Assert.assertEquals(true, responseInfo);
+        Mockito.verify(dneProducer, Mockito.times(1)).publishFailedNodeAllocation(any());
+    }
     /**
-     * Test that the notifyNodeAllocationComplete method can handle any errors.
+     * Test that the notifyNodeAllocationStatus method can handle any errors.
      *
      * @throws ServiceTimeoutException
      */
@@ -527,58 +559,16 @@ public class AmqpNodeServiceTest
             }
         };
 
-        nodeService.notifyNodeAllocationComplete("elementIdentifier");
+        nodeService.notifyNodeAllocationStatus("elementIdentifier","Completed");
         Mockito.verify(dneProducer, Mockito.times(1)).publishCompleteNodeAllocation(any());
     }
 
-    /**
-     * Test that the bootOrderStatus method can execute successfully.
-     *
-     * @throws ServiceTimeoutException
-     * @throws ServiceExecutionException
-     */
-    @Test
-    public void testBootOrderStatusSuccess() throws ServiceTimeoutException, ServiceExecutionException
+    @Test(expected = ServiceExecutionException.class)
+    public void testNotifyNodeAllocationStartedError() throws Exception
     {
         DelegatingMessageConsumer consumer = new DefaultMessageConsumer();
         DneProducer dneProducer = mock(DneProducer.class);
-        ConfigureBootDeviceIdracRequest bootOrderSequenceRequest = new ConfigureBootDeviceIdracRequest("nodeId", "idracIpAddress");
 
-        AmqpNodeService nodeService = new AmqpNodeService(consumer, dneProducer, "replyToMe", null, null, null, null)
-        {
-            @Override
-            protected void waitForServiceCallback(ServiceCallback serviceCallback, String requestId, long timeout)
-                    throws ServiceTimeoutException
-            {
-                com.dell.cpsd.MessageProperties messageProperties = new com.dell.cpsd.MessageProperties(Calendar.getInstance().getTime(),
-                        UUID.randomUUID().toString(), "replyToMe");
-
-                List<ConfigureBootDeviceIdracError> configureBootDeviceIdracErrors = new ArrayList<>();
-                ConfigureBootDeviceIdracResponseMessage responseMessage = new ConfigureBootDeviceIdracResponseMessage(messageProperties,
-                        ConfigureBootDeviceIdracResponseMessage.Status.SUCCESS, configureBootDeviceIdracErrors);
-
-                serviceCallback.handleServiceResponse(new ServiceResponse<>(requestId, responseMessage, null));
-            }
-        };
-
-        BootDeviceIdracStatus bootOrderStatus = nodeService.bootDeviceIdracStatus(bootOrderSequenceRequest);
-
-        Assert.assertNotNull(bootOrderStatus);
-        Assert.assertEquals("SUCCESS", bootOrderStatus.getStatus());
-        Mockito.verify(dneProducer, Mockito.times(1)).publishConfigureBootDeviceIdrac(any());
-    }
-
-    /**
-     * Test that the bootOrderStatus method can handle any errors.
-     *
-     * @throws ServiceTimeoutException
-     */
-    @Test
-    public void testBootOrderStatusError() throws Exception
-    {
-        DelegatingMessageConsumer consumer = new DefaultMessageConsumer();
-        DneProducer dneProducer = mock(DneProducer.class);
-        ConfigureBootDeviceIdracRequest bootOrderSequenceRequest = new ConfigureBootDeviceIdracRequest("nodeId", "idracIpAddress");
         AmqpNodeService nodeService = new AmqpNodeService(consumer, dneProducer, "replyToMe", null, null, null, null)
         {
             @Override
@@ -589,8 +579,28 @@ public class AmqpNodeServiceTest
             }
         };
 
-        nodeService.bootDeviceIdracStatus(bootOrderSequenceRequest);
-        Mockito.verify(dneProducer, Mockito.times(1)).publishConfigureBootDeviceIdrac(any());
+        nodeService.notifyNodeAllocationStatus("elementIdentifier","Started");
+        Mockito.verify(dneProducer, Mockito.times(1)).publishStartedNodeAllocation(any());
+    }
+
+    @Test(expected = ServiceExecutionException.class)
+    public void testNotifyNodeAllocationFailedError() throws Exception
+    {
+        DelegatingMessageConsumer consumer = new DefaultMessageConsumer();
+        DneProducer dneProducer = mock(DneProducer.class);
+
+        AmqpNodeService nodeService = new AmqpNodeService(consumer, dneProducer, "replyToMe", null, null, null, null)
+        {
+            @Override
+            protected void waitForServiceCallback(ServiceCallback serviceCallback, String requestId, long timeout)
+                    throws ServiceTimeoutException
+            {
+                serviceCallback.handleServiceError(new ServiceError(requestId, "network", "network"));
+            }
+        };
+
+        nodeService.notifyNodeAllocationStatus("elementIdentifier","failed");
+        Mockito.verify(dneProducer, Mockito.times(1)).publishFailedNodeAllocation(any());
     }
 
     @Test
@@ -925,7 +935,7 @@ public class AmqpNodeServiceTest
                 final MessageProperties messageProperties = new MessageProperties(new Date(), UUID.randomUUID().toString(), "test");
 
                 final DiscoveryResponseInfoMessage responseMessage = new DiscoveryResponseInfoMessage(messageProperties,
-                        Collections.singletonList(new Datacenter()));
+                        Collections.singletonList(new Datacenter()), "");
 
                 serviceCallback.handleServiceResponse(new ServiceResponse<>(requestId, responseMessage, null));
             }
@@ -985,7 +995,7 @@ public class AmqpNodeServiceTest
                         new Date(), UUID.randomUUID().toString(), "test");
 
                 final ListStorageResponseMessage responseMessage = new ListStorageResponseMessage(messageProperties,
-                        new ScaleIOSystemDataRestRep());
+                        new ScaleIOSystemDataRestRep(), "");
 
                 serviceCallback.handleServiceResponse(new ServiceResponse<>(requestId, responseMessage, null));
             }
@@ -1040,7 +1050,7 @@ public class AmqpNodeServiceTest
                 final MessageProperties messageProperties = new MessageProperties(new Date(), UUID.randomUUID().toString(), "test");
 
                 final AddEsxiHostVSphereLicenseResponse responseMessage = new AddEsxiHostVSphereLicenseResponse(messageProperties,
-                        AddEsxiHostVSphereLicenseResponse.Status.SUCCESS);
+                        AddEsxiHostVSphereLicenseResponse.Status.SUCCESS, "");
 
                 serviceCallback.handleServiceResponse(new ServiceResponse<>(requestId, responseMessage, null));
             }
@@ -1092,7 +1102,7 @@ public class AmqpNodeServiceTest
                 final MessageProperties messageProperties = new MessageProperties(new Date(), UUID.randomUUID().toString(), "test");
 
                 final HostMaintenanceModeResponseMessage responseMessage = new HostMaintenanceModeResponseMessage(messageProperties,
-                        HostMaintenanceModeResponseMessage.Status.SUCCESS);
+                        HostMaintenanceModeResponseMessage.Status.SUCCESS, "");
 
                 serviceCallback.handleServiceResponse(new ServiceResponse<>(requestId, responseMessage, null));
             }
@@ -1102,58 +1112,6 @@ public class AmqpNodeServiceTest
 
         assertTrue(success);
         Mockito.verify(dneProducer, Mockito.times(1)).publishHostMaintenanceMode(request);
-    }
-
-    @Test
-    public void testInstallEsxiFailure() throws Exception
-    {
-        final DelegatingMessageConsumer consumer = new DefaultMessageConsumer();
-        final DneProducer dneProducer = mock(DneProducer.class);
-        final DataServiceRepository repository = mock(DataServiceRepository.class);
-        final EsxiInstallationInfo info = mock(EsxiInstallationInfo.class);
-
-        AmqpNodeService nodeService = new AmqpNodeService(consumer, dneProducer, "replyToMe", repository, null, null, null)
-        {
-            @Override
-            protected void waitForServiceCallback(ServiceCallback serviceCallback, String requestId, long timeout)
-                    throws ServiceTimeoutException
-            {
-                serviceCallback.handleServiceError(new ServiceError(requestId, "network", "network"));
-            }
-        };
-
-        nodeService.requestInstallEsxi(info);
-        Mockito.verify(dneProducer, Mockito.times(1)).publishInstallEsxiRequest(any());
-    }
-
-    @Test
-    public void testInstallEsxiSuccess() throws Exception
-    {
-        final DelegatingMessageConsumer consumer = new DefaultMessageConsumer();
-        final DneProducer dneProducer = mock(DneProducer.class);
-        final DataServiceRepository repository = mock(DataServiceRepository.class);
-        final InstallESXiResponseMessage responseMessage = mock(InstallESXiResponseMessage.class);
-        final com.dell.cpsd.MessageProperties messageProperties = new com.dell.cpsd.MessageProperties(new Date(),
-                UUID.randomUUID().toString(), "test");
-
-        when(responseMessage.getMessageProperties()).thenReturn(messageProperties);
-        when(responseMessage.getStatus()).thenReturn("succeeded");
-
-        AmqpNodeService nodeService = new AmqpNodeService(consumer, dneProducer, "replyToMe", repository, null, null, null)
-        {
-            @Override
-            protected void waitForServiceCallback(ServiceCallback serviceCallback, String requestId, long timeout)
-                    throws ServiceTimeoutException
-            {
-                serviceCallback.handleServiceResponse(new ServiceResponse<>(requestId, responseMessage, null));
-            }
-        };
-
-        final boolean success = nodeService.requestInstallEsxi(any());
-
-        assertTrue(success);
-
-        Mockito.verify(dneProducer, Mockito.times(1)).publishInstallEsxiRequest(any());
     }
 
     @Test
@@ -1195,7 +1153,7 @@ public class AmqpNodeServiceTest
                 final MessageProperties messageProperties = new MessageProperties(new Date(), UUID.randomUUID().toString(), "test");
 
                 final ClusterOperationResponseMessage responseMessage = new ClusterOperationResponseMessage(messageProperties,
-                        ClusterOperationResponseMessage.Status.SUCCESS);
+                        ClusterOperationResponseMessage.Status.SUCCESS, "");
 
                 serviceCallback.handleServiceResponse(new ServiceResponse<>(requestId, responseMessage, null));
             }
@@ -1247,7 +1205,7 @@ public class AmqpNodeServiceTest
                 final MessageProperties messageProperties = new MessageProperties(new Date(), UUID.randomUUID().toString(), "test");
 
                 final AddHostToDvSwitchResponseMessage responseMessage = new AddHostToDvSwitchResponseMessage(messageProperties,
-                        AddHostToDvSwitchResponseMessage.Status.SUCCESS);
+                        AddHostToDvSwitchResponseMessage.Status.SUCCESS, "");
 
                 serviceCallback.handleServiceResponse(new ServiceResponse<>(requestId, responseMessage, null));
             }
@@ -1299,7 +1257,7 @@ public class AmqpNodeServiceTest
                 final MessageProperties messageProperties = new MessageProperties(new Date(), UUID.randomUUID().toString(), "test");
 
                 final DeployVMFromTemplateResponseMessage responseMessage = new DeployVMFromTemplateResponseMessage(messageProperties,
-                        DeployVMFromTemplateResponseMessage.Status.SUCCESS);
+                        DeployVMFromTemplateResponseMessage.Status.SUCCESS, "");
 
                 serviceCallback.handleServiceResponse(new ServiceResponse<>(requestId, responseMessage, null));
             }

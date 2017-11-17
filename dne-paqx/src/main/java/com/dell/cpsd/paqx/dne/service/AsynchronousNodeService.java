@@ -5,6 +5,7 @@
 
 package com.dell.cpsd.paqx.dne.service;
 
+import com.dell.cpsd.EsxiInstallationInfo;
 import com.dell.cpsd.paqx.dne.amqp.callback.AsynchronousNodeServiceCallback;
 import com.dell.cpsd.paqx.dne.service.model.BootDeviceIdracStatus;
 import com.dell.cpsd.paqx.dne.service.model.ConfigureBootDeviceIdracRequest;
@@ -31,5 +32,11 @@ public interface AsynchronousNodeService
     BootDeviceIdracStatus bootDeviceIdracStatusResponse(AsynchronousNodeServiceCallback<?> serviceCallback)
             throws ServiceExecutionException;
 
+    <T extends ServiceResponse<?>> AsynchronousNodeServiceCallback<?> requestInstallEsxi(String processId,
+                                                                                         String activityId,
+                                                                                         String messageId,
+                                                                                         EsxiInstallationInfo esxiInstallationInfo);
+
+    String requestInstallEsxi(AsynchronousNodeServiceCallback<?> serviceCallback) throws ServiceExecutionException;
 
 }

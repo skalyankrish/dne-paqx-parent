@@ -22,12 +22,12 @@ import static org.mockito.Mockito.spy;
  *
  * @since 1.0
  */
-public class ConfigureBootDeviceIdracResponseAdapterTest extends BaseResponseAdapterTest<ConfigureBootDeviceIdracResponseMessage>
+public class ConfigureBootDeviceIdracResponseAdapterTest extends BaseAsynchronousResponseAdapterTest<ConfigureBootDeviceIdracResponseMessage>
 {
     @Override
     protected ServiceCallbackAdapter<ConfigureBootDeviceIdracResponseMessage, ServiceResponse<ConfigureBootDeviceIdracResponseMessage>> createTestable()
     {
-        return new ConfigureBootDeviceIdracResponseAdapter(this.registry);
+        return new ConfigureBootDeviceIdracResponseAdapter(this.registry, this.runtimeService);
     }
 
     @Override

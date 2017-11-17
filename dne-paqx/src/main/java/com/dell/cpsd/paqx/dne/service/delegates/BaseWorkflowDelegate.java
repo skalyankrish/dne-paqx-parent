@@ -5,6 +5,9 @@
  */
 package com.dell.cpsd.paqx.dne.service.delegates;
 
+import com.dell.cpsd.paqx.dne.service.NodeService;
+import com.dell.cpsd.service.common.client.exception.ServiceExecutionException;
+import com.dell.cpsd.service.common.client.exception.ServiceTimeoutException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,7 +30,7 @@ public abstract class BaseWorkflowDelegate implements JavaDelegate
     private List<String> delegateStatus = new CopyOnWriteArrayList<>();
 
     @Override
-    public void execute(final DelegateExecution delegateExecution)
+    public void execute(final DelegateExecution delegateExecution) throws Exception
     {
         preExecute(delegateExecution);
         try
@@ -74,5 +77,4 @@ public abstract class BaseWorkflowDelegate implements JavaDelegate
     public void updateDelegateStatus(String statusString) {
         delegateStatus.add(statusString);
     }
-
 }

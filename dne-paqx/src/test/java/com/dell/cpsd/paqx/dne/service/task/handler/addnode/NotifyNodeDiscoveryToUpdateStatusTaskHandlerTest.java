@@ -69,7 +69,7 @@ public class NotifyNodeDiscoveryToUpdateStatusTaskHandlerTest
     @Before
     public void setUp()
     {
-        this.handler = spy(new NotifyNodeDiscoveryToUpdateStatusTaskHandler(this.service));
+        this.handler = spy(new NotifyNodeDiscoveryToUpdateStatusTaskHandler(this.service,"Completed"));
     }
 
     /**
@@ -86,12 +86,12 @@ public class NotifyNodeDiscoveryToUpdateStatusTaskHandlerTest
         doReturn(this.response).when(this.handler).initializeResponse(this.job);
         doReturn(this.request).when(this.job).getInputParams();
         doReturn(this.symphonyUuid).when(this.request).getSymphonyUuid();
-        doReturn(true).when(this.service).notifyNodeAllocationComplete(anyString());
+        doReturn(true).when(this.service).notifyNodeAllocationStatus(anyString(), anyString());
 
         boolean result = this.handler.executeTask(this.job);
 
         assertThat(result, is(true));
-        verify(this.service).notifyNodeAllocationComplete(any());
+        verify(this.service).notifyNodeAllocationStatus(any(), anyString());
         verify(this.response).setWorkFlowTaskStatus(Status.SUCCEEDED);
         verify(this.response, never()).addError(anyString());
     }
@@ -115,7 +115,7 @@ public class NotifyNodeDiscoveryToUpdateStatusTaskHandlerTest
         boolean result = this.handler.executeTask(this.job);
 
         assertThat(result, is(false));
-        verify(this.service, never()).notifyNodeAllocationComplete(any());
+        verify(this.service, never()).notifyNodeAllocationStatus(any(), anyString());
         verify(this.response).setWorkFlowTaskStatus(Status.FAILED);
         verify(this.response).addError(anyString());
     }
@@ -140,7 +140,7 @@ public class NotifyNodeDiscoveryToUpdateStatusTaskHandlerTest
         boolean result = this.handler.executeTask(this.job);
 
         assertThat(result, is(false));
-        verify(this.service, never()).notifyNodeAllocationComplete(any());
+        verify(this.service, never()).notifyNodeAllocationStatus(any(), anyString());
         verify(this.response).setWorkFlowTaskStatus(Status.FAILED);
         verify(this.response).addError(anyString());
     }
@@ -159,12 +159,12 @@ public class NotifyNodeDiscoveryToUpdateStatusTaskHandlerTest
         doReturn(this.response).when(this.handler).initializeResponse(this.job);
         doReturn(this.request).when(this.job).getInputParams();
         doReturn(this.symphonyUuid).when(this.request).getSymphonyUuid();
-        doReturn(false).when(this.service).notifyNodeAllocationComplete(anyString());
+        doReturn(false).when(this.service).notifyNodeAllocationStatus(anyString(), anyString());
 
         boolean result = this.handler.executeTask(this.job);
 
         assertThat(result, is(false));
-        verify(this.service).notifyNodeAllocationComplete(any());
+        verify(this.service).notifyNodeAllocationStatus(any(), anyString());
         verify(this.response).setWorkFlowTaskStatus(Status.FAILED);
         verify(this.response).addError(anyString());
     }

@@ -4,23 +4,7 @@
  */
 package com.dell.cpsd.paqx.dne.amqp.config;
 
-import com.dell.cpsd.ChangeIdracCredentialsRequestMessage;
-import com.dell.cpsd.ChangeIdracCredentialsResponseMessage;
-import com.dell.cpsd.CompleteNodeAllocationRequestMessage;
-import com.dell.cpsd.CompleteNodeAllocationResponseMessage;
-import com.dell.cpsd.ConfigureBootDeviceIdracRequestMessage;
-import com.dell.cpsd.ConfigureBootDeviceIdracResponseMessage;
-import com.dell.cpsd.ConfigurePxeBootRequestMessage;
-import com.dell.cpsd.ConfigurePxeBootResponseMessage;
-import com.dell.cpsd.DiscoveredNodeError;
-import com.dell.cpsd.InstallESXiRequestMessage;
-import com.dell.cpsd.InstallESXiResponseMessage;
-import com.dell.cpsd.ListNodes;
-import com.dell.cpsd.NodeInventoryRequestMessage;
-import com.dell.cpsd.NodeInventoryResponseMessage;
-import com.dell.cpsd.NodesListed;
-import com.dell.cpsd.SetObmSettingsRequestMessage;
-import com.dell.cpsd.SetObmSettingsResponseMessage;
+import com.dell.cpsd.*;
 import com.dell.cpsd.common.rabbitmq.MessageAnnotationProcessor;
 import com.dell.cpsd.common.rabbitmq.message.DefaultMessageConverterFactory;
 import com.dell.cpsd.common.rabbitmq.retrypolicy.DefaultRetryPolicyFactory;
@@ -31,6 +15,8 @@ import com.dell.cpsd.rackhd.adapter.model.idrac.IdracNetworkSettingsResponseMess
 import com.dell.cpsd.service.engineering.standards.EssValidateProtectionDomainsRequestMessage;
 import com.dell.cpsd.service.engineering.standards.EssValidateProtectionDomainsResponseMessage;
 import com.dell.cpsd.storage.capabilities.api.*;
+import com.dell.cpsd.storage.capabilities.api.ListComponentRequestMessage;
+import com.dell.cpsd.storage.capabilities.api.ListComponentResponseMessage;
 import com.dell.cpsd.virtualization.capabilities.api.AddEsxiHostVSphereLicenseRequest;
 import com.dell.cpsd.virtualization.capabilities.api.AddEsxiHostVSphereLicenseResponse;
 import com.dell.cpsd.virtualization.capabilities.api.AddHostToDvSwitchRequestMessage;
@@ -248,9 +234,15 @@ public class RabbitConfig
         messageClasses.add(DiscoverClusterRequestInfoMessage.class);
         messageClasses.add(DiscoverClusterResponseInfoMessage.class);
 
+        messageClasses.add(StartNodeAllocationRequestMessage.class);
+        messageClasses.add(StartNodeAllocationResponseMessage.class);
+
         messageClasses.add(CompleteNodeAllocationRequestMessage.class);
         messageClasses.add(CompleteNodeAllocationResponseMessage.class);
-        
+
+        messageClasses.add(FailNodeAllocationRequestMessage.class);
+        messageClasses.add(FailNodeAllocationResponseMessage.class);
+
         messageClasses.add(ChangeIdracCredentialsRequestMessage.class);
         messageClasses.add(ChangeIdracCredentialsResponseMessage.class);
 

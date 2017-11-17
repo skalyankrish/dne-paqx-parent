@@ -26,11 +26,6 @@ public class ConfigureBootDeviceIdracResponseAdapter
     private ServiceCallbackRegistry serviceCallbackRegistry;
     private RuntimeService runtimeService;
 
-    public ConfigureBootDeviceIdracResponseAdapter(final ServiceCallbackRegistry serviceCallbackRegistry)
-    {
-        this.serviceCallbackRegistry = serviceCallbackRegistry;
-    }
-
     public ConfigureBootDeviceIdracResponseAdapter(ServiceCallbackRegistry serviceCallbackRegistry, RuntimeService runtimeService)
     {
         this.serviceCallbackRegistry = serviceCallbackRegistry;
@@ -76,5 +71,15 @@ public class ConfigureBootDeviceIdracResponseAdapter
     public Class<ConfigureBootDeviceIdracResponseMessage> getSourceClass()
     {
         return ConfigureBootDeviceIdracResponseMessage.class;
+    }
+
+    public RuntimeService getRuntimeService()
+    {
+        return runtimeService;
+    }
+
+    public void setRuntimeService(final RuntimeService runtimeService)
+    {
+        this.runtimeService = runtimeService;
     }
 }

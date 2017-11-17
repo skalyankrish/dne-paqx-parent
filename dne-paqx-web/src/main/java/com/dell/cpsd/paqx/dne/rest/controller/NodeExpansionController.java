@@ -137,9 +137,9 @@ public class NodeExpansionController
     @ResponseStatus(HttpStatus.OK)
     public NodeInfo GetFirstDiscoveredNodes(HttpServletRequest servletRequest) throws ServiceTimeoutException, ServiceExecutionException, JsonProcessingException {
         DiscoveredNodeInfo discoveredNode = nodeService.getFirstDiscoveredNodeInfo();
-        if ( discoveredNode != null )
+        if (discoveredNode != null)
         {
-            return  new NodeInfo( discoveredNode.getSymphonyUuid(), NodeStatus.valueOf(discoveredNode.getNodeStatus().toString()),
+            return new NodeInfo(discoveredNode.getSymphonyUuid(), NodeStatus.valueOf(discoveredNode.getNodeStatus().toString()),
                     discoveredNode.getSerialNumber());
         }
         return null;

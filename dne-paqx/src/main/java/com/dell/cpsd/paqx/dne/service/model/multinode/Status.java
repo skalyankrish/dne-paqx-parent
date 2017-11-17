@@ -34,7 +34,7 @@ public class Status
     private String id;
     private String jobId;
     private StatusState state;
-    private Activity currentActivity;
+    private List<Activity> currentActivities;
     private List<Activity> completedSteps = new ArrayList<>();
     private List<Error> errors = new ArrayList<>();
     private List<Status> subProcesses = new ArrayList<>();
@@ -71,14 +71,14 @@ public class Status
         this.state = state;
     }
 
-    public Activity getCurrentActivity()
+    public List<Activity> getCurrentActivities()
     {
-        return currentActivity;
+        return currentActivities;
     }
 
-    public void setCurrentActivity(final Activity currentActivity)
+    public void setCurrentActivities(final List<Activity> currentActivities)
     {
-        this.currentActivity = currentActivity;
+        this.currentActivities = currentActivities;
     }
 
     public List<Activity> getCompletedSteps()

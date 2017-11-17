@@ -23,6 +23,7 @@ public class AddNodeTaskConfig
     {
         final Map<String, Step> workflowSteps = new HashMap<>();
         addWorkflowSteps(workflowSteps,
+                "notifyNodeDiscoveryToUpdateStatus",
                 "retrieveEsxiDefaultCredentialDetails",
                 "installEsxi",
                 "addHostToVcenter",

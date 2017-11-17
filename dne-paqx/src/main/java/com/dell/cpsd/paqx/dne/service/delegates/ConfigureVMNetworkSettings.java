@@ -9,6 +9,9 @@ package com.dell.cpsd.paqx.dne.service.delegates;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
+import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
+import com.dell.cpsd.virtualization.capabilities.api.ConfigureVmNetworkSettingsRequestMessage;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +20,22 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.CONFIGURE_VM_NETWORK_SETTINGS;
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.DEPLOY_SCALEIO_NEW_VM_NAME;
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.HOSTNAME;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
 
+/**
+ * Configure virtual machine network settings.
+ * <p>
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries. All Rights Reserved. Dell EMC Confidential/Proprietary Information
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
+ */
 @Component
 @Scope("prototype")
 @Qualifier("configureVMNetworkSettings")
@@ -43,7 +60,7 @@ public class ConfigureVMNetworkSettings extends BaseWorkflowDelegate
      * ConfigureVmNetworkSettingsTaskHandler constructor.
      *
      * @param nodeService - The <code>NodeService</code> instance
-     * @param repository - The <code>DataServiceRepository</code> instance
+     * @param repository  - The <code>DataServiceRepository</code> instance
      */
     @Autowired
     public ConfigureVMNetworkSettings(final NodeService nodeService, final DataServiceRepository repository)
@@ -57,87 +74,81 @@ public class ConfigureVMNetworkSettings extends BaseWorkflowDelegate
     {
         LOGGER.info("Execute Configure vm network settings");
         final String taskMessage = "Configure VM Network Settings";
+
         final NodeDetail nodeDetail = (NodeDetail) delegateExecution.getVariable(NODE_DETAIL);
-        /*try
+        final String hostname = (String) delegateExecution.getVariable(HOSTNAME);
+        final String vmName = (String) delegateExecution.getVariable(DEPLOY_SCALEIO_NEW_VM_NAME);
+
+        ComponentEndpointIds componentEndpointIds;
+        try
         {
-            final ComponentEndpointIds componentEndpointIds = repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER");
-
-            if (componentEndpointIds == null)
-            {
-                throw new IllegalStateException("No VCenter components found.");
-            }
-
-            final InstallEsxiTaskResponse installEsxiTaskResponse = (InstallEsxiTaskResponse) job.getTaskResponseMap().get("installEsxi");
-
-            if (installEsxiTaskResponse == null)
-            {
-                throw new IllegalStateException("No Install ESXi task response found");
-            }
-
-            final String hostname = installEsxiTaskResponse.getHostname();
-
-            if (StringUtils.isEmpty(hostname))
-            {
-                throw new IllegalStateException("Host name is null");
-            }
-
-            final DeployScaleIoVmTaskResponse deployScaleIoVmTaskResponse = (DeployScaleIoVmTaskResponse) job.getTaskResponseMap().get("deploySVM");
-
-            if (deployScaleIoVmTaskResponse == null)
-            {
-                throw new IllegalStateException("No deploy ScaleIO vm task response found");
-            }
-
-            final String vmName = deployScaleIoVmTaskResponse.getNewVMName();
-
-            if (StringUtils.isEmpty(vmName))
-            {
-                throw new IllegalStateException("VM name is null");
-            }
-
-            final Map<String, String> dvSwitchNames = repository.getDvSwitchNames();
-
-            if (dvSwitchNames == null)
-            {
-                throw new IllegalStateException("DVSwitch Names Map is null");
-            }
-
-            final Map<String, String> scaleIoNetworkNamesMap = repository.getScaleIoNetworkNames(dvSwitchNames);
-
-            if (scaleIoNetworkNamesMap == null)
-            {
-                throw new IllegalStateException("ScaleIO DVSwitch-Network Names Map is null");
-            }
-
-            final ConfigureVmNetworkSettingsRequestMessage requestMessage = new ConfigureVmNetworkSettingsRequestMessage();
-            requestMessage.setHostname(hostname);
-            requestMessage.setVmName(vmName);
-            requestMessage.setNetworkSettingsMap(scaleIoNetworkNamesMap);
-            requestMessage.setEndpointUrl(componentEndpointIds.getEndpointUrl());
-            requestMessage.setComponentEndpointIds(
-                    new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(componentEndpointIds.getComponentUuid(),
-                                                                                           componentEndpointIds.getEndpointUuid(), componentEndpointIds.getCredentialUuid()));
-
-            final boolean succeeded = this.nodeService.requestConfigureVmNetworkSettings(requestMessage);
-
-            if (!succeeded)
-            {
-                throw new IllegalStateException("Configure VM network settings request failed");
-            }
-
-            response.setWorkFlowTaskStatus(Status.SUCCEEDED);
-            return true;
+            componentEndpointIds = repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER");
         }
-        catch(Exception ex)
+        catch (Exception e)
         {
-            LOGGER.error("Exception occurred", ex);
-            response.addError(ex.getMessage());
+            String errorMessage = "An Unexpected Exception occurred attempting to retrieve VCenter Component Endpoints.  Reason: ";
+            LOGGER.error(errorMessage, e);
+            updateDelegateStatus(errorMessage + e.getMessage());
+            throw new BpmnError(CONFIGURE_VM_NETWORK_SETTINGS, errorMessage + e.getMessage());
         }
 
-        response.setWorkFlowTaskStatus(Status.FAILED);
-        return false;
-*/
-        LOGGER.info(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
-        updateDelegateStatus(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
+        Map<String, String> dvSwitchNames;
+        try
+        {
+            dvSwitchNames = repository.getDvSwitchNames();
+        } catch(Exception e)
+        {
+            String errorMessage = "An Unexpected Exception occurred attempting to retrieve DV Switch names.  Reason: ";
+            LOGGER.error(errorMessage, e);
+            updateDelegateStatus(errorMessage + e.getMessage());
+            throw new BpmnError(CONFIGURE_VM_NETWORK_SETTINGS, errorMessage + e.getMessage());
+        }
+
+        Map<String, String> scaleIoNetworkNamesMap;
+        try
+        {
+            scaleIoNetworkNamesMap = repository.getScaleIoNetworkNames(dvSwitchNames);
+        } catch(Exception e)
+        {
+            String errorMessage = "An Unexpected Exception occurred attempting to retrieve ScaleIO DVSwitch-Network Names Map.  Reason: ";
+            LOGGER.error(errorMessage, e);
+            updateDelegateStatus(errorMessage + e.getMessage());
+            throw new BpmnError(CONFIGURE_VM_NETWORK_SETTINGS, errorMessage + e.getMessage());
+        }
+
+        final ConfigureVmNetworkSettingsRequestMessage requestMessage = new ConfigureVmNetworkSettingsRequestMessage();
+        requestMessage.setHostname(hostname);
+        requestMessage.setVmName(vmName);
+        requestMessage.setNetworkSettingsMap(scaleIoNetworkNamesMap);
+        requestMessage.setEndpointUrl(componentEndpointIds.getEndpointUrl());
+        requestMessage.setComponentEndpointIds(
+                new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(componentEndpointIds.getComponentUuid(),
+                        componentEndpointIds.getEndpointUuid(), componentEndpointIds.getCredentialUuid()));
+
+        boolean succeeded;
+        try
+        {
+            succeeded = this.nodeService.requestConfigureVmNetworkSettings(requestMessage);
+        }
+        catch (Exception ex)
+        {
+            String errorMessage = "An Unexpected Exception occurred attempting to request " + taskMessage + ".  Reason: ";
+            LOGGER.error(errorMessage, ex);
+            updateDelegateStatus(errorMessage + ex.getMessage());
+            throw new BpmnError(CONFIGURE_VM_NETWORK_SETTINGS, errorMessage + ex.getMessage());
+
+        }
+
+        if (!succeeded)
+        {
+            String errorMessage = taskMessage + ": Configure VM network settings request failed";
+            LOGGER.error(errorMessage);
+            updateDelegateStatus(errorMessage);
+            throw new BpmnError(CONFIGURE_VM_NETWORK_SETTINGS, errorMessage);
+        }
+
+        String returnMessage = taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.";
+        LOGGER.info(returnMessage);
+        updateDelegateStatus(returnMessage);
     }
 }

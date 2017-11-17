@@ -5,7 +5,10 @@
  */
 package com.dell.cpsd.paqx.dne.service.delegates.model;
 
+import com.dell.cpsd.service.engineering.standards.DeviceAssignment;
+
 import java.io.Serializable;
+import java.util.Map;
 
 public class NodeDetail implements Serializable
 {
@@ -22,39 +25,33 @@ public class NodeDetail implements Serializable
     private String esxiManagementHostname;
 
     private String scaleIoData1SvmIpAddress;
-    private String scaleIoData1KernelIpAddress;
-    private String scaleIoSvmData1SubnetMask;
+    private String scaleIoData1SvmSubnetMask;
     private String scaleIoData2SvmIpAddress;
-    private String scaleIoData2KernelIpAddress;
-    private String scaleIoSvmData2SubnetMask;
+    private String scaleIoData2SvmSubnetMask;
+    private String scaleIoData1EsxIpAddress;
+    private String scaleIoData1EsxSubnetMask;
+    private String scaleIoData2EsxIpAddress;
+    private String scaleIoData2EsxSubnetMask;
     private String scaleIoSvmManagementIpAddress;
     private String scaleIoSvmManagementGatewayAddress;
     private String scaleIoSvmManagementSubnetMask;
-    private String hostname;
     private String clusterName;
     private String vMotionManagementIpAddress;
     private String vMotionManagementSubnetMask;
-    private String protectionDomain;
+    private String protectionDomainName;
+    private String protectionDomainId;
 
-    public String getId()
+    public NodeDetail()
     {
-        return id;
     }
 
-    public void setId(final String id)
+    public NodeDetail(final String id, final String serviceTag)
     {
         this.id = id;
-    }
-
-    public String getServiceTag()
-    {
-        return serviceTag;
-    }
-
-    public void setServiceTag(final String serviceTag)
-    {
         this.serviceTag = serviceTag;
     }
+
+    private Map<String, DeviceAssignment> deviceToDeviceStoragePool;
 
     public String getIdracIpAddress()
     {
@@ -136,24 +133,14 @@ public class NodeDetail implements Serializable
         this.scaleIoData1SvmIpAddress = scaleIoData1SvmIpAddress;
     }
 
-    public String getScaleIoData1KernelIpAddress()
+    public String getScaleIoData1SvmSubnetMask()
     {
-        return scaleIoData1KernelIpAddress;
+        return scaleIoData1SvmSubnetMask;
     }
 
-    public void setScaleIoData1KernelIpAddress(final String scaleIoData1KernelIpAddress)
+    public void setScaleIoData1SvmSubnetMask(final String scaleIoData1SvmSubnetMask)
     {
-        this.scaleIoData1KernelIpAddress = scaleIoData1KernelIpAddress;
-    }
-
-    public String getScaleIoSvmData1SubnetMask()
-    {
-        return scaleIoSvmData1SubnetMask;
-    }
-
-    public void setScaleIoSvmData1SubnetMask(final String scaleIoSvmData1SubnetMask)
-    {
-        this.scaleIoSvmData1SubnetMask = scaleIoSvmData1SubnetMask;
+        this.scaleIoData1SvmSubnetMask = scaleIoData1SvmSubnetMask;
     }
 
     public String getScaleIoData2SvmIpAddress()
@@ -166,24 +153,124 @@ public class NodeDetail implements Serializable
         this.scaleIoData2SvmIpAddress = scaleIoData2SvmIpAddress;
     }
 
-    public String getScaleIoData2KernelIpAddress()
+    public String getvMotionManagementIpAddress()
     {
-        return scaleIoData2KernelIpAddress;
+        return vMotionManagementIpAddress;
     }
 
-    public void setScaleIoData2KernelIpAddress(final String scaleIoData2KernelIpAddress)
+    public void setvMotionManagementIpAddress(final String vMotionManagementIpAddress)
     {
-        this.scaleIoData2KernelIpAddress = scaleIoData2KernelIpAddress;
+        this.vMotionManagementIpAddress = vMotionManagementIpAddress;
     }
 
-    public String getScaleIoSvmData2SubnetMask()
+    public String getvMotionManagementSubnetMask()
     {
-        return scaleIoSvmData2SubnetMask;
+        return vMotionManagementSubnetMask;
     }
 
-    public void setScaleIoSvmData2SubnetMask(final String scaleIoSvmData2SubnetMask)
+    public void setvMotionManagementSubnetMask(final String vMotionManagementSubnetMask)
     {
-        this.scaleIoSvmData2SubnetMask = scaleIoSvmData2SubnetMask;
+        this.vMotionManagementSubnetMask = vMotionManagementSubnetMask;
+    }
+
+    public String getScaleIoData2SvmSubnetMask()
+    {
+        return scaleIoData2SvmSubnetMask;
+    }
+
+    public String getScaleIoData1EsxIpAddress()
+    {
+        return scaleIoData1EsxIpAddress;
+    }
+
+    public String getScaleIoData1EsxSubnetMask()
+    {
+        return scaleIoData1EsxSubnetMask;
+    }
+
+    public String getScaleIoData2EsxIpAddress()
+    {
+        return scaleIoData2EsxIpAddress;
+    }
+
+    public String getScaleIoData2EsxSubnetMask()
+    {
+        return scaleIoData2EsxSubnetMask;
+    }
+
+    public String getProtectionDomainName()
+    {
+        return protectionDomainName;
+    }
+
+    public String getProtectionDomainId()
+    {
+        return protectionDomainId;
+    }
+
+    public Map<String, DeviceAssignment> getDeviceToDeviceStoragePool()
+    {
+        return deviceToDeviceStoragePool;
+    }
+
+    public void setScaleIoData2SvmSubnetMask(final String scaleIoData2SvmSubnetMask)
+    {
+        this.scaleIoData2SvmSubnetMask = scaleIoData2SvmSubnetMask;
+    }
+
+    public void setScaleIoData1EsxIpAddress(final String scaleIoData1EsxIpAddress)
+    {
+        this.scaleIoData1EsxIpAddress = scaleIoData1EsxIpAddress;
+    }
+
+    public void setScaleIoData1EsxSubnetMask(final String scaleIoData1EsxSubnetMask)
+    {
+        this.scaleIoData1EsxSubnetMask = scaleIoData1EsxSubnetMask;
+    }
+
+    public void setScaleIoData2EsxIpAddress(final String scaleIoData2EsxIpAddress)
+    {
+        this.scaleIoData2EsxIpAddress = scaleIoData2EsxIpAddress;
+    }
+
+    public void setScaleIoData2EsxSubnetMask(final String scaleIoData2EsxSubnetMask)
+    {
+        this.scaleIoData2EsxSubnetMask = scaleIoData2EsxSubnetMask;
+    }
+
+    public void setProtectionDomainName(final String protectionDomainName)
+    {
+        this.protectionDomainName = protectionDomainName;
+    }
+
+    public void setProtectionDomainId(final String protectionDomainId)
+    {
+        this.protectionDomainId = protectionDomainId;
+    }
+
+    public void setDeviceToDeviceStoragePool(final Map<String, DeviceAssignment> deviceToDeviceStoragePool)
+    {
+        this.deviceToDeviceStoragePool = deviceToDeviceStoragePool;
+    }
+
+    public String getId()
+    {
+        return id;
+    }
+
+    public void setId(final String id)
+    {
+        this.id = id;
+    }
+
+    public String getServiceTag()
+    {
+        return serviceTag;
+    }
+
+    public void setServiceTag(final String serviceTag)
+    {
+        this.serviceTag = serviceTag;
     }
 
     public String getScaleIoSvmManagementIpAddress()
@@ -216,16 +303,6 @@ public class NodeDetail implements Serializable
         this.scaleIoSvmManagementSubnetMask = scaleIoSvmManagementSubnetMask;
     }
 
-    public String getHostname()
-    {
-        return hostname;
-    }
-
-    public void setHostname(final String hostname)
-    {
-        this.hostname = hostname;
-    }
-
     public String getClusterName()
     {
         return clusterName;
@@ -236,36 +313,6 @@ public class NodeDetail implements Serializable
         this.clusterName = clusterName;
     }
 
-    public String getvMotionManagementIpAddress()
-    {
-        return vMotionManagementIpAddress;
-    }
-
-    public void setvMotionManagementIpAddress(final String vMotionManagementIpAddress)
-    {
-        this.vMotionManagementIpAddress = vMotionManagementIpAddress;
-    }
-
-    public String getvMotionManagementSubnetMask()
-    {
-        return vMotionManagementSubnetMask;
-    }
-
-    public void setvMotionManagementSubnetMask(final String vMotionManagementSubnetMask)
-    {
-        this.vMotionManagementSubnetMask = vMotionManagementSubnetMask;
-    }
-
-    public String getProtectionDomain()
-    {
-        return protectionDomain;
-    }
-
-    public void setProtectionDomain(final String protectionDomain)
-    {
-        this.protectionDomain = protectionDomain;
-    }
-
     @Override
     public boolean equals(final Object o)
     {
@@ -273,25 +320,172 @@ public class NodeDetail implements Serializable
         {
             return true;
         }
-        if (!(o instanceof NodeDetail))
+        if (o == null || getClass() != o.getClass())
         {
             return false;
         }
 
         final NodeDetail that = (NodeDetail) o;
 
-        if (!getId().equals(that.getId()))
+        if (idracIpAddress != null ? !idracIpAddress.equals(that.idracIpAddress) : that.idracIpAddress != null)
         {
             return false;
         }
-        return getServiceTag().equals(that.getServiceTag());
+        if (idracGatewayIpAddress != null ? !idracGatewayIpAddress.equals(that.idracGatewayIpAddress) : that.idracGatewayIpAddress != null)
+        {
+            return false;
+        }
+        if (idracSubnetMask != null ? !idracSubnetMask.equals(that.idracSubnetMask) : that.idracSubnetMask != null)
+        {
+            return false;
+        }
+        if (esxiManagementIpAddress != null ?
+                !esxiManagementIpAddress.equals(that.esxiManagementIpAddress) :
+                that.esxiManagementIpAddress != null)
+        {
+            return false;
+        }
+        if (esxiManagementGatewayIpAddress != null ?
+                !esxiManagementGatewayIpAddress.equals(that.esxiManagementGatewayIpAddress) :
+                that.esxiManagementGatewayIpAddress != null)
+        {
+            return false;
+        }
+        if (esxiManagementSubnetMask != null ?
+                !esxiManagementSubnetMask.equals(that.esxiManagementSubnetMask) :
+                that.esxiManagementSubnetMask != null)
+        {
+            return false;
+        }
+        if (esxiManagementHostname != null ?
+                !esxiManagementHostname.equals(that.esxiManagementHostname) :
+                that.esxiManagementHostname != null)
+        {
+            return false;
+        }
+        if (scaleIoData1SvmIpAddress != null ?
+                !scaleIoData1SvmIpAddress.equals(that.scaleIoData1SvmIpAddress) :
+                that.scaleIoData1SvmIpAddress != null)
+        {
+            return false;
+        }
+        if (scaleIoData1SvmSubnetMask != null ?
+                !scaleIoData1SvmSubnetMask.equals(that.scaleIoData1SvmSubnetMask) :
+                that.scaleIoData1SvmSubnetMask != null)
+        {
+            return false;
+        }
+        if (scaleIoData2SvmIpAddress != null ?
+                !scaleIoData2SvmIpAddress.equals(that.scaleIoData2SvmIpAddress) :
+                that.scaleIoData2SvmIpAddress != null)
+        {
+            return false;
+        }
+        if (scaleIoData2SvmSubnetMask != null ?
+                !scaleIoData2SvmSubnetMask.equals(that.scaleIoData2SvmSubnetMask) :
+                that.scaleIoData2SvmSubnetMask != null)
+        {
+            return false;
+        }
+        if (scaleIoData1EsxIpAddress != null ?
+                !scaleIoData1EsxIpAddress.equals(that.scaleIoData1EsxIpAddress) :
+                that.scaleIoData1EsxIpAddress != null)
+        {
+            return false;
+        }
+        if (scaleIoData1EsxSubnetMask != null ?
+                !scaleIoData1EsxSubnetMask.equals(that.scaleIoData1EsxSubnetMask) :
+                that.scaleIoData1EsxSubnetMask != null)
+        {
+            return false;
+        }
+        if (scaleIoData2EsxIpAddress != null ?
+                !scaleIoData2EsxIpAddress.equals(that.scaleIoData2EsxIpAddress) :
+                that.scaleIoData2EsxIpAddress != null)
+        {
+            return false;
+        }
+        if (scaleIoData2EsxSubnetMask != null ?
+                !scaleIoData2EsxSubnetMask.equals(that.scaleIoData2EsxSubnetMask) :
+                that.scaleIoData2EsxSubnetMask != null)
+        {
+            return false;
+        }
+        if (scaleIoSvmManagementIpAddress != null ?
+                !scaleIoSvmManagementIpAddress.equals(that.scaleIoSvmManagementIpAddress) :
+                that.scaleIoSvmManagementIpAddress != null)
+        {
+            return false;
+        }
+        if (scaleIoSvmManagementGatewayAddress != null ?
+                !scaleIoSvmManagementGatewayAddress.equals(that.scaleIoSvmManagementGatewayAddress) :
+                that.scaleIoSvmManagementGatewayAddress != null)
+        {
+            return false;
+        }
+        if (scaleIoSvmManagementSubnetMask != null ?
+                !scaleIoSvmManagementSubnetMask.equals(that.scaleIoSvmManagementSubnetMask) :
+                that.scaleIoSvmManagementSubnetMask != null)
+        {
+            return false;
+        }
+        if (clusterName != null ? !clusterName.equals(that.clusterName) : that.clusterName != null)
+        {
+            return false;
+        }
+        if (vMotionManagementIpAddress != null ?
+                !vMotionManagementIpAddress.equals(that.vMotionManagementIpAddress) :
+                that.vMotionManagementIpAddress != null)
+        {
+            return false;
+        }
+        if (vMotionManagementSubnetMask != null ?
+                !vMotionManagementSubnetMask.equals(that.vMotionManagementSubnetMask) :
+                that.vMotionManagementSubnetMask != null)
+        {
+            return false;
+        }
+        if (protectionDomainName != null ? !protectionDomainName.equals(that.protectionDomainName) : that.protectionDomainName != null)
+        {
+            return false;
+        }
+        if (protectionDomainId != null ? !protectionDomainId.equals(that.protectionDomainId) : that.protectionDomainId != null)
+        {
+            return false;
+        }
+        return deviceToDeviceStoragePool != null ?
+                deviceToDeviceStoragePool.equals(that.deviceToDeviceStoragePool) :
+                that.deviceToDeviceStoragePool == null;
     }
 
     @Override
     public int hashCode()
     {
-        int result = getId().hashCode();
-        result = 31 * result + getServiceTag().hashCode();
+        int result = idracIpAddress != null ? idracIpAddress.hashCode() : 0;
+        result = 31 * result + (idracGatewayIpAddress != null ? idracGatewayIpAddress.hashCode() : 0);
+        result = 31 * result + (idracSubnetMask != null ? idracSubnetMask.hashCode() : 0);
+        result = 31 * result + (esxiManagementIpAddress != null ? esxiManagementIpAddress.hashCode() : 0);
+        result = 31 * result + (esxiManagementGatewayIpAddress != null ? esxiManagementGatewayIpAddress.hashCode() : 0);
+        result = 31 * result + (esxiManagementSubnetMask != null ? esxiManagementSubnetMask.hashCode() : 0);
+        result = 31 * result + (esxiManagementHostname != null ? esxiManagementHostname.hashCode() : 0);
+        result = 31 * result + (scaleIoData1SvmIpAddress != null ? scaleIoData1SvmIpAddress.hashCode() : 0);
+        result = 31 * result + (scaleIoData1SvmSubnetMask != null ? scaleIoData1SvmSubnetMask.hashCode() : 0);
+        result = 31 * result + (scaleIoData2SvmIpAddress != null ? scaleIoData2SvmIpAddress.hashCode() : 0);
+        result = 31 * result + (scaleIoData2SvmSubnetMask != null ? scaleIoData2SvmSubnetMask.hashCode() : 0);
+        result = 31 * result + (scaleIoData1EsxIpAddress != null ? scaleIoData1EsxIpAddress.hashCode() : 0);
+        result = 31 * result + (scaleIoData1EsxSubnetMask != null ? scaleIoData1EsxSubnetMask.hashCode() : 0);
+        result = 31 * result + (scaleIoData2EsxIpAddress != null ? scaleIoData2EsxIpAddress.hashCode() : 0);
+        result = 31 * result + (scaleIoData2EsxSubnetMask != null ? scaleIoData2EsxSubnetMask.hashCode() : 0);
+        result = 31 * result + (scaleIoSvmManagementIpAddress != null ? scaleIoSvmManagementIpAddress.hashCode() : 0);
+        result = 31 * result + (scaleIoSvmManagementGatewayAddress != null ? scaleIoSvmManagementGatewayAddress.hashCode() : 0);
+        result = 31 * result + (scaleIoSvmManagementSubnetMask != null ? scaleIoSvmManagementSubnetMask.hashCode() : 0);
+        result = 31 * result + (clusterName != null ? clusterName.hashCode() : 0);
+        result = 31 * result + (vMotionManagementIpAddress != null ? vMotionManagementIpAddress.hashCode() : 0);
+        result = 31 * result + (vMotionManagementSubnetMask != null ? vMotionManagementSubnetMask.hashCode() : 0);
+        result = 31 * result + (protectionDomainName != null ? protectionDomainName.hashCode() : 0);
+        result = 31 * result + (protectionDomainId != null ? protectionDomainId.hashCode() : 0);
+        result = 31 * result + (deviceToDeviceStoragePool != null ? deviceToDeviceStoragePool.hashCode() : 0);
         return result;
     }
+
 }

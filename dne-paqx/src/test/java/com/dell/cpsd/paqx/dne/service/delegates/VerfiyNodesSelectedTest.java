@@ -41,7 +41,7 @@ public class VerfiyNodesSelectedTest {
     {
         nodeService = mock(NodeService.class);
         repository = mock(DataServiceRepository.class);
-        verifyNodesSelected = new VerifyNodesSelected(nodeService);
+        verifyNodesSelected = new VerifyNodesSelected(nodeService, repository);
         delegateExecution = mock(DelegateExecution.class);
         nodeDetail = new NodeDetail();
         nodeDetail.setServiceTag("abc");
@@ -104,7 +104,7 @@ public class VerfiyNodesSelectedTest {
     {
         when(delegateExecution.getVariable(DelegateConstants.NODE_DETAILS)).thenReturn(nodeDetails);
         when(nodeService.listDiscoveredNodeInfo()).thenReturn(discoveredNodes);
-        final VerifyNodesSelected c = spy(new VerifyNodesSelected(nodeService));
+        final VerifyNodesSelected c = spy(new VerifyNodesSelected(nodeService, repository));
         c.delegateExecute(delegateExecution);
         verify(c).updateDelegateStatus("Attempting to verify selected Nodes are still available.");
     }

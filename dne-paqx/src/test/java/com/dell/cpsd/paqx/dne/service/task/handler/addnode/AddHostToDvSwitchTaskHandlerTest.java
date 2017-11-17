@@ -107,8 +107,8 @@ public class AddHostToDvSwitchTaskHandlerTest
         doReturn(this.installEsxiTaskResponse).when(this.taskResponseMap).get(anyString());
         doReturn(this.hostname).when(this.installEsxiTaskResponse).getHostname();
         doReturn(this.inputParams).when(this.job).getInputParams();
-        doReturn("1.1.1.1").when(this.inputParams).getVMotionManagementIpAddress();
-        doReturn("2.2.2.2").when(this.inputParams).getVMotionManagementSubnetMask();
+        doReturn("1.1.1.1").when(this.inputParams).getvMotionManagementIpAddress();
+        doReturn("2.2.2.2").when(this.inputParams).getvMotionManagementSubnetMask();
         doReturn("3.3.3.3").when(this.inputParams).getScaleIoData1EsxIpAddress();
         doReturn("5.5.5.5").when(this.inputParams).getScaleIoData2EsxIpAddress();
         doReturn("6.6.6.6").when(this.inputParams).getScaleIoData1EsxSubnetMask();
@@ -211,8 +211,8 @@ public class AddHostToDvSwitchTaskHandlerTest
         doReturn(this.installEsxiTaskResponse).when(this.taskResponseMap).get(anyString());
         doReturn(this.hostname).when(this.installEsxiTaskResponse).getHostname();
         doReturn(this.inputParams).when(this.job).getInputParams();
-        doReturn("1.1.1.1").when(this.inputParams).getVMotionManagementIpAddress();
-        doReturn("2.2.2.2").when(this.inputParams).getVMotionManagementSubnetMask();
+        doReturn("1.1.1.1").when(this.inputParams).getvMotionManagementIpAddress();
+        doReturn("2.2.2.2").when(this.inputParams).getvMotionManagementSubnetMask();
         doReturn("3.3.3.3").when(this.inputParams).getScaleIoData1EsxIpAddress();
         doReturn("5.5.5.5").when(this.inputParams).getScaleIoData2EsxIpAddress();
         doReturn("6.6.6.6").when(this.inputParams).getScaleIoData1EsxSubnetMask();

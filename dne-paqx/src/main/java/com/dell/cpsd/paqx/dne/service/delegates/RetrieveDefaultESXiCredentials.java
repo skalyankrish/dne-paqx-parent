@@ -6,7 +6,10 @@
 package com.dell.cpsd.paqx.dne.service.delegates;
 
 import com.dell.cpsd.paqx.dne.service.NodeService;
+import com.dell.cpsd.paqx.dne.service.delegates.model.ESXiCredentialDetails;
+import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
 import com.dell.cpsd.virtualization.capabilities.api.ListEsxiCredentialDetailsRequestMessage;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.ESXI_CREDENTIAL_DETAILS;
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.RETRIEVE_DEFAULT_ESXI_CREDENTIALS_FAILED;
 
 @Component
 @Scope("prototype")
@@ -41,7 +47,7 @@ public class RetrieveDefaultESXiCredentials extends BaseWorkflowDelegate
     {
         LOGGER.info("Execute Retrieve ESXi Credential Details");
 
-        /*ComponentEndpointIds returnData = null;
+        ComponentEndpointIds returnData = null;
         try
         {
             final ListEsxiCredentialDetailsRequestMessage requestMessage = getListDefaultCredentialsRequestMessage();
@@ -52,7 +58,7 @@ public class RetrieveDefaultESXiCredentials extends BaseWorkflowDelegate
             LOGGER.error("An Unexpected Exception Occurred attempting to retrieve the ESXi Default Credentials.", e);
             updateDelegateStatus(
                     "An Unexpected Exception Occurred attempting to retrieve the ESXi Default Credentials.  Reason: " + e.getMessage());
-            throw new BpmnError(RETRIEVE_DEFAULT_ESXI_CREDENTIALS_FAILED,"An Unexpected Exception Occurred attempting to retrieve the ESXi Default Credentials.  Reason: " + e.getMessage());
+            throw new BpmnError(RETRIEVE_DEFAULT_ESXI_CREDENTIALS_FAILED, "An Unexpected Exception Occurred attempting to retrieve the ESXi Default Credentials.  Reason: " + e.getMessage());
         }
         if (returnData == null)
         {
@@ -65,7 +71,6 @@ public class RetrieveDefaultESXiCredentials extends BaseWorkflowDelegate
         esXiCredentialDetails.setEndpointUuid(returnData.getEndpointUuid());
 
         delegateExecution.setVariable(ESXI_CREDENTIAL_DETAILS, esXiCredentialDetails);
-*/
     }
 
     private ListEsxiCredentialDetailsRequestMessage getListDefaultCredentialsRequestMessage()

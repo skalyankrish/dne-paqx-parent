@@ -40,6 +40,7 @@ def load_test_data():
 
 ##############################################################################################
 
+@pytest.mark.skip(reason='Unable to test using RMQ API due to TLS')
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_dnePAQX_container_using_AMQP_over_TLS():
@@ -81,7 +82,7 @@ def test_dnePAQX_container_using_AMQP_over_TLS():
 
         raise Exception(err)
 
-
+@pytest.mark.skip(reason='Covered by implementation of tls')
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_DNEpaqx_AMQP_data_is_encrypted():

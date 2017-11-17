@@ -6,14 +6,16 @@
 
 package com.dell.cpsd.paqx.dne.service.delegates;
 
-import com.dell.cpsd.paqx.dne.domain.Job;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
+import com.dell.cpsd.service.engineering.standards.DeviceAssignment;
+import com.dell.cpsd.storage.capabilities.api.AddHostToProtectionDomainRequestMessage;
 import com.dell.cpsd.storage.capabilities.api.DeviceInfo;
 import com.dell.cpsd.storage.capabilities.api.HostToProtectionDomain;
 import com.dell.cpsd.storage.capabilities.api.SdsIp;
 import com.dell.cpsd.storage.capabilities.api.SdsIpDetails;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +26,22 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.ADD_VCENTER_HOST_TO_PROTECTION_DOMAIN;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
 
+/**
+ * Add a vCenter host to a protection domain.
+ * <p>
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries. All Rights Reserved. Dell EMC Confidential/Proprietary Information
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
+ */
 @Component
 @Scope("prototype")
 @Qualifier("addVCenterHostToProtectionDomain")
@@ -61,7 +76,8 @@ public class AddVCenterHostToProtectionDomain extends BaseWorkflowDelegate
      * @return
      */
     private HostToProtectionDomain setHostToProtectionDomain(String protectionDomain, String name, List<SdsIp> sdsIpList,
-            final List<DeviceInfo> deviceInfoList) {
+            final List<DeviceInfo> deviceInfoList)
+    {
         /**
          * Creating the request message
          */
@@ -76,28 +92,40 @@ public class AddVCenterHostToProtectionDomain extends BaseWorkflowDelegate
     /**
      * get Sds names
      *
-     * @param job
+     * @param nodeDetail
      * @return
      */
-    private String getSdsName(Job job) {
+    private String getSdsName(NodeDetail nodeDetail)
+    {
         String name = null;
-        if (job.getInputParams().getEsxiManagementHostname() != null){
-            name = (job.getInputParams().getEsxiManagementHostname() + "-ESX");
+        String esxiManagementHostname = nodeDetail.getEsxiManagementHostname();
+        if (esxiManagementHostname != null)
+        {
+            String hostDomain = repository.getDomainName();
+            if (!esxiManagementHostname.contains(hostDomain))
+            {
+                esxiManagementHostname = esxiManagementHostname + "." + hostDomain;
+            }
+            name = (esxiManagementHostname + "-ESX");
         }
-        else if (job.getInputParams().getEsxiManagementIpAddress() != null){
-            name = (job.getInputParams().getEsxiManagementIpAddress() + "-ESX");
+        else if (nodeDetail.getEsxiManagementIpAddress() != null)
+        {
+            name = (nodeDetail.getEsxiManagementIpAddress() + "-ESX");
         }
+
         return name;
     }
 
     /**
      * Create Sds Ip list from input
-     * @param job
+     *
+     * @param nodeDetail
      * @return
      */
-    private List<SdsIp> createSdsIps(Job job) {
-        String ScaleIoData1IP = job.getInputParams().getScaleIoData1SvmIpAddress();
-        String ScaleIoData2IP = job.getInputParams().getScaleIoData2SvmIpAddress();
+    private List<SdsIp> createSdsIps(NodeDetail nodeDetail)
+    {
+        String ScaleIoData1IP = nodeDetail.getScaleIoData1SvmIpAddress();
+        String ScaleIoData2IP = nodeDetail.getScaleIoData2SvmIpAddress();
 
         SdsIp sdsIp1 = new SdsIp();
         SdsIpDetails sdsIpDetails1 = new SdsIpDetails();
@@ -112,9 +140,49 @@ public class AddVCenterHostToProtectionDomain extends BaseWorkflowDelegate
         sdsIp2.setSdsIpDetails(sdsIpDetails2);
 
         List<SdsIp> sdsIpList = new ArrayList<>();
-        sdsIpList.add(0,sdsIp1);
-        sdsIpList.add(1,sdsIp2);
+        sdsIpList.add(0, sdsIp1);
+        sdsIpList.add(1, sdsIp2);
         return sdsIpList;
+    }
+
+    /**
+     * set Host to protection domain
+     *
+     * @param protectionDomain
+     * @param name
+     * @param sdsIpList
+     * @param deviceInfoList
+     * @return
+     */
+    private HostToProtectionDomain createHostToProtectionDomain(String protectionDomain, String name, List<SdsIp> sdsIpList,
+            final List<DeviceInfo> deviceInfoList)
+    {
+        /**
+         * Creating the request message
+         */
+        HostToProtectionDomain hostToProtectionDomain = new HostToProtectionDomain();
+        hostToProtectionDomain.setProtectionDomainId(protectionDomain);
+        hostToProtectionDomain.setName(name);
+        hostToProtectionDomain.setSdsIpList(sdsIpList);
+        hostToProtectionDomain.setDeviceInfoList(deviceInfoList);
+
+        return hostToProtectionDomain;
+    }
+
+    private List<DeviceInfo> createDeviceInfoList(Map<String, DeviceAssignment> deviceToDeviceStoragePoolAssignment)
+    {
+
+        List<DeviceInfo> returnVal = null;
+
+        if (deviceToDeviceStoragePoolAssignment != null)
+        {
+            //spaces are NOT allowed in the deviceName, so we will replace any spaces with '/'
+            // '/' is a valid character for deviceName
+            //the deviceName tends to look like "/dev/sda scsi" so it will change to "/dev/sda/scsi"
+            returnVal = deviceToDeviceStoragePoolAssignment.values().stream().filter(Objects::nonNull)
+                    .map(ddspa -> new DeviceInfo(ddspa.getLogicalName(), ddspa.getStoragePoolId(), null)).collect(Collectors.toList());
+        }
+        return returnVal;
     }
 
     @Override
@@ -124,73 +192,72 @@ public class AddVCenterHostToProtectionDomain extends BaseWorkflowDelegate
         final String taskMessage = "Add Host To Protection Domain";
         final NodeDetail nodeDetail = (NodeDetail) delegateExecution.getVariable(NODE_DETAIL);
 
-        /*try{
-            AddHostToProtectionDomainRequestMessage requestMessage = new AddHostToProtectionDomainRequestMessage();
+        AddHostToProtectionDomainRequestMessage requestMessage = new AddHostToProtectionDomainRequestMessage();
 
-            *//**
-             * Getting the protection domain id from FindProtectionDomainTaskHandler
-             *//*
-            final NodeExpansionRequest inputParams = job.getInputParams();
-            final String protectionDomain = inputParams.getProtectionDomain();
+        /**
+         * Getting the protection domain id from FindProtectionDomainTaskHandler
+         */
 
-            if (protectionDomain == null)
-            {
-                throw new IllegalStateException("No Protection domain provided");
-            }
+        final String protectionDomainId = nodeDetail.getProtectionDomainId();
 
-            *//**
-             * Getting the SdsName
-             *//*
-            String name = getSdsName(job);
+        final Map<String, DeviceAssignment> deviceToDeviceStoragePoolAssignment = nodeDetail.getDeviceToDeviceStoragePool();
 
-            *//**
-             * Getting the sdsList
-             *//*
-            List<SdsIp> sdsIpList = createSdsIps(job);
+        /**
+         * Getting the SdsName
+         */
+        String name = getSdsName(nodeDetail);
 
-            List<DeviceInfo> deviceInfoList = createDeviceAssignmentList(job);
+        /**
+         * Getting the sdsList
+         */
+        List<SdsIp> sdsIpList = createSdsIps(nodeDetail);
 
-            final com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds componentEndpointIds = repository.getComponentEndpointIds("SCALEIO-CLUSTER");
+        List<DeviceInfo> deviceInfoList = createDeviceInfoList(deviceToDeviceStoragePoolAssignment);
 
-            *//**
-             * Adding component endpoint ids
-             *//*
-            com.dell.cpsd.storage.capabilities.api.ComponentEndpointIds componentEndpoints = new com.dell.cpsd.storage.capabilities.api.ComponentEndpointIds();
-            componentEndpoints.setEndpointUuid(componentEndpointIds.getEndpointUuid());
-            componentEndpoints.setComponentUuid(componentEndpointIds.getComponentUuid());
-            componentEndpoints.setCredentialUuid(componentEndpointIds.getCredentialUuid());
+        final com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds componentEndpointIds = repository
+                .getComponentEndpointIds("SCALEIO-CLUSTER");
 
-            HostToProtectionDomain hostToProtectionDomain = setHostToProtectionDomain(protectionDomain, name, sdsIpList, deviceInfoList);
+        /**
+         * Adding component endpoint ids
+         */
+        com.dell.cpsd.storage.capabilities.api.ComponentEndpointIds componentEndpoints = new com.dell.cpsd.storage.capabilities.api.ComponentEndpointIds();
+        componentEndpoints.setEndpointUuid(componentEndpointIds.getEndpointUuid());
+        componentEndpoints.setComponentUuid(componentEndpointIds.getComponentUuid());
+        componentEndpoints.setCredentialUuid(componentEndpointIds.getCredentialUuid());
 
-            *//**
-             * Adding the endpoint url
-             *//*
-            String endpointUrl = ("https://" + componentEndpointIds.getEndpointUrl() +":443");
-            requestMessage.setHostToProtectionDomain(hostToProtectionDomain);
-            requestMessage.setComponentEndpointIds(componentEndpoints);
-            requestMessage.setEndpointUrl(endpointUrl);
+        HostToProtectionDomain hostToProtectionDomain = createHostToProtectionDomain(protectionDomainId, name, sdsIpList, deviceInfoList);
 
-            *//**
-             * Creating the response message
-             *//*
-            final boolean success = this.nodeService.requestAddHostToProtectionDomain(requestMessage);
-            if (!success)
-            {
-                throw new IllegalStateException("Request add host to protection domain failed");
-            }
-            response.setWorkFlowTaskStatus(Status.SUCCEEDED);
+        /**
+         * Adding the endpoint url
+         */
+        String endpointUrl = ("https://" + componentEndpointIds.getEndpointUrl() + ":443");
+        requestMessage.setHostToProtectionDomain(hostToProtectionDomain);
+        requestMessage.setComponentEndpointIds(componentEndpoints);
+        requestMessage.setEndpointUrl(endpointUrl);
 
-            return true;
-        }
-        catch(Exception e)
+        boolean success;
+        try
         {
-            LOGGER.error("Exception occurred", e);
-            response.addError(e.toString());
+            success = this.nodeService.requestAddHostToProtectionDomain(requestMessage);
         }
-        response.setWorkFlowTaskStatus(Status.FAILED);
-        return false;
-*/
-        LOGGER.info(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
-        updateDelegateStatus(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
+        catch (Exception e)
+        {
+            String errorMessage = "An Unexpected Exception occurred attempting to request " + taskMessage + ".  Reason: ";
+            LOGGER.error(errorMessage, e);
+            updateDelegateStatus(errorMessage + e.getMessage());
+            throw new BpmnError(ADD_VCENTER_HOST_TO_PROTECTION_DOMAIN, errorMessage + e.getMessage());
+        }
+
+        if (!success)
+        {
+            String errorMessage = taskMessage + ": request add host to protection domain failed";
+            LOGGER.error(errorMessage);
+            updateDelegateStatus(errorMessage);
+            throw new BpmnError(ADD_VCENTER_HOST_TO_PROTECTION_DOMAIN, errorMessage);
+        }
+
+        String returnMessage = taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.";
+        LOGGER.info(returnMessage);
+        updateDelegateStatus(returnMessage);
     }
 }

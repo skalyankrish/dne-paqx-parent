@@ -14,7 +14,18 @@ import com.dell.cpsd.paqx.dne.service.BaseService;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.WorkflowService;
 import com.dell.cpsd.paqx.dne.service.model.NodeExpansionResponse;
-import com.dell.cpsd.paqx.dne.service.task.handler.preprocess.*;
+import com.dell.cpsd.paqx.dne.service.task.handler.preprocess.ChangeIdracCredentialsTaskHandler;
+import com.dell.cpsd.paqx.dne.service.task.handler.preprocess.CleanInMemoryDatabaseTaskHandler;
+import com.dell.cpsd.paqx.dne.service.task.handler.preprocess.ConfigIdracTaskHandler;
+import com.dell.cpsd.paqx.dne.service.task.handler.preprocess.ConfigureObmSettingsTaskHandler;
+import com.dell.cpsd.paqx.dne.service.task.handler.preprocess.DiscoverScaleIoTaskHandler;
+import com.dell.cpsd.paqx.dne.service.task.handler.preprocess.DiscoverVCenterTaskHandler;
+import com.dell.cpsd.paqx.dne.service.task.handler.preprocess.FindOrCreateValidStoragePoolTaskHandler;
+import com.dell.cpsd.paqx.dne.service.task.handler.preprocess.FindProtectionDomainTaskHandler;
+import com.dell.cpsd.paqx.dne.service.task.handler.preprocess.FindVClusterTaskHandler;
+import com.dell.cpsd.paqx.dne.service.task.handler.preprocess.ListScaleIoComponentsTaskHandler;
+import com.dell.cpsd.paqx.dne.service.task.handler.preprocess.ListVCenterComponentsTaskHandler;
+import com.dell.cpsd.paqx.dne.service.task.handler.preprocess.PingIdracTaskHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +64,7 @@ public class PreProcessService extends BaseService implements IPreProcessService
 
     private static final int PING_IDRAC_TIMEOUT = 120000; // 120 seconds
 
-    @Bean("cleanInMemoryDatabase")
+    @Bean("cleanInMemoryDatabaseTask")
     private WorkflowTask cleanInMemoryDatabase()
     {
         return createTask("Clean in memory database", new CleanInMemoryDatabaseTaskHandler(this.nodeService, this.repository));
@@ -80,12 +91,6 @@ public class PreProcessService extends BaseService implements IPreProcessService
     private WorkflowTask pingIdracTask()
     {
         return createTask("Ping server out of band IP address", new PingIdracTaskHandler(PING_IDRAC_TIMEOUT));
-    }
-
-    @Bean("configureBootDeviceIdrac")
-    private WorkflowTask configureBootDeviceIdrac()
-    {
-        return createTask("Configure server boot device and boot sequence", new ConfigureBootDeviceIdracTaskHandler(nodeService));
     }
 
     @Bean("findVClusterTask")
@@ -144,7 +149,6 @@ public class PreProcessService extends BaseService implements IPreProcessService
         workflowTasks.put("configureObmSettings", configureObmSettingsTask());
         workflowTasks.put("configIdrac", configIdracTask());
         workflowTasks.put("pingIdrac", pingIdracTask());
-        workflowTasks.put("configureBootDeviceIdrac", configureBootDeviceIdrac());
         workflowTasks.put("findOrCreateValidStoragePool", findOrCreateValidStoragePoolTask());
         workflowTasks.put("findVCluster", createVClusterTask());
         workflowTasks.put("findProtectionDomain", findProtectionDomainTask());

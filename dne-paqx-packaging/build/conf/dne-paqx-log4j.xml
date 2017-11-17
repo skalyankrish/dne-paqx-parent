@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--Copyright &copy; 2017 Dell Inc. or its subsidiaries. All Rights Reserved.-->
+<!--Dell EMC Confidential/Proprietary Information-->
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration>
+
+    <appender name="consoleAppender" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="Threshold" value="INFO"/>
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p (%t) %c{1} - %m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="errorFileAppender" class="org.apache.log4j.RollingFileAppender">
+        <param name="Threshold" value="ERROR"/>
+        <param name="File" value="/opt/dell/cpsd/dne/node-expansion-service/logs/dne-paqx-error.log"/>
+        <param name="MaxFileSize" value="10MB"/>
+        <param name="MaxBackupIndex" value="5"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p (%t) %c{1} - %m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="infoFileAppender" class="org.apache.log4j.RollingFileAppender">
+        <param name="Threshold" value="INFO"/>
+        <param name="File" value="/opt/dell/cpsd/dne/node-expansion-service/logs/dne-paqx-info.log"/>
+        <param name="MaxFileSize" value="10MB"/>
+        <param name="MaxBackupIndex" value="5"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p (%t) %c{1} - %m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="debugFileAppender" class="org.apache.log4j.RollingFileAppender">
+        <param name="Threshold" value="INFO"/>
+        <param name="File" value="/opt/dell/cpsd/dne/node-expansion-service/logs/dne-paqx-trace.log"/>
+        <param name="MaxFileSize" value="10MB"/>
+        <param name="MaxBackupIndex" value="5"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p (%t) %c{1} - %m%n"/>
+        </layout>
+    </appender>
+
+
+    <logger name="com.dell">
+        <level value="INFO"/>
+    </logger>
+
+    <logger name="org.springframework">
+        <level value="INFO"/>
+    </logger>
+
+    <root>
+        <level value="INFO"/>
+        <appender-ref ref="errorFileAppender"/>
+        <appender-ref ref="infoFileAppender"/>
+   <!-- <appender-ref ref="debugFileAppender"/>-->
+        <appender-ref ref="consoleAppender"/>
+    </root>
+</log4j:configuration>

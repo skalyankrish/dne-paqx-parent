@@ -48,15 +48,18 @@ public class VerfiyNodeDetailTest {
         nodeDetail.setEsxiManagementSubnetMask("abc");
         nodeDetail.setEsxiManagementHostname("abc");
         nodeDetail.setScaleIoData1SvmIpAddress("abc");
-        nodeDetail.setScaleIoData1KernelIpAddress("abc");
+
+//        nodeDetail.setScaleIoData1KernelIpAddress("abc");
         nodeDetail.setScaleIoData2SvmIpAddress("abc");
-        nodeDetail.setScaleIoData2KernelIpAddress("abc");
-        nodeDetail.setScaleIoSvmManagementIpAddress("abc");
-        nodeDetail.setScaleIoSvmManagementGatewayAddress("abc");
-        nodeDetail.setScaleIoSvmManagementSubnetMask("abc");
-        nodeDetail.setHostname("abc");
+//        nodeDetail.setScaleIoData2KernelIpAddress("abc");
+
+//        nodeDetail.setScaleIoSvmManagementIpAddress("abc");
+//        nodeDetail.setScaleIoSvmManagementGatewayAddress("abc");
+//        nodeDetail.setScaleIoSvmManagementSubnetMask("abc");
+//        nodeDetail.setHostname("abc");
         nodeDetail.setClusterName("abc");
-        nodeDetail.setProtectionDomain("abc");
+        nodeDetail.setProtectionDomainId("abc");
+        nodeDetail.setProtectionDomainName("pd-abc");
     }
 
     @Ignore @Test

@@ -9,6 +9,9 @@ package com.dell.cpsd.paqx.dne.service.delegates;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
+import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
+import com.dell.cpsd.virtualization.capabilities.api.RemoteCommandExecutionRequestMessage;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +20,18 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.INSTALL_SCALEIO_VM_PACKAGES;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
 
+/**
+ * Install ScaleIo VM packages.
+ * <p>
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries. All Rights Reserved. Dell EMC Confidential/Proprietary Information
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
+ */
 @Component
 @Scope("prototype")
 @Qualifier("installScaleIOVMPackages")
@@ -62,59 +75,52 @@ public class InstallScaleIOVMPackages extends BaseWorkflowDelegate
         LOGGER.info("Execute InstallSvmPackagesTaskHandler task");
         final String taskMessage = "Install Scale IO VM Packages";
         final NodeDetail nodeDetail = (NodeDetail) delegateExecution.getVariable(NODE_DETAIL);
+        final String scaleIoSvmManagementIpAddress = nodeDetail.getScaleIoSvmManagementIpAddress();
 
-        /*try
-        {
-            final ComponentEndpointIds componentEndpointIds = repository
+        ComponentEndpointIds componentEndpointIds;
+        try {
+            componentEndpointIds = repository
                     .getComponentEndpointIds(COMPONENT_TYPE, ENDPOINT_TYPE, COMMON_CREDENTIALS);
+        }
+        catch (Exception e)
+        {
+            String errorMessage = "An Unexpected Exception occurred attempting to retrieve VCenter Component Endpoints. Reason: ";
+            LOGGER.error(errorMessage, e);
+            updateDelegateStatus(errorMessage + e.getMessage());
+            throw new BpmnError(INSTALL_SCALEIO_VM_PACKAGES, errorMessage + e.getMessage());
+        }
 
-            if (componentEndpointIds == null)
-            {
-                throw new IllegalStateException("No component ids found.");
-            }
+        RemoteCommandExecutionRequestMessage requestMessage = new RemoteCommandExecutionRequestMessage();
+        requestMessage.setRemoteHost(scaleIoSvmManagementIpAddress);
+        requestMessage.setRemoteCommand(RemoteCommandExecutionRequestMessage.RemoteCommand.INSTALL_PACKAGE_SDS_LIA);
+        requestMessage.setOsType(RemoteCommandExecutionRequestMessage.OsType.LINUX);
+        requestMessage.setComponentEndpointIds(
+                new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(componentEndpointIds.getComponentUuid(),
+                        componentEndpointIds.getEndpointUuid(), componentEndpointIds.getCredentialUuid()));
 
-            final NodeExpansionRequest nodeExpansionRequest = job.getInputParams();
-
-            if (nodeExpansionRequest == null)
-            {
-                throw new IllegalStateException("Job input parameters are null");
-            }
-
-            final String scaleIoSvmManagementIpAddress = nodeExpansionRequest.getScaleIoSvmManagementIpAddress();
-
-            if (StringUtils.isEmpty(scaleIoSvmManagementIpAddress))
-            {
-                throw new IllegalStateException("ScaleIO VM Management IP Address is null");
-            }
-
-            RemoteCommandExecutionRequestMessage requestMessage = new RemoteCommandExecutionRequestMessage();
-            requestMessage.setRemoteHost(scaleIoSvmManagementIpAddress);
-            requestMessage.setRemoteCommand(RemoteCommandExecutionRequestMessage.RemoteCommand.INSTALL_PACKAGE_SDS_LIA);
-            requestMessage.setOsType(RemoteCommandExecutionRequestMessage.OsType.LINUX);
-            requestMessage.setComponentEndpointIds(
-                    new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(componentEndpointIds.getComponentUuid(),
-                                                                                           componentEndpointIds.getEndpointUuid(), componentEndpointIds.getCredentialUuid()));
-
-            final boolean succeeded = this.nodeService.requestRemoteCommandExecution(requestMessage);
-
-            if (!succeeded)
-            {
-                throw new IllegalStateException("Install ScaleIO packages request failed");
-            }
-
-            response.setWorkFlowTaskStatus(Status.SUCCEEDED);
-            return true;
+        boolean succeeded;
+        try
+        {
+            succeeded = this.nodeService.requestRemoteCommandExecution(requestMessage);
         }
         catch (Exception ex)
         {
-            LOGGER.error("Error while installing the svm packages", ex);
-            response.addError(ex.toString());
+            String errorMessage = "An Unexpected Exception occurred attempting to request " + taskMessage + ".  Reason: ";
+            LOGGER.error(errorMessage, ex);
+            updateDelegateStatus(errorMessage + ex.getMessage());
+            throw new BpmnError(INSTALL_SCALEIO_VM_PACKAGES, errorMessage + ex.getMessage());
         }
 
-        response.setWorkFlowTaskStatus(Status.FAILED);
-        return false;
-*/
-        LOGGER.info(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
-        updateDelegateStatus(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
+        if (!succeeded)
+        {
+            String errorMessage = taskMessage + ": install ScaleIO packages request failed";
+            LOGGER.error(errorMessage);
+            updateDelegateStatus(errorMessage);
+            throw new BpmnError(INSTALL_SCALEIO_VM_PACKAGES, errorMessage);
+        }
+
+        String returnMessage = taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.";
+        LOGGER.info(returnMessage);
+        updateDelegateStatus(returnMessage);
     }
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Author: cullia
+# Author:
 # Revision: 1.1
 # Code Reviewed by:
 # Description: Testing the DNE Container.
@@ -17,41 +17,22 @@ import os
 
 ##############################################################################################
 
-@pytest.fixture(scope="module", autouse=True)
-def load_test_data():
-    import cpsd
-    global cpsd
 
-    # Update config ini files at runtime
-    my_data_file = os.environ.get('AF_RESOURCES_PATH') + '/continuous-integration-deploy-suite/symphony-sds.properties'
-    af_support_tools.set_config_file_property_by_data_file(my_data_file)
-
-    # Set config ini file name
-    global env_file
+@pytest.fixture()
+def setup():
+    parameters = {}
     env_file = 'env.ini'
 
-    # Test VM Details
-    global ipaddress
     ipaddress = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='hostname')
-
-    global cli_username
-    cli_username = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS',
-                                                             property='username')
-
-    global cli_password
+    cli_user = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS', property='username')
     cli_password = af_support_tools.get_config_file_property(config_file=env_file, heading='Base_OS',
                                                              property='password')
 
-    # RMQ Details
-    global rmq_username
-    rmq_username = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ',
-                                                             property='username')
-    global rmq_password
-    rmq_password = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ',
-                                                             property='password')
-    global port
-    port = af_support_tools.get_config_file_property(config_file=env_file, heading='RabbitMQ',
-                                                     property='ssl_port')
+    parameters['IP'] = ipaddress
+    parameters['cli_user'] = cli_user
+    parameters['cli_password'] = cli_password
+
+    return parameters
 
 
 #####################################################################
@@ -60,7 +41,7 @@ def load_test_data():
 
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_dne_servicerunning():
+def test_dne_servicerunning(setup):
     """
     Description     :       This method tests docker service for a container
                             It will fail if :
@@ -69,12 +50,13 @@ def test_dne_servicerunning():
     Returns         :       None
     """
 
-    print('\n* * * Testing the DNE PAQX on system:', ipaddress, '* * *\n')
+    print('\n* * * Testing the DNE PAQX on system:', setup['IP'], '* * *\n')
 
     service_name = 'symphony-dne-paqx'
 
     sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
-    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+    my_return_status = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['cli_user'],
+                                                         password=setup['cli_password'],
                                                          command=sendCommand, return_output=True)
     my_return_status = my_return_status.strip()
     print('\nDocker Container is:', my_return_status, '\n')
@@ -83,7 +65,7 @@ def test_dne_servicerunning():
 
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_dne_registered_in_Consul():
+def test_dne_registered_in_Consul(setup):
     """
     Test Case Title :
     Description     :       This method tests that dne-paqx is registered in the Consul API http://{SymphonyIP}:8500/v1/agent/services
@@ -93,15 +75,15 @@ def test_dne_registered_in_Consul():
     Returns         :       None
     """
 
-    service = 'dne-paqx'
+    service = 'symphony-dne-paqx'
 
     url_body = ':8500/v1/agent/services'
-    my_url = 'http://' + ipaddress + url_body
+    my_url = 'https://' + setup['IP'] + url_body
 
     print('GET:', my_url)
 
     try:
-        url_response = requests.get(my_url)
+        url_response = requests.get(my_url, verify=False)
         url_response.raise_for_status()
 
         # A 200 has been received
@@ -110,7 +92,7 @@ def test_dne_registered_in_Consul():
         the_response = url_response.text
 
         # Create the sting as it should appear in the API
-        serviceToCheck = '"Service": "' + service + '"'
+        serviceToCheck = '"Service":"' + service + '"'
 
         assert serviceToCheck in the_response, ('ERROR:', service, 'is not in Consul\n')
 
@@ -124,10 +106,9 @@ def test_dne_registered_in_Consul():
         raise Exception(err)
 
 
-
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_dne_passing_status_in_Consul():
+def test_dne_passing_status_in_Consul(setup):
     """
     Description     :       This method tests that dne-paqx has a passing status in the Consul API http://{SymphonyIP}:8500/v1/health/checks/dne-paqx
                             It will fail if :
@@ -135,22 +116,22 @@ def test_dne_passing_status_in_Consul():
     Parameters      :       none
     Returns         :       None
     """
-    service = 'dne-paqx'
+    service = 'symphony-dne-paqx'
 
     url_body = ':8500/v1/health/checks/' + service
-    my_url = 'http://' + ipaddress + url_body
+    my_url = 'https://' + setup['IP'] + url_body
 
     print('GET:', my_url)
 
     try:
-        url_response = requests.get(my_url)
+        url_response = requests.get(my_url, verify=False)
         url_response.raise_for_status()
 
         # A 200 has been received
         print(url_response)
         the_response = url_response.text
 
-        serviceStatus = '"Status": "passing"'
+        serviceStatus = '"Status":"passing"'
         assert serviceStatus in the_response, ('ERROR:', service, 'is not Passing in Consul\n')
         print(service, 'Status = Passing in consul\n\n')
 
@@ -162,10 +143,10 @@ def test_dne_passing_status_in_Consul():
         raise Exception(err)
 
 
-
+@pytest.mark.skip(reason='Unable to test using RMQ API due to TLS')
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_dne_rmq_bindings_response_1(suppliedExchange='exchange.dell.cpsd.paqx.node.discovery.response',
+def test_dne_rmq_bindings_response_1(setup, suppliedExchange='exchange.dell.cpsd.paqx.node.discovery.response',
                                      suppliedQueue='queue.dell.cpsd.dne-paqx.response'):
     """
     Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
@@ -176,7 +157,7 @@ def test_dne_rmq_bindings_response_1(suppliedExchange='exchange.dell.cpsd.paqx.n
     Returns         :       None
     """
 
-    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
+    queues = rest_queue_list(host='amqp', port=15672, virtual_host='%2f',
                              exchange=suppliedExchange)
     queues = json.dumps(queues)
 
@@ -184,9 +165,10 @@ def test_dne_rmq_bindings_response_1(suppliedExchange='exchange.dell.cpsd.paqx.n
     print(suppliedExchange, '\nis bound to\n', suppliedQueue, '\n')
 
 
+@pytest.mark.skip(reason='Unable to test using RMQ API due to TLS')
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_dne_rmq_bindings_response_2(suppliedExchange='exchange.dell.cpsd.hdp.capability.registry.response',
+def test_dne_rmq_bindings_response_2(setup, suppliedExchange='exchange.dell.cpsd.hdp.capability.registry.response',
                                      suppliedQueue='queue.dell.cpsd.hdp.capability.registry.response.dne-paqx'):
     """
     Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
@@ -197,7 +179,7 @@ def test_dne_rmq_bindings_response_2(suppliedExchange='exchange.dell.cpsd.hdp.ca
     Returns         :       None
     """
 
-    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
+    queues = rest_queue_list(host='amqp', port=15672, virtual_host='%2f',
                              exchange=suppliedExchange)
     queues = json.dumps(queues)
 
@@ -205,9 +187,10 @@ def test_dne_rmq_bindings_response_2(suppliedExchange='exchange.dell.cpsd.hdp.ca
     print(suppliedExchange, '\nis bound to\n', suppliedQueue, '\n')
 
 
+@pytest.mark.skip(reason='Unable to test using RMQ API due to TLS')
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_dne_rmq_bindings_cap_reg_event(suppliedExchange='exchange.dell.cpsd.hdp.capability.registry.event',
+def test_dne_rmq_bindings_cap_reg_event(setup, suppliedExchange='exchange.dell.cpsd.hdp.capability.registry.event',
                                         suppliedQueue='queue.dell.cpsd.hdp.capability.registry.event.dne-paqx'):
     """
     Description     :       This method tests that a binding exists between a RMQ Exchange & a RMQ Queue.
@@ -217,7 +200,7 @@ def test_dne_rmq_bindings_cap_reg_event(suppliedExchange='exchange.dell.cpsd.hdp
     Parameters      :       1. RMQ Exchange. 2. RQM Queue
     Returns         :       None
     """
-    queues = rest_queue_list(user=rmq_username, password=rmq_password, host=ipaddress, port=15672, virtual_host='%2f',
+    queues = rest_queue_list(host='amqp', port=15672, virtual_host='%2f',
                              exchange=suppliedExchange)
     queues = json.dumps(queues)
 
@@ -227,7 +210,7 @@ def test_dne_rmq_bindings_cap_reg_event(suppliedExchange='exchange.dell.cpsd.hdp
 
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_dne_log_files_exist():
+def test_dne_log_files_exist(setup):
     """
     Description     :       This method tests that the ESS log files exist and contain no Exceptions.
                             It will fail:
@@ -236,17 +219,19 @@ def test_dne_log_files_exist():
     Parameters      :       None
     Returns         :       None
     """
-
+    service = 'cpsd-dne-paqx'
     filePath = '/opt/dell/cpsd/dne-paqx/logs/'
     errorLogFile = 'dne-paqx-error.log'
     infoLogFile = 'dne-paqx-info.log'
 
-    # Verify the log files exist
-    sendCommand = 'ls ' + filePath
-    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+    sendCommand = 'docker ps | grep ' + service + ' | awk \'{system("docker exec -i "$1" ls ' + filePath + '") }\''
+
+    my_return_status = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['cli_user'],
+                                                         password=setup['cli_password'],
                                                          command=sendCommand, return_output=True)
     error_list = []
 
+    # Verify the log files exist in the returned data
     if (errorLogFile not in my_return_status):
         error_list.append(errorLogFile)
 
@@ -255,13 +240,12 @@ def test_dne_log_files_exist():
 
     assert not error_list, 'Log file missing'
 
-    print('Valid log files exist')
-
+    print('\nValid log files exist')
 
 
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
-def test_dne_log_files_free_of_exceptions():
+def test_dne_log_files_free_of_exceptions(setup):
     """
     Description     :       This method tests that the ESS log files exist and contain no Exceptions.
                             It will fail:
@@ -271,9 +255,9 @@ def test_dne_log_files_free_of_exceptions():
     Returns         :       None
     """
 
+    service = 'cpsd-dne-paqx'
     filePath = '/opt/dell/cpsd/dne-paqx/logs/'
     errorLogFile = 'dne-paqx-error.log'
-    infoLogFile = 'dne-paqx-info.log'
 
     excep1 = 'AuthenticationFailureException'
     excep2 = 'RuntimeException'
@@ -283,36 +267,40 @@ def test_dne_log_files_free_of_exceptions():
     error_list = []
 
     # Verify there are no Authentication errors
-    sendCommand = 'cat ' + filePath + errorLogFile + ' | grep \'' + excep1 + '\''
-    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+    sendCommand = 'docker ps | grep ' + service + ' | awk \'{system("docker exec -i "$1" cat ' + filePath + errorLogFile + ' | grep ' + excep1 +'")}\''
+    my_return_status = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['cli_user'],
+                                                         password=setup['cli_password'],
                                                          command=sendCommand, return_output=True)
     if (excep1 in my_return_status):
         error_list.append(excep1)
 
     # Verify there are no RuntimeException errors
-    sendCommand = 'cat ' + filePath + errorLogFile + ' | grep \'' + excep2 + '\''
-    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+    sendCommand = 'docker ps | grep ' + service + ' | awk \'{system("docker exec -i "$1" cat ' + filePath + errorLogFile + ' | grep ' + excep2 +'")}\''
+    my_return_status = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['cli_user'],
+                                                         password=setup['cli_password'],
                                                          command=sendCommand, return_output=True)
     if (excep2 in my_return_status):
         error_list.append(excep2)
 
     # Verify there are no NullPointerException errors
-    sendCommand = 'cat ' + filePath + errorLogFile + ' | grep \'' + excep3 + '\''
-    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+    sendCommand = 'docker ps | grep ' + service + ' | awk \'{system("docker exec -i "$1" cat ' + filePath + errorLogFile + ' | grep ' + excep3 +'")}\''
+    my_return_status = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['cli_user'],
+                                                         password=setup['cli_password'],
                                                          command=sendCommand, return_output=True)
     if (excep3 in my_return_status):
         error_list.append(excep3)
 
     # Verify there are no BeanCreationException errors
-    sendCommand = 'cat ' + filePath + errorLogFile + ' | grep \'' + excep4 + '\''
-    my_return_status = af_support_tools.send_ssh_command(host=ipaddress, username=cli_username, password=cli_password,
+    sendCommand = 'docker ps | grep ' + service + ' | awk \'{system("docker exec -i "$1" cat ' + filePath + errorLogFile + ' | grep ' + excep4 +'")}\''
+    my_return_status = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['cli_user'],
+                                                         password=setup['cli_password'],
                                                          command=sendCommand, return_output=True)
     if (excep4 in my_return_status):
         error_list.append(excep4)
 
     assert not error_list, 'Exceptions in log files, Review the ' + errorLogFile + ' file'
 
-    print('No Authentication, RuntimeException or NullPointerException in log files\n')
+    print('\nNo Authentication, RuntimeException or NullPointerException in log files\n')
 
 
 ##############################################################################################

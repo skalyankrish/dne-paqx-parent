@@ -235,14 +235,16 @@ public class CamundaWorkflowServiceImpl implements ICamundaWorkflowService
 
                     if (activeActivityIds != null && activeActivityIds.size() > 0)
                     {
+                        List<Activity> currentActivities = new ArrayList<>();
                         for (String activeActivityId : activeActivityIds)
                         {
                             final String activityName = getActivityName(activeActivityId, bpmnModelInstance);
                             Activity activity = new Activity();
                             activity.setId(activeActivityId);
                             activity.setName(activityName);
-                            currentStatus.setCurrentActivity(activity);
+                            currentActivities.add(activity);
                         }
+                        currentStatus.setCurrentActivities(currentActivities);
                     }
                 }
                 catch (Exception e)

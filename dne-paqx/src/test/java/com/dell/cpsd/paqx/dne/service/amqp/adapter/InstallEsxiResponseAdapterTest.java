@@ -22,12 +22,12 @@ import static org.mockito.Mockito.spy;
  *
  * @since 1.0
  */
-public class InstallEsxiResponseAdapterTest extends BaseResponseAdapterTest<InstallESXiResponseMessage>
+public class InstallEsxiResponseAdapterTest extends BaseAsynchronousResponseAdapterTest<InstallESXiResponseMessage>
 {
     @Override
     protected ServiceCallbackAdapter<InstallESXiResponseMessage, ServiceResponse<InstallESXiResponseMessage>> createTestable()
     {
-        return new InstallEsxiResponseAdapter(this.registry);
+        return new InstallEsxiResponseAdapter(this.registry, this.runtimeService);
     }
 
     @Override

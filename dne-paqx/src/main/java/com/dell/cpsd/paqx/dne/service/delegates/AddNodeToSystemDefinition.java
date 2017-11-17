@@ -128,7 +128,7 @@ public class AddNodeToSystemDefinition extends BaseWorkflowDelegate
             parentGroups.add("SystemCompute");
             endpoints.add("RACKHD-EP");
             newNode.setUuid(nodeInfo.getSymphonyUuid());
-            newNode.setIdentity(new Identity("computeServer", nodeInfo.getSymphonyUuid(), nodeInfo.getSymphonyUuid(),
+            newNode.setIdentity(new Identity("SERVER", nodeInfo.getSymphonyUuid(), nodeInfo.getSymphonyUuid(),
                                              nodeInfo.getSerialNumber(), null));
             newNode.setDefinition(
                     new Definition(nodeInfo.getProductFamily(), nodeInfo.getProduct(), nodeInfo.getModelFamily(),

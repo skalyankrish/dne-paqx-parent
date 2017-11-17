@@ -72,6 +72,8 @@ public class ScaleIOSDC
         this.mdmConnectionState = mdmConnectorState;
     }
 
+    public String getName() { return name; }
+
     public ScaleIOData getScaleIOData()
     {
         return scaleIOData;

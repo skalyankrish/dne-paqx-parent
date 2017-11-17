@@ -9,6 +9,10 @@ package com.dell.cpsd.paqx.dne.service.delegates;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
+import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
+import com.dell.cpsd.virtualization.capabilities.api.RemoteCommandExecutionRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.VmPasswordUpdateRequest;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +21,18 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.CHANGE_SCALEIO_VM_CREDENTIALS;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
 
+/**
+ * Change ScaleIo VM credentials.
+ * <p>
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries. All Rights Reserved. Dell EMC Confidential/Proprietary Information
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
+ */
 @Component
 @Scope("prototype")
 @Qualifier("changeScaleIOVMCredentials")
@@ -39,11 +53,6 @@ public class ChangeScaleIOVMCredentials extends BaseWorkflowDelegate
      */
     private final DataServiceRepository repository;
 
-    /*
-    * The time to wait before sending the request to change the svm credentials
-    */
-    //private final long waitTime;
-
     /**
      * ScaleIO SVM credential components
      */
@@ -57,95 +66,87 @@ public class ChangeScaleIOVMCredentials extends BaseWorkflowDelegate
      *
      * @param nodeService - The <code>NodeService</code> instance
      * @param repository  - The <code>DataServiceRepository</code> instance
-     * @param waitTime  - The time to wait before sending the request to change the SVM credentials.
-     *                  We need this because after a SVM is deployed and powered up for the first time
-     *                  it does a reboot, which makes any other solution for pinging the vm unreliable.
      */
     @Autowired
     public ChangeScaleIOVMCredentials(final NodeService nodeService, final DataServiceRepository repository)
     {
         this.nodeService = nodeService;
         this.repository = repository;
-        //this.waitTime = waitTime;
     }
 
     @Override
     public void delegateExecute(final DelegateExecution delegateExecution)
     {
         LOGGER.info("Execute ChangeSvmCredentialsTaskHandler task");
+
         final String taskMessage = "Configure VM Network Settings";
         final NodeDetail nodeDetail = (NodeDetail) delegateExecution.getVariable(NODE_DETAIL);
+        final String scaleIoSvmManagementIpAddress = nodeDetail.getScaleIoSvmManagementIpAddress();
 
-       /* try
+        ComponentEndpointIds factoryComponentEndpointIds;
+        try
         {
-            final ComponentEndpointIds factoryComponentEndpointIds = repository
-                    .getComponentEndpointIds(COMPONENT_TYPE, ENDPOINT_TYPE, FACTORY_CREDENTIALS);
+            factoryComponentEndpointIds = repository.getComponentEndpointIds(COMPONENT_TYPE, ENDPOINT_TYPE, FACTORY_CREDENTIALS);
+        }
+        catch (Exception e)
+        {
+            String errorMessage = "No factory component ids found. Reason: ";
+            LOGGER.error(errorMessage, e);
+            updateDelegateStatus(errorMessage + e.getMessage());
+            throw new BpmnError(CHANGE_SCALEIO_VM_CREDENTIALS, errorMessage + e.getMessage());
+        }
 
-            if (factoryComponentEndpointIds == null)
-            {
-                throw new IllegalStateException("No factory component ids found.");
-            }
+        ComponentEndpointIds commonComponentEndpointIds;
+        try
+        {
+            commonComponentEndpointIds = repository.getComponentEndpointIds(COMPONENT_TYPE, ENDPOINT_TYPE, COMMON_CREDENTIALS);
+        }
+        catch (Exception e)
+        {
+            String errorMessage = "No common component ids found. Reason: ";
+            LOGGER.error(errorMessage, e);
+            updateDelegateStatus(errorMessage + e.getMessage());
+            throw new BpmnError(CHANGE_SCALEIO_VM_CREDENTIALS, errorMessage + e.getMessage());
+        }
 
-            final ComponentEndpointIds commonComponentEndpointIds = repository
-                    .getComponentEndpointIds(COMPONENT_TYPE, ENDPOINT_TYPE, COMMON_CREDENTIALS);
+        VmPasswordUpdateRequest vmPasswordUpdateRequest = new VmPasswordUpdateRequest();
+        vmPasswordUpdateRequest.setCredentialName(VmPasswordUpdateRequest.CredentialName.SVM_FACTORY);
+        vmPasswordUpdateRequest.setComponentEndpointIds(
+                new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(factoryComponentEndpointIds.getComponentUuid(),
+                        factoryComponentEndpointIds.getEndpointUuid(), factoryComponentEndpointIds.getCredentialUuid()));
 
-            if (commonComponentEndpointIds == null)
-            {
-                throw new IllegalStateException("No common component ids found.");
-            }
+        RemoteCommandExecutionRequestMessage requestMessage = new RemoteCommandExecutionRequestMessage();
+        requestMessage.setVmPasswordUpdateRequest(vmPasswordUpdateRequest);
+        requestMessage.setRemoteCommand(RemoteCommandExecutionRequestMessage.RemoteCommand.CHANGE_PASSWORD);
+        requestMessage.setRemoteHost(scaleIoSvmManagementIpAddress);
+        requestMessage.setOsType(RemoteCommandExecutionRequestMessage.OsType.LINUX);
+        requestMessage.setComponentEndpointIds(
+                new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(commonComponentEndpointIds.getComponentUuid(),
+                        commonComponentEndpointIds.getEndpointUuid(), commonComponentEndpointIds.getCredentialUuid()));
 
-            final NodeExpansionRequest nodeExpansionRequest = job.getInputParams();
-
-            if (nodeExpansionRequest == null)
-            {
-                throw new IllegalStateException("Job input parameters are null");
-            }
-
-            final String scaleIoSvmManagementIpAddress = nodeExpansionRequest.getScaleIoSvmManagementIpAddress();
-
-            if (StringUtils.isEmpty(scaleIoSvmManagementIpAddress))
-            {
-                throw new IllegalStateException("ScaleIO VM Management IP Address is null");
-            }
-
-            VmPasswordUpdateRequest vmPasswordUpdateRequest = new VmPasswordUpdateRequest();
-            vmPasswordUpdateRequest.setCredentialName(VmPasswordUpdateRequest.CredentialName.SVM_FACTORY);
-            vmPasswordUpdateRequest.setComponentEndpointIds(
-                    new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(factoryComponentEndpointIds.getComponentUuid(),
-                                                                                           factoryComponentEndpointIds.getEndpointUuid(), factoryComponentEndpointIds.getCredentialUuid()));
-
-            RemoteCommandExecutionRequestMessage requestMessage = new RemoteCommandExecutionRequestMessage();
-            requestMessage.setVmPasswordUpdateRequest(vmPasswordUpdateRequest);
-            requestMessage.setRemoteCommand(RemoteCommandExecutionRequestMessage.RemoteCommand.CHANGE_PASSWORD);
-            requestMessage.setRemoteHost(scaleIoSvmManagementIpAddress);
-            requestMessage.setOsType(RemoteCommandExecutionRequestMessage.OsType.LINUX);
-            requestMessage.setComponentEndpointIds(
-                    new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(commonComponentEndpointIds.getComponentUuid(),
-                                                                                           commonComponentEndpointIds.getEndpointUuid(), commonComponentEndpointIds.getCredentialUuid()));
-
-            Thread.sleep(this.waitTime);
-
-            final boolean succeeded = this.nodeService.requestRemoteCommandExecution(requestMessage);
-
-            if (!succeeded)
-            {
-                throw new IllegalStateException("Change ScaleIO vm credentials request failed");
-            }
-
-            response.setWorkFlowTaskStatus(Status.SUCCEEDED);
-            return true;
+        boolean succeeded;
+        try
+        {
+            succeeded = this.nodeService.requestRemoteCommandExecution(requestMessage);
         }
         catch (Exception ex)
         {
-            LOGGER.error("Error while changing the svm credentials", ex);
-            response.addError(ex.toString());
+            String errorMessage = "An Unexpected Exception occurred attempting to request " + taskMessage + ".  Reason: ";
+            LOGGER.error(errorMessage, ex);
+            updateDelegateStatus(errorMessage + ex.getMessage());
+            throw new BpmnError(CHANGE_SCALEIO_VM_CREDENTIALS, errorMessage + ex.getMessage());
         }
 
-        response.setWorkFlowTaskStatus(Status.FAILED);
-        return false;*/
+        if (!succeeded)
+        {
+            String errorMessage = taskMessage + ": Change ScaleIO vm credentials request failed";
+            LOGGER.error(errorMessage);
+            updateDelegateStatus(errorMessage);
+            throw new BpmnError(CHANGE_SCALEIO_VM_CREDENTIALS, errorMessage);
+        }
 
-        LOGGER.info(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
-        updateDelegateStatus(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
-
+        String returnMessage = taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.";
+        LOGGER.info(returnMessage);
+        updateDelegateStatus(returnMessage);
     }
 }

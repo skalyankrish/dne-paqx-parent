@@ -6,16 +6,13 @@
 
 package com.dell.cpsd.paqx.dne.service.delegates;
 
-import com.dell.cpsd.paqx.dne.domain.Job;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
 import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
-import com.dell.cpsd.paqx.dne.service.model.DeployScaleIoVmTaskResponse;
-import com.dell.cpsd.paqx.dne.service.model.EnablePciPassThroughTaskResponse;
-import com.dell.cpsd.paqx.dne.service.model.InstallEsxiTaskResponse;
 import com.dell.cpsd.virtualization.capabilities.api.Credentials;
 import com.dell.cpsd.virtualization.capabilities.api.UpdatePCIPassthruSVMRequestMessage;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +21,21 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.DEPLOY_SCALEIO_NEW_VM_NAME;
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.HOSTNAME;
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.HOST_PCI_DEVICE_ID;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.UPDATE_PCI_PASSTHROUGH;
 
+/**
+ * Update PCI Passthrough Controller for ScaleIo Vm.
+ * <p>
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries. All Rights Reserved. Dell EMC Confidential/Proprietary Information
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
+ */
 @Component
 @Scope("prototype")
 @Qualifier("updatePCIPassThrough")
@@ -70,128 +80,49 @@ public class UpdatePCIPassThrough extends BaseWorkflowDelegate
         final String taskMessage = "Set PCI Pass Through";
 
         final NodeDetail nodeDetail = (NodeDetail) delegateExecution.getVariable(NODE_DETAIL);
-        /*try
+        final String hostname =(String) delegateExecution.getVariable(HOSTNAME);
+        final String hostPciDeviceId = (String) delegateExecution.getVariable(HOST_PCI_DEVICE_ID);
+        final String newVMName = (String) delegateExecution.getVariable(DEPLOY_SCALEIO_NEW_VM_NAME);
+
+        ComponentEndpointIds componentEndpointIds;
+        try
         {
-            final Validate validate = new Validate(job).invoke();
-            final String hostname = validate.getHostname();
-            final String hostPciDeviceId = validate.getHostPciDeviceId();
-            final String newVMName = validate.getNewVMName();
-            final ComponentEndpointIds componentEndpointIds = validate.getComponentEndpointIds();
-
-            final UpdatePCIPassthruSVMRequestMessage requestMessage = getUpdatePCIPassthruSVMRequestMessage(hostname, hostPciDeviceId,
-                                                                                                            newVMName, componentEndpointIds);
-
-            final boolean success = this.nodeService.requestSetPciPassThrough(requestMessage);
-
-            if (!success)
-            {
-                throw new IllegalStateException("Configure PCI PassThrough Failed");
-            }
-
-            response.setWorkFlowTaskStatus(Status.SUCCEEDED);
-
-            return true;
+            componentEndpointIds = repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER");
         }
         catch (Exception e)
         {
-            LOGGER.error("Exception occurred", e);
-            response.addError(e.getMessage());
+            String errorMessage = "An Unexpected Exception occurred attempting to retrieve VCenter Component Endpoints. Reason: ";
+            LOGGER.error(errorMessage, e);
+            updateDelegateStatus(errorMessage + e.getMessage());
+            throw new BpmnError(UPDATE_PCI_PASSTHROUGH, errorMessage + e.getMessage());
         }
 
-        response.setWorkFlowTaskStatus(Status.FAILED);
-        return false;*/
+        final UpdatePCIPassthruSVMRequestMessage requestMessage = getUpdatePCIPassthruSVMRequestMessage(hostname, hostPciDeviceId,
+                newVMName, componentEndpointIds);
 
-        LOGGER.info(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
-        updateDelegateStatus(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
-    }
-
-    private class Validate
-    {
-        private final Job                  job;
-        private       ComponentEndpointIds componentEndpointIds;
-        private       String               hostname;
-        private       String               hostPciDeviceId;
-        private       String               newVMName;
-
-        Validate(final Job job)
+        boolean success;
+        try
         {
-            this.job = job;
+           success = this.nodeService.requestSetPciPassThrough(requestMessage);
         }
-
-        Validate invoke()
+        catch (Exception ex)
         {
-            componentEndpointIds = repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER");
-
-            if (componentEndpointIds == null)
-            {
-                throw new IllegalStateException("No VCenter components found.");
-            }
-
-            final InstallEsxiTaskResponse installEsxiTaskResponse = (InstallEsxiTaskResponse) job.getTaskResponseMap().get("installEsxi");
-
-            if (installEsxiTaskResponse == null)
-            {
-                throw new IllegalStateException("No Install ESXi task response found");
-            }
-
-            hostname = installEsxiTaskResponse.getHostname();
-
-            if (hostname == null)
-            {
-                throw new IllegalStateException("Host name is null");
-            }
-
-            final EnablePciPassThroughTaskResponse enablePciPassThroughTaskResponse = (EnablePciPassThroughTaskResponse) job
-                    .getTaskResponseMap().get("enablePciPassthroughHost");
-
-            if (enablePciPassThroughTaskResponse == null)
-            {
-                throw new IllegalStateException("Enable PCI Task Response is null");
-            }
-
-            hostPciDeviceId = enablePciPassThroughTaskResponse.getHostPciDeviceId();
-
-            if (hostPciDeviceId == null)
-            {
-                throw new IllegalStateException("Host PCI Device ID is null");
-            }
-
-            final DeployScaleIoVmTaskResponse deployScaleIoVmTaskResponse = (DeployScaleIoVmTaskResponse) job.getTaskResponseMap()
-                    .get("deploySVM");
-
-            if (deployScaleIoVmTaskResponse == null)
-            {
-                throw new IllegalStateException("Deploy ScaleIO VM Task Response is null");
-            }
-
-            newVMName = deployScaleIoVmTaskResponse.getNewVMName();
-
-            if (newVMName == null)
-            {
-                throw new IllegalStateException("New Virtual Machine name is null");
-            }
-
-            return this;
+            String errorMessage = "An Unexpected Exception occurred attempting to request " + taskMessage + ".  Reason: ";
+            LOGGER.error(errorMessage, ex);
+            updateDelegateStatus(errorMessage + ex.getMessage());
+            throw new BpmnError(UPDATE_PCI_PASSTHROUGH, errorMessage + ex.getMessage());
         }
 
-        ComponentEndpointIds getComponentEndpointIds()
+        if (!success)
         {
-            return componentEndpointIds;
+            String errorMessage = "Configure PCI PassThrough Failed!";
+            LOGGER.error(errorMessage);
+            updateDelegateStatus(errorMessage);
+            throw new BpmnError(UPDATE_PCI_PASSTHROUGH, errorMessage);
         }
 
-        String getHostname()
-        {
-            return hostname;
-        }
-
-        String getHostPciDeviceId()
-        {
-            return hostPciDeviceId;
-        }
-
-        String getNewVMName()
-        {
-            return newVMName;
-        }
+        String returnMessage = taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.";
+        LOGGER.info(returnMessage);
+        updateDelegateStatus(returnMessage);
     }
 }

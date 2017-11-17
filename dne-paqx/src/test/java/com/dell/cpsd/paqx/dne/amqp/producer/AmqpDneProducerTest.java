@@ -431,9 +431,65 @@ public class AmqpDneProducerTest
     }
 
     @Test
+    public void publishStartedNodeAllocation()
+    {
+        StartNodeAllocationRequestMessage request = mock(StartNodeAllocationRequestMessage.class);
+        String profile = "manage-node-allocation";
+
+        EndpointProperty property = new EndpointProperty();
+        property.setName("request-message-type");
+        property.setValue((request.getClass().getAnnotation(Message.class)).value());
+        this.endpointProperties.add(property);
+
+        doReturn(this.capabilityDataList).when(this.capabilityBinder).getCurrentCapabilities();
+        doReturn(this.capability).when(this.capabilityData).getCapability();
+        doReturn(profile).when(this.capability).getProfile();
+        doReturn(this.providerEndpoint).when(this.capability).getProviderEndpoint();
+        doReturn(this.endpointProperties).when(this.providerEndpoint).getEndpointProperties();
+
+        this.producer.publishStartedNodeAllocation(request);
+
+        verify(this.rabbitTemplate).convertAndSend(this.exchange, this.routingKey, request);
+    }
+
+    @Test
+    public void publishFailedNodeAllocation()
+    {
+        FailNodeAllocationRequestMessage request = mock(FailNodeAllocationRequestMessage.class);
+        String profile = "manage-node-allocation";
+
+        EndpointProperty property = new EndpointProperty();
+        property.setName("request-message-type");
+        property.setValue((request.getClass().getAnnotation(Message.class)).value());
+        this.endpointProperties.add(property);
+
+        doReturn(this.capabilityDataList).when(this.capabilityBinder).getCurrentCapabilities();
+        doReturn(this.capability).when(this.capabilityData).getCapability();
+        doReturn(profile).when(this.capability).getProfile();
+        doReturn(this.providerEndpoint).when(this.capability).getProviderEndpoint();
+        doReturn(this.endpointProperties).when(this.providerEndpoint).getEndpointProperties();
+
+        this.producer.publishFailedNodeAllocation(request);
+
+        verify(this.rabbitTemplate).convertAndSend(this.exchange, this.routingKey, request);
+    }
+
+    @Test
     public void publishCompleteNodeAllocation_no_capabilities()
     {
         this.executeTest_no_capabilities(mock(CompleteNodeAllocationRequestMessage.class), this.producer::publishCompleteNodeAllocation);
+    }
+
+    @Test
+    public void publishStartedNodeAllocation_no_capabilities()
+    {
+        this.executeTest_no_capabilities(mock(StartNodeAllocationRequestMessage.class), this.producer::publishStartedNodeAllocation);
+    }
+
+    @Test
+    public void publishFailedNodeAllocation_no_capabilities()
+    {
+        this.executeTest_no_capabilities(mock(FailNodeAllocationRequestMessage.class), this.producer::publishFailedNodeAllocation);
     }
 
     @Test

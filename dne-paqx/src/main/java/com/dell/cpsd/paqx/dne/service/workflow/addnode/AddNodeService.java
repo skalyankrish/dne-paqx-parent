@@ -28,7 +28,6 @@ import com.dell.cpsd.paqx.dne.service.task.handler.addnode.DeployScaleIoVmTaskHa
 import com.dell.cpsd.paqx.dne.service.task.handler.addnode.EnablePciPassthroughTaskHandler;
 import com.dell.cpsd.paqx.dne.service.task.handler.addnode.EnterHostMaintenanceModeTaskHandler;
 import com.dell.cpsd.paqx.dne.service.task.handler.addnode.ExitHostMaintenanceModeTaskHandler;
-import com.dell.cpsd.paqx.dne.service.task.handler.addnode.InstallEsxiTaskHandler;
 import com.dell.cpsd.paqx.dne.service.task.handler.addnode.InstallScaleIoVibTaskHandler;
 import com.dell.cpsd.paqx.dne.service.task.handler.addnode.InstallSvmPackagesTaskHandler;
 import com.dell.cpsd.paqx.dne.service.task.handler.addnode.ListESXiCredentialDetailsTaskHandler;
@@ -104,7 +103,6 @@ public class AddNodeService extends BaseService implements IAddNodeService
     {
         final Map<String, WorkflowTask> workflowTasks = new HashMap<>();
 
-        workflowTasks.put("installEsxi", installEsxiTask());
         workflowTasks.put("retrieveEsxiDefaultCredentialDetails", esxiCredentialDetailsTask());
         workflowTasks.put("addHostToVcenter", addHostToVcenterTask());
         workflowTasks.put("applyEsxiLicense", applyEsxiLicenseTask());
@@ -204,13 +202,6 @@ public class AddNodeService extends BaseService implements IAddNodeService
         return createTask("Configure PXE boot", new ConfigurePxeBootTaskHandler(nodeService));
     }
 
-    @Bean("installEsxiTask")
-    private WorkflowTask installEsxiTask()
-    {
-        return createTask("Install ESXi",
-                new InstallEsxiTaskHandler(this.nodeService, hostToInstallEsxiRequestTransformer, this.repository));
-    }
-
     @Bean("addHostToVcenterTask")
     private WorkflowTask addHostToVcenterTask()
     {
@@ -269,7 +260,7 @@ public class AddNodeService extends BaseService implements IAddNodeService
     @Bean("notifyNodeDiscoveryToUpdateStatusTask")
     private WorkflowTask notifyNodeDiscoveryToUpdateStatusTask()
     {
-        return createTask("Notify node discovery to update status", new NotifyNodeDiscoveryToUpdateStatusTaskHandler(this.nodeService));
+        return createTask("Notify node discovery to update status", new NotifyNodeDiscoveryToUpdateStatusTaskHandler(this.nodeService,"Completed"));
     }
 
     @Bean("datastoreRenameTask")

@@ -9,15 +9,9 @@ import com.dell.cpsd.ChangeIdracCredentialsRequestMessage;
 import com.dell.cpsd.ChangeIdracCredentialsResponseMessage;
 import com.dell.cpsd.CompleteNodeAllocationRequestMessage;
 import com.dell.cpsd.CompleteNodeAllocationResponseMessage;
-import com.dell.cpsd.ConfigureBootDeviceIdracError;
-import com.dell.cpsd.ConfigureBootDeviceIdracRequestMessage;
-import com.dell.cpsd.ConfigureBootDeviceIdracResponseMessage;
 import com.dell.cpsd.ConfigurePxeBootError;
 import com.dell.cpsd.ConfigurePxeBootRequestMessage;
 import com.dell.cpsd.ConfigurePxeBootResponseMessage;
-import com.dell.cpsd.EsxiInstallationInfo;
-import com.dell.cpsd.InstallESXiRequestMessage;
-import com.dell.cpsd.InstallESXiResponseMessage;
 import com.dell.cpsd.ListNodes;
 import com.dell.cpsd.MessageProperties;
 import com.dell.cpsd.NodeInventoryRequestMessage;
@@ -26,6 +20,10 @@ import com.dell.cpsd.NodesListed;
 import com.dell.cpsd.PxeBootConfig;
 import com.dell.cpsd.SetObmSettingsRequestMessage;
 import com.dell.cpsd.SetObmSettingsResponseMessage;
+import com.dell.cpsd.StartNodeAllocationResponseMessage;
+import com.dell.cpsd.StartNodeAllocationRequestMessage;
+import com.dell.cpsd.FailNodeAllocationResponseMessage;
+import com.dell.cpsd.FailNodeAllocationRequestMessage;
 import com.dell.cpsd.common.logging.ILogger;
 import com.dell.cpsd.paqx.dne.amqp.config.ServiceConfig;
 import com.dell.cpsd.paqx.dne.amqp.producer.DneProducer;
@@ -50,7 +48,6 @@ import com.dell.cpsd.paqx.dne.service.amqp.adapter.ApplyEsxiLicenseResponseAdapt
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.ChangeIdracCredentialsResponseAdapter;
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.ClustersListedResponseAdapter;
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.CompleteNodeAllocationResponseAdapter;
-import com.dell.cpsd.paqx.dne.service.amqp.adapter.ConfigureBootDeviceIdracResponseAdapter;
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.ConfigureObmSettingsResponseAdapter;
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.ConfigurePxeBootResponseAdapter;
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.ConfigureVmNetworkSettingsResponseAdapter;
@@ -63,7 +60,6 @@ import com.dell.cpsd.paqx.dne.service.amqp.adapter.DiscoverVCenterResponseAdapte
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.EnablePciPassthroughResponseAdapter;
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.HostMaintenanceModeResponseAdapter;
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.IdracConfigResponseAdapter;
-import com.dell.cpsd.paqx.dne.service.amqp.adapter.InstallEsxiResponseAdapter;
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.ListESXiCredentialDetailsResponseAdapter;
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.ListScaleIoComponentsResponseAdapter;
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.ListVCenterComponentsResponseAdapter;
@@ -79,10 +75,11 @@ import com.dell.cpsd.paqx.dne.service.amqp.adapter.ValidateClusterResponseAdapte
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.ValidateProtectionDomainResponseAdapter;
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.ValidateStoragePoolResponseAdapter;
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.VmPowerOperationResponseAdapter;
+import com.dell.cpsd.paqx.dne.service.amqp.adapter.StartNodeAllocationResponseAdapter;
+import com.dell.cpsd.paqx.dne.service.amqp.adapter.FailNodeAllocationResponseAdapter;
 import com.dell.cpsd.paqx.dne.service.model.BootDeviceIdracStatus;
 import com.dell.cpsd.paqx.dne.service.model.ChangeIdracCredentialsResponse;
 import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
-import com.dell.cpsd.paqx.dne.service.model.ConfigureBootDeviceIdracRequest;
 import com.dell.cpsd.paqx.dne.service.model.DiscoveredNode;
 import com.dell.cpsd.paqx.dne.service.model.IdracInfo;
 import com.dell.cpsd.paqx.dne.service.model.IdracNetworkSettingsRequest;
@@ -247,8 +244,7 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
     @Value("${rackhd.boot.proto.value}")
     private String bootProtoValue;
 
-    private static final long timeout            = 1800000L;
-    private static final long installEsxiTimeout = 2700000L;
+    private static final long timeout            = 240000L;
 
     /**
      * AmqpNodeService constructor.
@@ -288,9 +284,10 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
         this.consumer.addAdapter(new NodesListedResponseAdapter(this));
         this.consumer.addAdapter(new ClustersListedResponseAdapter(this));
         this.consumer.addAdapter(new CompleteNodeAllocationResponseAdapter(this));
+        this.consumer.addAdapter(new StartNodeAllocationResponseAdapter(this));
+        this.consumer.addAdapter(new FailNodeAllocationResponseAdapter(this));
         this.consumer.addAdapter(new IdracConfigResponseAdapter(this));
         this.consumer.addAdapter(new ChangeIdracCredentialsResponseAdapter(this));
-        this.consumer.addAdapter(new ConfigureBootDeviceIdracResponseAdapter(this));
         this.consumer.addAdapter(new ConfigurePxeBootResponseAdapter(this));
         this.consumer.addAdapter(new ConfigureObmSettingsResponseAdapter(this));
         this.consumer.addAdapter(new ValidateClusterResponseAdapter(this));
@@ -300,7 +297,6 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
         this.consumer.addAdapter(new ListVCenterComponentsResponseAdapter(this));
         this.consumer.addAdapter(new DiscoverScaleIoResponseAdapter(this));
         this.consumer.addAdapter(new DiscoverVCenterResponseAdapter(this));
-        this.consumer.addAdapter(new InstallEsxiResponseAdapter(this));
         this.consumer.addAdapter(new AddHostToVCenterResponseAdapter(this));
         this.consumer.addAdapter(new SoftwareVibResponseAdapter(this));
         this.consumer.addAdapter(new AddHostToDvSwitchResponseAdapter(this));
@@ -431,11 +427,14 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
         });
 
         NodesListed nodes = processResponse(response, NodesListed.class);
+
         if (nodes != null)
         {
             if (nodes.getDiscoveredNodes() != null)
             {
-                return nodes.getDiscoveredNodes().stream().filter(d->d.getAllocationStatus() == com.dell.cpsd.DiscoveredNode.AllocationStatus.DISCOVERED).map(d -> new DiscoveredNode(d.getConvergedUuid(), d.getAllocationStatus()))
+                return nodes.getDiscoveredNodes().stream()
+                        .filter(d -> d.getAllocationStatus() == com.dell.cpsd.DiscoveredNode.AllocationStatus.DISCOVERED)
+                        .map(d -> new DiscoveredNode(d.getConvergedUuid(), d.getAllocationStatus(), d.getSerial(), d.getProduct(), d.getVendor()))
                         .collect(Collectors.toList());
             }
         }
@@ -445,28 +444,31 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
 
     @Override
     @Transactional
-    public List<DiscoveredNodeInfo> listDiscoveredNodeInfo() throws ServiceTimeoutException, ServiceExecutionException, JsonProcessingException {
+    public List<DiscoveredNodeInfo> listDiscoveredNodeInfo()
+            throws ServiceTimeoutException, ServiceExecutionException, JsonProcessingException
+    {
         List<DiscoveredNode> discoveredNodes = listDiscoveredNodes();
         List<DiscoveredNodeInfo> retList = new ArrayList<>();
 
-        for (DiscoveredNode node : discoveredNodes) {
-            Object nodeInventoryResponse = listNodeInventory(node.getConvergedUuid());
-
-            if (nodeInventoryResponse != null) {
-                NodeInventory nodeInventory = new NodeInventory(node.getConvergedUuid(), nodeInventoryResponse);
-                boolean isNodeInventorySaved = repository.saveNodeInventory(nodeInventory);
-                DiscoveredNodeInfo discoveredNodeInfo = NodeInventoryParsingUtil.getDiscoveredNodeInfo(nodeInventoryResponse, node.getConvergedUuid());
-                if ( isNodeInventorySaved && discoveredNodeInfo != null) {
-                    discoveredNodeInfo.setNodeStatus(NodeStatus.valueOf(node.getNodeStatus().toString()));
-                    repository.saveDiscoveredNodeInfo(discoveredNodeInfo);
-                    retList.add(discoveredNodeInfo);
-                }
-            } else {
-                LOGGER.info("There is no node inventory for UUID " + node.getConvergedUuid());
+        if (discoveredNodes != null && !discoveredNodes.isEmpty())
+        {
+            for (DiscoveredNode node : discoveredNodes)
+            {
+                DiscoveredNodeInfo discoveredNodeInfo = new DiscoveredNodeInfo(node.getProduct(), null, node.getProduct(), null,
+                        node.getSerial(), node.getConvergedUuid());
+                discoveredNodeInfo.setNodeStatus(NodeStatus.valueOf(node.getNodeStatus().toString()));
+                discoveredNodeInfo.setVendor(node.getVendor());
+                retList.add(discoveredNodeInfo);
             }
+
+            LOGGER.info("Listing DiscoveredNodeInfo data ...");
+        }
+        else
+        {
+            LOGGER.info("There are no Discovered Nodes");
         }
 
-        LOGGER.info("Listing DiscoveredNodeInfo data ...");
+
         return retList;
     }
 
@@ -665,16 +667,60 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
         return processResponse(response, ValidateVcenterClusterResponseMessage.class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public boolean notifyNodeAllocationComplete(String elementIdentifier) throws ServiceTimeoutException, ServiceExecutionException
+    public boolean notifyNodeAllocationStatus(String elementIdentifier,String action) throws ServiceTimeoutException, ServiceExecutionException
     {
         com.dell.cpsd.MessageProperties messageProperties = new com.dell.cpsd.MessageProperties();
         messageProperties.setCorrelationId(UUID.randomUUID().toString());
         messageProperties.setTimestamp(Calendar.getInstance().getTime());
         messageProperties.setReplyTo(replyTo);
+
+        if("Completed".equalsIgnoreCase(action))
+        {
+            return notifyNodeAllocationComplete(elementIdentifier,messageProperties);
+        } else if ("Started".equalsIgnoreCase(action))
+        {
+            return notifyNodeAllocationStarted(elementIdentifier,messageProperties);
+        } else if ("failed".equalsIgnoreCase(action))
+        {
+            return notifyNodeAllocationFailed(elementIdentifier,messageProperties);
+        }
+
+        return false;
+    }
+
+    private boolean notifyNodeAllocationStarted(String elementIdentifier, com.dell.cpsd.MessageProperties messageProperties) throws ServiceTimeoutException, ServiceExecutionException
+    {
+
+        StartNodeAllocationRequestMessage request = new StartNodeAllocationRequestMessage(messageProperties, elementIdentifier, null);
+
+        ServiceResponse<?> response = processRequest(timeout, new ServiceRequestCallback()
+        {
+            @Override
+            public String getRequestId()
+            {
+                return messageProperties.getCorrelationId();
+            }
+
+            @Override
+            public void executeRequest(String requestId) throws Exception
+            {
+                producer.publishStartedNodeAllocation(request);
+            }
+        });
+
+        StartNodeAllocationResponseMessage responseInfo = processResponse(response, StartNodeAllocationResponseMessage.class);
+
+        if ( responseInfo != null && StartNodeAllocationResponseMessage.Status.FAILED.equals(responseInfo.getStatus()))
+        {
+            LOGGER.error("Error response from notify node allocation started: " + responseInfo.getNodeAllocationErrors());
+        }
+
+        return responseInfo!=null && StartNodeAllocationResponseMessage.Status.SUCCESS.equals(responseInfo.getStatus());
+    }
+
+    private boolean notifyNodeAllocationComplete(String elementIdentifier, com.dell.cpsd.MessageProperties messageProperties) throws ServiceTimeoutException, ServiceExecutionException
+    {
 
         CompleteNodeAllocationRequestMessage request = new CompleteNodeAllocationRequestMessage(messageProperties, elementIdentifier, null);
 
@@ -701,6 +747,37 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
         }
 
         return responseInfo!=null && CompleteNodeAllocationResponseMessage.Status.SUCCESS.equals(responseInfo.getStatus());
+    }
+
+
+    private boolean notifyNodeAllocationFailed(String elementIdentifier, com.dell.cpsd.MessageProperties messageProperties) throws ServiceTimeoutException, ServiceExecutionException
+    {
+
+        FailNodeAllocationRequestMessage request = new FailNodeAllocationRequestMessage(messageProperties, elementIdentifier, null);
+
+        ServiceResponse<?> response = processRequest(timeout, new ServiceRequestCallback()
+        {
+            @Override
+            public String getRequestId()
+            {
+                return messageProperties.getCorrelationId();
+            }
+
+            @Override
+            public void executeRequest(String requestId) throws Exception
+            {
+                producer.publishFailedNodeAllocation(request);
+            }
+        });
+
+        FailNodeAllocationResponseMessage responseInfo = processResponse(response, FailNodeAllocationResponseMessage.class);
+
+        if ( responseInfo != null && FailNodeAllocationResponseMessage.Status.FAILED.equals(responseInfo.getStatus()))
+        {
+            LOGGER.error("Error response from notify node allocation failed: " + responseInfo.getNodeAllocationErrors());
+        }
+
+        return responseInfo!=null && FailNodeAllocationResponseMessage.Status.SUCCESS.equals(responseInfo.getStatus());
     }
 
     /**
@@ -796,70 +873,6 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
 
         return responseMessage;
     }
-
-    @Override
-    public BootDeviceIdracStatus bootDeviceIdracStatus(ConfigureBootDeviceIdracRequest configureBootDeviceIdracRequest)
-    {
-
-        BootDeviceIdracStatus bootDeviceIdracStatus = new BootDeviceIdracStatus();
-
-        try
-        {
-            ConfigureBootDeviceIdracRequestMessage configureBootDeviceIdracRequestMessage = new ConfigureBootDeviceIdracRequestMessage();
-
-            com.dell.cpsd.MessageProperties messageProperties = new com.dell.cpsd.MessageProperties();
-            messageProperties.setCorrelationId(UUID.randomUUID().toString());
-            messageProperties.setTimestamp(Calendar.getInstance().getTime());
-            messageProperties.setReplyTo(replyTo);
-            configureBootDeviceIdracRequestMessage.setMessageProperties(messageProperties);
-
-            configureBootDeviceIdracRequestMessage.setUuid(configureBootDeviceIdracRequest.getUuid());
-            configureBootDeviceIdracRequestMessage.setIpAddress(configureBootDeviceIdracRequest.getIdracIpAddress());
-
-            ServiceResponse<?> response = processRequest(timeout, new ServiceRequestCallback()
-            {
-                @Override
-                public String getRequestId()
-                {
-                    return messageProperties.getCorrelationId();
-                }
-
-                @Override
-                public void executeRequest(String requestId) throws Exception
-                {
-                    producer.publishConfigureBootDeviceIdrac(configureBootDeviceIdracRequestMessage);
-                }
-            });
-
-            ConfigureBootDeviceIdracResponseMessage resp = processResponse(response, ConfigureBootDeviceIdracResponseMessage.class);
-            if (resp != null)
-            {
-                if (resp.getMessageProperties() != null)
-                {
-                    if (resp.getStatus() != null)
-                    {
-                        LOGGER.info("Response message is: " + resp.getStatus().toString());
-
-                        bootDeviceIdracStatus.setStatus(resp.getStatus().toString());
-                        List<ConfigureBootDeviceIdracError> errors = resp.getConfigureBootDeviceIdracErrors();
-                        if (!CollectionUtils.isEmpty(errors))
-                        {
-                            List<String> errorMsgs = errors.stream().map(ConfigureBootDeviceIdracError::getMessage).collect(Collectors.toList());
-                            bootDeviceIdracStatus.setErrors(errorMsgs);
-                        }
-                    }
-                }
-
-            }
-        }
-        catch (Exception e)
-        {
-            LOGGER.error("Exception in boot order sequence: ", e);
-        }
-
-        return bootDeviceIdracStatus;
-    }
-
 
     @Override
     public BootDeviceIdracStatus configurePxeBoot(String uuid, String ipAddress)
@@ -1250,50 +1263,6 @@ public class AmqpNodeService extends AbstractServiceClient implements NodeServic
                 final VCenter vCenterData = discoveryInfoToVCenterDomainTransformer.transform(responseMessage);
 
                 return vCenterData != null && repository.saveVCenterData(jobId, vCenterData);
-            }
-            else
-            {
-                LOGGER.error("Message is null");
-            }
-        }
-        catch (Exception e)
-        {
-            LOGGER.error("Exception occurred", e);
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean requestInstallEsxi(final EsxiInstallationInfo esxiInstallationInfo)
-    {
-        try
-        {
-            final InstallESXiRequestMessage requestMessage = new InstallESXiRequestMessage();
-            final String correlationId = UUID.randomUUID().toString();
-            requestMessage.setMessageProperties(new com.dell.cpsd.MessageProperties(new Date(), correlationId, replyTo));
-            requestMessage.setEsxiInstallationInfo(esxiInstallationInfo);
-
-            ServiceResponse<?> callbackResponse = processRequest(installEsxiTimeout, new ServiceRequestCallback()
-            {
-                @Override
-                public String getRequestId()
-                {
-                    return correlationId;
-                }
-
-                @Override
-                public void executeRequest(String requestId) throws Exception
-                {
-                    producer.publishInstallEsxiRequest(requestMessage);
-                }
-            });
-
-            InstallESXiResponseMessage responseMessage = processResponse(callbackResponse, InstallESXiResponseMessage.class);
-
-            if (responseMessage != null && responseMessage.getMessageProperties() != null)
-            {
-                return "succeeded".equalsIgnoreCase(responseMessage.getStatus());
             }
             else
             {

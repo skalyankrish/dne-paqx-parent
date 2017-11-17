@@ -50,10 +50,14 @@ public class DiscoveredNodeInfo {
     @Column(name = "PRODCUT_FAMILY")
     private String productFamily;
 
+    @Column(name = "VENDOR")
+    private String vendor;
+
     public DiscoveredNodeInfo() {
     }
 
-    public DiscoveredNodeInfo(String model, String modelFamily, String product, String productFamily, String serialNumber, String symphonyUUID) {
+    public DiscoveredNodeInfo(String model, String modelFamily, String product, String productFamily, String serialNumber,
+            String symphonyUUID) {
         this.model = model;
         this.modelFamily = modelFamily;
         this.product = product;
@@ -94,6 +98,16 @@ public class DiscoveredNodeInfo {
         return symphonyUuid;
     }
 
+    public String getVendor()
+    {
+        return vendor;
+    }
+
+    public void setVendor(String vendor)
+    {
+        this.vendor = vendor;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -107,6 +121,7 @@ public class DiscoveredNodeInfo {
         if (model != null ? !model.equals(that.model) : that.model != null) return false;
         if (modelFamily != null ? !modelFamily.equals(that.modelFamily) : that.modelFamily != null) return false;
         if (product != null ? !product.equals(that.product) : that.product != null) return false;
+        if (vendor != null ? !vendor.equals(that.vendor) : that.vendor != null) return false;
         return productFamily != null ? productFamily.equals(that.productFamily) : that.productFamily == null;
 
     }
@@ -120,6 +135,7 @@ public class DiscoveredNodeInfo {
         result = 31 * result + (modelFamily != null ? modelFamily.hashCode() : 0);
         result = 31 * result + (product != null ? product.hashCode() : 0);
         result = 31 * result + (productFamily != null ? productFamily.hashCode() : 0);
+        result = 31 * result + (vendor != null ? vendor.hashCode() : 0);
         return result;
     }
 
@@ -133,6 +149,7 @@ public class DiscoveredNodeInfo {
                 ", modelFamily='" + modelFamily + '\'' +
                 ", product='" + product + '\'' +
                 ", productFamily='" + productFamily + '\'' +
+                ", vendor='" + vendor + '\'' +
                 '}';
     }
 }

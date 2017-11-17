@@ -120,12 +120,6 @@ public class PreProcessServiceImplTest {
     }
 
     @Test
-    public void testTaskName_configureBootDeviceIdrac()
-    {
-        assertEquals("Configure server boot device and boot sequence", workFlowTasks.get("configureBootDeviceIdrac").getTaskName());
-    }
-
-    @Test
     public void testTaskName_findVCluster() {
         assertEquals("Find vCenter cluster", workFlowTasks.get("findVCluster").getTaskName());
     }

@@ -40,7 +40,7 @@ public class PreProcessTaskConfig {
                 "pingIdrac",
                 //"changeIdracCredentials", currently has a bug so leave out for now...
                 "configureObmSettings",
-                "configureBootDeviceIdrac",
+                //"configureBootDeviceIdrac",
                 "findVCluster",
                 "findProtectionDomain",
                 "findOrCreateValidStoragePool");

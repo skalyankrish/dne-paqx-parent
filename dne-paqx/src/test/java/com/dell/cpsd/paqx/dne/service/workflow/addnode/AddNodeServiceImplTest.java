@@ -12,10 +12,6 @@ import com.dell.cpsd.paqx.dne.domain.WorkflowTask;
 import com.dell.cpsd.paqx.dne.repository.InMemoryJobRepository;
 import com.dell.cpsd.paqx.dne.service.WorkflowServiceImpl;
 import com.dell.cpsd.paqx.dne.service.model.Step;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,6 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class AddNodeServiceImplTest
 {
@@ -72,12 +71,6 @@ public class AddNodeServiceImplTest
     {
         assertNotNull(workFlowTasks);
         assertThat(workFlowTasks.size(), greaterThan(0));
-    }
-
-    @Test
-    public void testTaskName_installEsxi()
-    {
-        assertEquals("Install ESXi", workFlowTasks.get("installEsxi").getTaskName());
     }
 
     @Test
@@ -211,5 +204,4 @@ public class AddNodeServiceImplTest
     {
         assertEquals("Notify node discovery to update status", workFlowTasks.get("notifyNodeDiscoveryToUpdateStatus").getTaskName());
     }
-
 }

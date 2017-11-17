@@ -36,7 +36,7 @@ public class EnablePCIPassThrough extends BaseWorkflowDelegate
      * The logger instance
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(EnablePCIPassThrough.class);
-    private static final String DELL_PCI_REGEX = "Dell.*(H730|HBA330).*Mini*";
+    private static final String DELL_PCI_REGEX = "Dell.*(H730|HBA330|HBA).*Mini*";
     private static final String PCI_BUS_DEVICE_ID = "0000:02:00.0";
 
     /**

@@ -8,12 +8,14 @@ package com.dell.cpsd.paqx.dne.rest.controller;
 
 import com.dell.cpsd.paqx.dne.rest.exception.WorkflowNotFoundException;
 import com.dell.cpsd.paqx.dne.rest.model.AboutInfo;
+import com.dell.cpsd.paqx.dne.rest.model.Node;
 import com.dell.cpsd.paqx.dne.service.ICamundaWorkflowService;
 import com.dell.cpsd.paqx.dne.service.delegates.exception.JobNotFoundException;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
 import com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants;
 import com.dell.cpsd.paqx.dne.service.model.multinode.Job;
 import com.dell.cpsd.paqx.dne.service.model.multinode.Status;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +28,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @EnableAsync
 @RestController
@@ -68,11 +72,17 @@ public class MultiNodeController
     @CrossOrigin
     @RequestMapping(path = "/preprocess", method = RequestMethod.POST, consumes = "application/json",
                     produces = "application/json")
-    public Job startPreProcessWorkflow() throws InterruptedException, ExecutionException
+    public Job startPreProcessWorkflow(@RequestBody List<Node> nodesList) throws InterruptedException, ExecutionException
     {
         Job responseJob = null;
 
-        String jobId = camundaWorkflowService.startWorkflow("preProcess", null);
+        Map<String, Object> inputVariables = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(nodesList)) {
+            List<NodeDetail> nodeDetailsList = nodesList.stream().map(node -> new NodeDetail(node.getId(), node.getServiceTag() )).collect(Collectors.toList());
+            inputVariables.put(DelegateConstants.NODE_DETAILS, nodeDetailsList);
+        }
+
+        String jobId = camundaWorkflowService.startWorkflow("preProcess", inputVariables);
         if (jobId != null)
         {
             responseJob = new Job();

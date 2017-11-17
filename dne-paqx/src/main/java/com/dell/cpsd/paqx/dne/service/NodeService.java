@@ -5,7 +5,6 @@
 
 package com.dell.cpsd.paqx.dne.service;
 
-import com.dell.cpsd.EsxiInstallationInfo;
 import com.dell.cpsd.SetObmSettingsRequestMessage;
 import com.dell.cpsd.paqx.dne.domain.Job;
 import com.dell.cpsd.paqx.dne.domain.node.DiscoveredNodeInfo;
@@ -13,8 +12,13 @@ import com.dell.cpsd.paqx.dne.domain.scaleio.ScaleIOData;
 import com.dell.cpsd.paqx.dne.domain.scaleio.ScaleIOStoragePool;
 import com.dell.cpsd.paqx.dne.domain.vcenter.Host;
 import com.dell.cpsd.paqx.dne.domain.vcenter.HostStorageDevice;
-import com.dell.cpsd.paqx.dne.service.model.*;
+import com.dell.cpsd.paqx.dne.service.model.BootDeviceIdracStatus;
+import com.dell.cpsd.paqx.dne.service.model.ChangeIdracCredentialsResponse;
 import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
+import com.dell.cpsd.paqx.dne.service.model.DiscoveredNode;
+import com.dell.cpsd.paqx.dne.service.model.IdracInfo;
+import com.dell.cpsd.paqx.dne.service.model.IdracNetworkSettingsRequest;
+import com.dell.cpsd.paqx.dne.service.model.ObmSettingsResponse;
 import com.dell.cpsd.service.common.client.exception.ServiceExecutionException;
 import com.dell.cpsd.service.common.client.exception.ServiceTimeoutException;
 import com.dell.cpsd.service.engineering.standards.Device;
@@ -26,7 +30,24 @@ import com.dell.cpsd.storage.capabilities.api.CreateProtectionDomainRequestMessa
 import com.dell.cpsd.storage.capabilities.api.CreateStoragePoolRequestMessage;
 import com.dell.cpsd.storage.capabilities.api.CreateStoragePoolResponseMessage;
 import com.dell.cpsd.storage.capabilities.api.SioSdcUpdatePerformanceProfileRequestMessage;
-import com.dell.cpsd.virtualization.capabilities.api.*;
+import com.dell.cpsd.virtualization.capabilities.api.AddEsxiHostVSphereLicenseRequest;
+import com.dell.cpsd.virtualization.capabilities.api.AddHostToDvSwitchRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.ClusterInfo;
+import com.dell.cpsd.virtualization.capabilities.api.ClusterOperationRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.ConfigureVmNetworkSettingsRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.DatastoreRenameRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.DeployVMFromTemplateRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.EnablePCIPassthroughRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.HostMaintenanceModeRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.HostPowerOperationRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.ListEsxiCredentialDetailsRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.RemoteCommandExecutionRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.SoftwareVIBConfigureRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.SoftwareVIBRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.UpdatePCIPassthruSVMRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.VCenterUpdateSoftwareAcceptanceRequestMessage;
+import com.dell.cpsd.virtualization.capabilities.api.ValidateVcenterClusterResponseMessage;
+import com.dell.cpsd.virtualization.capabilities.api.VmPowerOperationsRequestMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import javax.persistence.NoResultException;
@@ -134,7 +155,7 @@ public interface NodeService
      * @throws ServiceTimeoutException
      * @throws ServiceExecutionException
      */
-    boolean notifyNodeAllocationComplete(String elementIdentifier) throws ServiceTimeoutException, ServiceExecutionException;
+    boolean notifyNodeAllocationStatus(String elementIdentifier,String action) throws ServiceTimeoutException, ServiceExecutionException;
 
     /**
      * Configure the iDRAC network settings.
@@ -162,15 +183,6 @@ public interface NodeService
      * @return
      */
     ObmSettingsResponse obmSettingsResponse(SetObmSettingsRequestMessage setObmSettingsRequestMessage);
-
-    /**
-     * Configure the iDRAC boot device.
-     *
-     * @param configureBootDeviceIdracRequest - The <code>ConfigureBootDeviceIdracRequest</code> instance.
-     *
-     * @return
-     */
-    BootDeviceIdracStatus bootDeviceIdracStatus(ConfigureBootDeviceIdracRequest configureBootDeviceIdracRequest);
 
     /**
      *
@@ -215,14 +227,6 @@ public interface NodeService
      * @return
      */
     boolean requestDiscoverVCenter(ComponentEndpointIds componentEndpointIds, String jobId);
-
-    /**
-     * Request an installation of ESXi.
-     *
-     * @param esxiInstallationInfo - The <code>EsxiInstallationInfo</code> instance
-     * @return
-     */
-    boolean requestInstallEsxi(EsxiInstallationInfo esxiInstallationInfo);
 
     /**
      * Request a host to be added to VCenter.

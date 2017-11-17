@@ -69,20 +69,31 @@ public class VerifyNodeDetail extends BaseWorkflowDelegate
             missingFields.add("esxiManagementHostname");
         }
         if (StringUtils.isBlank(nodeDetail.getScaleIoData1SvmIpAddress())) {
-            missingFields.add("scaleIoDataSvmIpAddress");
+            missingFields.add("scaleIoData1SvmIpAddress");
         }
-        if (StringUtils.isBlank(nodeDetail.getScaleIoSvmData1SubnetMask())) {
+
+        if (StringUtils.isBlank(nodeDetail.getScaleIoData1SvmSubnetMask())) {
             missingFields.add("scaleIoData1SvmSubnetMask");
         }
         if (StringUtils.isBlank(nodeDetail.getScaleIoData2SvmIpAddress())) {
             missingFields.add("scaleIoData2SvmIpAddress");
         }
-        if (StringUtils.isBlank(nodeDetail.getScaleIoData2KernelIpAddress())) {
-            missingFields.add("scaleIoData2KernelIpAddress");
+        if (StringUtils.isBlank(nodeDetail.getScaleIoData2SvmSubnetMask())) {
+            missingFields.add("scaleIoData2SvmSubnetMask");
         }
-        if (StringUtils.isBlank(nodeDetail.getScaleIoSvmData2SubnetMask())) {
+        if (StringUtils.isBlank(nodeDetail.getScaleIoData1EsxIpAddress())) {
+            missingFields.add("scaleIoData1EsxIpAddress");
+        }
+        if (StringUtils.isBlank(nodeDetail.getScaleIoData1EsxSubnetMask())) {
             missingFields.add("scaleIoData1EsxSubnetMask");
         }
+        if (StringUtils.isBlank(nodeDetail.getScaleIoData2EsxIpAddress())) {
+            missingFields.add("scaleIoData2EsxIpAddress");
+        }
+        if (StringUtils.isBlank(nodeDetail.getScaleIoData2EsxSubnetMask())) {
+            missingFields.add("scaleIoData2EsxSubnetMask");
+        }
+
         if (StringUtils.isBlank(nodeDetail.getScaleIoSvmManagementIpAddress())) {
             missingFields.add("scaleIoSvmManagementIpAddress");
         }

@@ -6,11 +6,12 @@
 
 package com.dell.cpsd.paqx.dne.service.delegates;
 
+import com.dell.cpsd.paqx.dne.amqp.callback.AsynchronousNodeServiceCallback;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
-import com.dell.cpsd.paqx.dne.service.NodeService;
+import com.dell.cpsd.paqx.dne.service.AsynchronousNodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
-import com.dell.cpsd.paqx.dne.transformers.HostToInstallEsxiRequestTransformer;
 import org.apache.commons.lang3.StringUtils;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.HOSTNAME;
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.INSTALL_ESXI_FAILED;
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.INSTALL_ESXI_MESSAGE_ID;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
 
 @Component
@@ -31,35 +35,16 @@ public class InstallEsxi extends BaseWorkflowDelegate
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(InstallEsxi.class);
 
-    /**
-     * The <code>NodeService</code> instance
-     */
-    private final NodeService nodeService;
-
-    private final HostToInstallEsxiRequestTransformer hostToInstallEsxiRequestTransformer;
+    private final AsynchronousNodeService asynchronousNodeService;
 
     private final DataServiceRepository repository;
 
     @Autowired
-    public InstallEsxi(final NodeService nodeService,
-                       final HostToInstallEsxiRequestTransformer hostToInstallEsxiRequestTransformer,
+    public InstallEsxi(final AsynchronousNodeService asynchronousNodeService,
                        final DataServiceRepository repository)
     {
-        this.nodeService = nodeService;
-        this.hostToInstallEsxiRequestTransformer = hostToInstallEsxiRequestTransformer;
+        this.asynchronousNodeService = asynchronousNodeService;
         this.repository = repository;
-    }
-
-    /*
-    * Auto generates the hostname using the ESXI Management IP Address.
-    */
-    private String generateHostname(final String esxiManagementIpAddress)
-    {
-        StringBuilder builder = new StringBuilder();
-        builder.append("vCenterHost");
-        builder.append("-");
-        builder.append(esxiManagementIpAddress.replaceAll("\\.", "-"));
-        return builder.toString();
     }
 
     /*
@@ -88,63 +73,33 @@ public class InstallEsxi extends BaseWorkflowDelegate
 
         LOGGER.info("Execute Install ESXi");
         NodeDetail nodeDetail = (NodeDetail) delegateExecution.getVariable(NODE_DETAIL);
+        AsynchronousNodeServiceCallback<?> responseCallback = (AsynchronousNodeServiceCallback<?>) delegateExecution.getVariable(INSTALL_ESXI_MESSAGE_ID);
 
-
-/*
-            final String symphonyUuid = nodeDetail.getId();
-
-            final String esxiManagementIpAddress = nodeDetail.getEsxiManagementIpAddress();
-
-            final String esxiManagementGatewayIpAddress = nodeDetail.getEsxiManagementGatewayIpAddress();
-
-            final String esxiManagementSubnetMask = nodeDetail.getEsxiManagementSubnetMask();
-
-            String esxiManagementHostname = nodeDetail.getEsxiManagementHostname();
-            if (StringUtils.isEmpty(esxiManagementHostname))
-            {
-                LOGGER.warn("ESXi Management hostname is null, will auto generate hostname");
-
-                esxiManagementHostname = this.generateHostname(esxiManagementIpAddress);
-
-                LOGGER.info("Auto generated ESXi Management hostname is " + esxiManagementHostname);
-            }
-
-            final IpV4Configuration ipV4Configuration = new IpV4Configuration();
-            ipV4Configuration.setEsxiManagementIpAddress(esxiManagementIpAddress);
-            ipV4Configuration.setEsxiManagementGateway(esxiManagementGatewayIpAddress);
-            ipV4Configuration.setEsxiManagementNetworkMask(esxiManagementSubnetMask);
-
-            final EsxiInstallationInfo esxiInstallationInfo = hostToInstallEsxiRequestTransformer
-                    .transformInstallEsxiData(esxiManagementHostname, symphonyUuid, ipV4Configuration);
-
-            boolean succeeded = false;
+        String status = null;
+        if (responseCallback != null && responseCallback.isDone())
+        {
             try
             {
-                succeeded = this.nodeService.requestInstallEsxi(esxiInstallationInfo);
+                status = this.asynchronousNodeService.requestInstallEsxi(responseCallback);
             }
             catch (Exception e)
             {
-                LOGGER.error("An Unexpected Exception Occurred attempting to Install Esxi on Node " +
-                             nodeDetail.getServiceTag(), e);
-                updateDelegateStatus("An Unexpected Exception Occurred attempting to Install Esxi on Node " +
-                                     nodeDetail.getServiceTag());
+                final String message = "Install Esxi on Node " + nodeDetail.getServiceTag() + " failed!  Reason: ";
+                LOGGER.error(message, e);
+                updateDelegateStatus(message + e.getMessage());
                 throw new BpmnError(INSTALL_ESXI_FAILED,
-                                    "Install Esxi on Node " + nodeDetail.getServiceTag() +
-                                    " failed!  Reason: " + e.getMessage());
+                                    message + e.getMessage());
             }
-
-            if (!succeeded)
-            {
-                LOGGER.error("Install Esxi on Node " + nodeDetail.getServiceTag() + " failed!");
-                updateDelegateStatus(
-                        "Install Esxi on Node " + nodeDetail.getServiceTag() + " failed!");
-                throw new BpmnError(INSTALL_ESXI_FAILED,
-                                    "Install Esxi on Node " + nodeDetail.getServiceTag() +
-                                    " failed!");
-            }
-        String fqdn = this.generateHostFqdn(esxiManagementHostname);
+        }
+        if (status == null || !"succeeded".equalsIgnoreCase(status))
+        {
+            final String message = "Install Esxi on Node " + nodeDetail.getServiceTag() + " failed!";
+            LOGGER.error(message);
+            updateDelegateStatus(message);
+            throw new BpmnError(INSTALL_ESXI_FAILED, message);
+        }
+        String fqdn = this.generateHostFqdn(nodeDetail.getEsxiManagementHostname());
         delegateExecution.setVariable(HOSTNAME, fqdn);
-*/
         LOGGER.info("Install Esxi on Node " + nodeDetail.getServiceTag() + " was successful.");
         updateDelegateStatus("Install Esxi on Node " + nodeDetail.getServiceTag() + " was successful.");
 

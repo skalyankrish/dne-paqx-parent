@@ -8,8 +8,6 @@
 package com.dell.cpsd.paqx.dne.service.delegates;
 
 import com.dell.cpsd.paqx.dne.domain.scaleio.ScaleIOData;
-import com.dell.cpsd.paqx.dne.domain.vcenter.Host;
-import com.dell.cpsd.paqx.dne.domain.vcenter.PciDevice;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.ESXiCredentialDetails;
@@ -19,11 +17,8 @@ import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.ESXI_CREDENTIAL_DETAILS;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.HOSTNAME;
@@ -60,7 +55,7 @@ public class ConfigureScaleIOVIBTest {
         scaleIOData = new ScaleIOData("abc", "abc", "abc", "abc", "abc", "abc", "abc");
     }
 
-    @Ignore @Test
+    @Test
     public void testExceptionThrown1() throws Exception {
         try {
             when(delegateExecution.getVariable(HOSTNAME)).thenReturn("abc");
@@ -74,7 +69,7 @@ public class ConfigureScaleIOVIBTest {
         }
     }
 
-    @Ignore @Test
+    @Test
     public void testExceptionThrown2() throws Exception {
         try {
             when(delegateExecution.getVariable(HOSTNAME)).thenReturn("abc");
@@ -89,7 +84,7 @@ public class ConfigureScaleIOVIBTest {
         }
     }
 
-    @Ignore @Test
+    @Test
     public void testFailed() throws Exception
     {
         try {
@@ -106,7 +101,7 @@ public class ConfigureScaleIOVIBTest {
         }
     }
 
-    @Ignore @Test
+    @Test
     public void testSuccess() throws Exception
     {
         when(delegateExecution.getVariable(HOSTNAME)).thenReturn("abc");

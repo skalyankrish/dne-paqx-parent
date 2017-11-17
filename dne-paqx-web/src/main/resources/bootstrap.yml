@@ -1,3 +1,42 @@
+#
+#Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+#Dell EMC Confidential/Proprietary Information
+#
 spring:
   application:
-    name: dne-paqx
+    name: node-expansion-service
+  cloud:
+    consul:
+      host: https://consul.cpsd.dell
+      port: 8500
+      discovery:
+        hostname: node-expansion-service.cpsd.dell
+        scheme: https
+        enabled: true
+        port: 8071
+        register-health-check: true
+        register: true
+        fail-fast: false
+        health-check-path: ${server.context-path}/health
+      config:
+       enabled: true
+server.port: 8071
+endpoints:
+  actuator:
+    enabled: true
+  health:
+    enabled: true
+    sensitive: false
+  info:
+    enabled: true
+server:
+  compression:
+    enabled: true
+  context-path: /
+  ssl:
+    key-store-type: JKS
+    key-store: ${javax.net.ssl.trustStore}
+    key-store-password: ${javax.net.ssl.trustStorePassword}
+management:
+  security:
+    enabled: false

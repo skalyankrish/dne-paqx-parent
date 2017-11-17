@@ -9,11 +9,18 @@ public class DiscoveredNode
 {
     private final String convergedUuid;
     private final com.dell.cpsd.DiscoveredNode.AllocationStatus nodeStatus;
+    private final String serial;
+    private final String product;
+    private final String vendor;
 
-    public DiscoveredNode(String convergedUuid, com.dell.cpsd.DiscoveredNode.AllocationStatus nodeStatus)
+    public DiscoveredNode(String convergedUuid, com.dell.cpsd.DiscoveredNode.AllocationStatus nodeStatus, String serial, String product,
+            String vendor)
     {
         this.convergedUuid = convergedUuid;
         this.nodeStatus = nodeStatus;
+        this.serial = serial;
+        this.product = product;
+        this.vendor = vendor;
     }
 
     public String getConvergedUuid()
@@ -23,5 +30,20 @@ public class DiscoveredNode
 
     public com.dell.cpsd.DiscoveredNode.AllocationStatus getNodeStatus() {
         return nodeStatus;
+    }
+
+    public String getSerial()
+    {
+        return serial;
+    }
+
+    public String getProduct()
+    {
+        return product;
+    }
+
+    public String getVendor()
+    {
+        return vendor;
     }
 }

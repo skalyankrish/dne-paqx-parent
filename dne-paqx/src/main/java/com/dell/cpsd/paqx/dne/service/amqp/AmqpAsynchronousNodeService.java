@@ -7,6 +7,9 @@ package com.dell.cpsd.paqx.dne.service.amqp;
 import com.dell.cpsd.ConfigureBootDeviceIdracError;
 import com.dell.cpsd.ConfigureBootDeviceIdracRequestMessage;
 import com.dell.cpsd.ConfigureBootDeviceIdracResponseMessage;
+import com.dell.cpsd.EsxiInstallationInfo;
+import com.dell.cpsd.InstallESXiRequestMessage;
+import com.dell.cpsd.InstallESXiResponseMessage;
 import com.dell.cpsd.common.logging.ILogger;
 import com.dell.cpsd.paqx.dne.amqp.callback.AsynchronousNodeServiceCallback;
 import com.dell.cpsd.paqx.dne.amqp.config.AsynchronousNodeServiceConfig;
@@ -15,6 +18,7 @@ import com.dell.cpsd.paqx.dne.log.DneLoggingManager;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.AsynchronousNodeService;
 import com.dell.cpsd.paqx.dne.service.amqp.adapter.ConfigureBootDeviceIdracResponseAdapter;
+import com.dell.cpsd.paqx.dne.service.amqp.adapter.InstallEsxiResponseAdapter;
 import com.dell.cpsd.paqx.dne.service.model.BootDeviceIdracStatus;
 import com.dell.cpsd.paqx.dne.service.model.ConfigureBootDeviceIdracRequest;
 import com.dell.cpsd.service.common.client.callback.IServiceCallback;
@@ -32,6 +36,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -101,7 +106,8 @@ public class AmqpAsynchronousNodeService extends AbstractServiceCallbackManager 
  */
     private void initCallbacks()
     {
-//        this.consumer.addAdapter(new ConfigureBootDeviceIdracResponseAdapter(this, this.runtimeService));
+        this.consumer.addAdapter(new ConfigureBootDeviceIdracResponseAdapter(this, this.runtimeService));
+        this.consumer.addAdapter(new InstallEsxiResponseAdapter(this, this.runtimeService));
     }
 
     /**
@@ -289,5 +295,57 @@ public class AmqpAsynchronousNodeService extends AbstractServiceCallbackManager 
             }
         }
         return bootDeviceIdracStatus;
+    }
+
+    @Override
+    public <T extends ServiceResponse<?>> AsynchronousNodeServiceCallback<?> requestInstallEsxi(final String processId,
+                                                                                                final String activityId,
+                                                                                                final String messageId,
+                                                                                                final EsxiInstallationInfo esxiInstallationInfo)
+    {
+
+        AsynchronousNodeServiceCallback<?> response = null;
+        try
+        {
+            final InstallESXiRequestMessage requestMessage = new InstallESXiRequestMessage();
+            final String correlationId = UUID.randomUUID().toString();
+            requestMessage.setMessageProperties(new com.dell.cpsd.MessageProperties(new Date(), correlationId, replyTo));
+            requestMessage.setEsxiInstallationInfo(esxiInstallationInfo);
+
+            response = processRequest(processId, activityId, messageId, 0L, new ServiceRequestCallback()
+            {
+                @Override
+                public String getRequestId()
+                {
+                    return correlationId;
+                }
+
+                @Override
+                public void executeRequest(String requestId) throws Exception
+                {
+                    producer.publishInstallEsxiRequest(requestMessage);
+                }
+            });
+
+        }
+        catch (Exception e) {
+            LOGGER.error(" An unexpected exception occurred requesting Installation of Esxi on Node.", e);
+        }
+        return response;
+    }
+
+    @Override
+    public String requestInstallEsxi(final AsynchronousNodeServiceCallback<?> serviceCallback) throws ServiceExecutionException
+    {
+        String status = null;
+        if (serviceCallback != null)
+        {
+            InstallESXiResponseMessage responseMessage = processResponse(serviceCallback, InstallESXiResponseMessage.class);
+            if (responseMessage != null && responseMessage.getMessageProperties() != null)
+            {
+                status = responseMessage.getStatus();
+            }
+        }
+        return status;
     }
 }

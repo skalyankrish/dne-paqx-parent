@@ -5,14 +5,7 @@
 
 package com.dell.cpsd.paqx.dne.amqp.producer;
 
-import com.dell.cpsd.ChangeIdracCredentialsRequestMessage;
-import com.dell.cpsd.CompleteNodeAllocationRequestMessage;
-import com.dell.cpsd.ConfigureBootDeviceIdracRequestMessage;
-import com.dell.cpsd.ConfigurePxeBootRequestMessage;
-import com.dell.cpsd.InstallESXiRequestMessage;
-import com.dell.cpsd.ListNodes;
-import com.dell.cpsd.NodeInventoryRequestMessage;
-import com.dell.cpsd.SetObmSettingsRequestMessage;
+import com.dell.cpsd.*;
 import com.dell.cpsd.common.rabbitmq.annotation.Message;
 import com.dell.cpsd.hdp.capability.registry.api.ProviderEndpoint;
 import com.dell.cpsd.hdp.capability.registry.client.binder.CapabilityBinder;
@@ -607,6 +600,30 @@ public class AmqpDneProducer implements DneProducer
         {
             LOGGER.info("Sending create protection domain request message: [{}]", requestMessage);
             rabbitTemplate.convertAndSend(endpointHelper.getRequestExchange(), endpointHelper.getRequestRoutingKey(), requestMessage);
+        }
+    }
+
+    @Override
+    public void publishStartedNodeAllocation(final StartNodeAllocationRequestMessage requestMessage)
+    {
+        final AmqpProviderEndpointHelper endpointHelper = findEndpointHelper(StartNodeAllocationRequestMessage.class);
+
+        if (endpointHelper != null)
+        {
+            LOGGER.info("Sending start node allocation request message: [{}]", requestMessage);
+            rabbitTemplate.convertAndSend(endpointHelper.getRequestExchange(), endpointHelper.getRequestRoutingKey(), requestMessage);
+        }
+    }
+
+    @Override
+    public void publishFailedNodeAllocation(FailNodeAllocationRequestMessage request)
+    {
+        AmqpProviderEndpointHelper endpointHelper = findEndpointHelper(FailNodeAllocationRequestMessage.class);
+
+        if (endpointHelper != null)
+        {
+            LOGGER.info("Send Fail node allocation request message from DNE paqx.");
+            rabbitTemplate.convertAndSend(endpointHelper.getRequestExchange(), endpointHelper.getRequestRoutingKey(), request);
         }
     }
 

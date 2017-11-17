@@ -96,13 +96,13 @@ public class AddHostToDvSwitchTaskHandler extends BaseTaskHandler implements IWo
             }
 
             //VMotion Config
-            final String vMotionManagementIpAddress = inputParams.getVMotionManagementIpAddress();
+            final String vMotionManagementIpAddress = inputParams.getvMotionManagementIpAddress();
             if (StringUtils.isEmpty(vMotionManagementIpAddress))
             {
                 throw new IllegalStateException("VMotion Management IP Address is null or empty");
             }
 
-            final String vMotionManagementSubnetMask = inputParams.getVMotionManagementSubnetMask();
+            final String vMotionManagementSubnetMask = inputParams.getvMotionManagementSubnetMask();
             if (StringUtils.isEmpty(vMotionManagementSubnetMask))
             {
                 throw new IllegalStateException("VMotion Management Subnet Mask is null or empty");

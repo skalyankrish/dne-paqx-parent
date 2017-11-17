@@ -1,0 +1,17 @@
+# Copyright (c) 2017 Dell Inc. or its subsidiaries. All Rights Reserved.
+# Dell EMC Confidential/Proprietary Information
+
+version: '2'
+
+services:
+
+  dne-paqx:
+    image: dell-cpsd-dne-node-expansion-service:${IMAGE_TAG}
+    container_name: dell-cpsd-dne-node-expansion-service
+    network_mode: "bridge"
+    hostname: node-expansion-service
+    ports:
+      - "8071:8071"
+      - "8555:8555"
+    dns: 172.17.0.1
+    restart: unless-stopped

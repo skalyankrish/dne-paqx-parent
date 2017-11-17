@@ -2,126 +2,106 @@
 # Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
 # Dell EMC Confidential/Proprietary Information
 #
+
+%define _source %_name-%_version.tgz
+
 Summary: Dell Inc. DNE PAQX
-Name: cpsd-node-expansion-services
+Name:    %_name
 Version: %_version
 Release: %_revision
+Source:  %_source
 License: Commercial
 Vendor: Dell Inc.
 Group: System Environment/Dell Inc. Applications
 URL: http://www.dell.com
-Requires: dell-cpsd-core-services dell-cpsd-core-adapters cpsd-node-discovery-service
 
-%define _use_internal_dependency_generator 0
-%define __find_requires %{nil}
+BuildArch: %(uname -m)
+Requires: dell-cpsd-core-services
+Requires: dell-cpsd-core-adapters
+Requires: dell-cpsd-dne-node-discovery-service
+Requires: dell-cpsd-dne-engineering-standards-service
 
 %description
 Dell Inc. DNE PAQX
 
+%define  debug_package %{nil}
 
-##############################################################################
-# build
-##############################################################################
+%prep
+%setup -q
+
 %build
 
-# Creates directory if it doesn't exist
-# $1: Directory path
-init_dir ()
-{
-    [ -d $1 ] || mkdir -p $1
-}
-
-##############################################################################
-# check and create the root directory
-##############################################################################
-init_dir ${RPM_BUILD_ROOT}/opt/dell
-init_dir ${RPM_BUILD_ROOT}/opt/dell/cpsd
-init_dir ${RPM_BUILD_ROOT}/opt/dell/cpsd/dne-paqx
-
-
-##############################################################################
-# check and create the directories for the service
-##############################################################################
-
-SERVICE_BUILD_ROOT=${RPM_BUILD_ROOT}/opt/dell/cpsd/dne-paqx
-
-init_dir ${SERVICE_BUILD_ROOT}
-init_dir ${SERVICE_BUILD_ROOT}/install
-init_dir ${SERVICE_BUILD_ROOT}/install/dell-dne-paqx-web
-init_dir ${SERVICE_BUILD_ROOT}/install/dell-dne-paqx-ess
-init_dir ${SERVICE_BUILD_ROOT}/image
-init_dir ${SERVICE_BUILD_ROOT}/image/dne-paqx-web
-init_dir ${SERVICE_BUILD_ROOT}/image/engineering-standards-service
-
-
-##############################################################################
-# copy the image to the required directory
-##############################################################################
-cp -r ${RPM_SOURCE_DIR}/target/dependency/dne-paqx/* ${SERVICE_BUILD_ROOT}/image/dne-paqx-web
-cp -r ${RPM_SOURCE_DIR}/target/dependency/engineering-standards-service/* ${SERVICE_BUILD_ROOT}/image/engineering-standards-service
-
-
-##############################################################################
-# copy the scripts to the install directory
-##############################################################################
-echo "rpm source dir ${RPM_SOURCE_DIR}"
-echo "service build dir ${SERVICE_BUILD_ROOT}"
-cp -rf ${RPM_SOURCE_DIR}/build/install.sh ${SERVICE_BUILD_ROOT}/install
-cp -rf ${RPM_SOURCE_DIR}/build/remove.sh ${SERVICE_BUILD_ROOT}/install
-cp -rf ${RPM_SOURCE_DIR}/build/upgrade.sh ${SERVICE_BUILD_ROOT}/install
-cp -riv ${RPM_SOURCE_DIR}/../dne-paqx-distribution/build/install/.env ${SERVICE_BUILD_ROOT}/install/dell-dne-paqx-web/.env
-cp -riv ${RPM_SOURCE_DIR}/../dne-paqx-distribution/build/install/.env ${SERVICE_BUILD_ROOT}/install/dell-dne-paqx-ess/.env
-
-##############################################################################
-# copy the unit file
-##############################################################################
-
-
-cp -r ${RPM_SOURCE_DIR}/target/dependency/dne-paqx/docker-compose.yml ${SERVICE_BUILD_ROOT}/install/dell-dne-paqx-web/docker-compose.yml
-cp -r ${RPM_SOURCE_DIR}/target/dependency/engineering-standards-service/docker-compose.yml ${SERVICE_BUILD_ROOT}/install/dell-dne-paqx-ess/docker-compose.yml
-
-##############################################################################
-# pre
-##############################################################################
 %pre
+
 getent group dell >/dev/null || /usr/sbin/groupadd -f -r dell
-getent passwd dnepx >/dev/null || /usr/sbin/useradd -r -g dell -s /sbin/nologin -M dnepx
+getent passwd core >/dev/null || /usr/sbin/useradd -r -g dell -s /sbin/nologin -M core
 exit 0
 
+%install
 
-##############################################################################
-# post
-##############################################################################
+install -D dell-cpsd-dne-node-expansion-service.tar %{buildroot}/opt/dell/cpsd/dne/node-expansion-service/image/dell-cpsd-dne-node-expansion-service.tar
+install -D install/docker-compose.yml %{buildroot}/opt/dell/cpsd/dne/node-expansion-service/install/docker-compose.yml
+
 %post
+
 if [ $1 -eq 1 ];then
-    /bin/sh /opt/dell/cpsd/dne-paqx/install/install.sh
+    RETVAL=0
+
+    SERVICE_BASE=/opt/dell/cpsd/dne/node-expansion-service
+
+    echo "Installing Dell Inc.DNE PAQX components"
+
+    if [ ! -d "$SERVICE_BASE" ]; then
+        echo "Could not find directory - [$SERVICE_BASE] does not exist."
+        exit 1
+    fi
+
+    usermod -aG docker core
+
+    docker load -i ${SERVICE_BASE}/image/dell-cpsd-dne-node-expansion-service.tar
+
+    (
+        cd ${SERVICE_BASE}/install/
+        docker-compose create
+    )
+    docker start dell-cpsd-dne-node-expansion-service
+
+    echo "Dell Inc. DNE PAQX components install has completed successfully."
+
+    exit 0
 elif [ $1 -eq 2 ];then
-    /bin/sh /opt/dell/cpsd/dne-paqx/install/upgrade.sh
+    echo "Upgrade is not possible with this rpm"
+    exit 1
 else
     echo "Unexpected argument passed to RPM %post script: [$1]"
     exit 1
 fi
 exit 0
 
-
-##############################################################################
-# preun
-##############################################################################
 %preun
+
 if [ $1 -eq 0 ];then
-    /bin/sh /opt/dell/cpsd/dne-paqx/install/remove.sh
+    SERVICE_BASE=/opt/dell/cpsd/dne/node-expansion-service
+
+    echo "Removing Dell Inc. DNE PAQX components"
+    echo "This will take a few minutes and several services will be restarted on the system. This is normal and please let the script run to completion"
+
+
+    echo "Stopping Dell Inc. DNE PAQX components"
+    /usr/bin/docker stop dell-cpsd-dne-node-expansion-service
+    /usr/bin/docker rm --volumes dell-cpsd-dne-node-expansion-service
+
+    echo "Deleting the DNE PAQX components for Dell Inc."
+    /usr/bin/docker rmi $(docker images -q dell-cpsd-dne-node-expansion-service)
+
+    echo "Dell Inc. DNE PAQX components removal has completed successfully"
 fi
 exit 0
 
-##############################################################################
-# configure directory and file permissions
-##############################################################################
 %files
 
-%attr(0754,dnepx,dell) /opt/dell/cpsd/dne-paqx
-%attr(0755,dnepx,dell) /opt/dell/cpsd/dne-paqx/install
-%attr(0755,dnepx,dell) /opt/dell/cpsd/dne-paqx/install/dell-dne-paqx-web
-%attr(0755,dnepx,dell) /opt/dell/cpsd/dne-paqx/install/dell-dne-paqx-ess
-%attr(0755,dnepx,dell) /opt/dell/cpsd/dne-paqx/image
-%attr(0755,dnepx,dell) /opt/dell/cpsd/dne-paqx/image/dne-paqx-web
-%attr(0755,dnepx,dell) /opt/dell/cpsd/dne-paqx/image/engineering-standards-service
+%attr(0754,core,dell) %dir /opt/dell/cpsd/dne/node-expansion-service
+%attr(0755,core,dell) %dir /opt/dell/cpsd/dne/node-expansion-service/image
+%attr(0755,core,dell) %dir /opt/dell/cpsd/dne/node-expansion-service/install
+%attr(0644,root,root) /opt/dell/cpsd/dne/node-expansion-service/install/docker-compose.yml
+%attr(0644,root,root) /opt/dell/cpsd/dne/node-expansion-service/image/dell-cpsd-dne-node-expansion-service.tar

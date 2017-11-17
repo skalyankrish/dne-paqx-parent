@@ -50,7 +50,7 @@ public class ConfigIdracIpAddress extends BaseWorkflowDelegate
         NodeDetail nodeDetail = (NodeDetail) delegateExecution.getVariable(NODE_DETAIL);
         final String taskMessage = "Configure IP Address";
         
-        IdracInfo idracInfo = null;
+        IdracInfo idracInfo;
         try
         {
             IdracNetworkSettingsRequest idracNetworkSettingsRequest = new IdracNetworkSettingsRequest();

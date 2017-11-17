@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -43,13 +44,13 @@ public class ConfigureObmSettings extends BaseWorkflowDelegate
     /**
      * The obm services to set
      */
-    private final String[] obmServices;
+    @Value("${obm.services}")
+    private String[] obmServices;
 
     @Autowired
-    public ConfigureObmSettings(NodeService nodeService, String[] obmServices)
+    public ConfigureObmSettings(NodeService nodeService)
     {
         this.nodeService = nodeService;
-        this.obmServices = obmServices;
     }
 
     @Override

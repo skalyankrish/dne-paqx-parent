@@ -9,6 +9,10 @@ package com.dell.cpsd.paqx.dne.service.delegates;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.NodeService;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
+import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
+import com.dell.cpsd.storage.capabilities.api.PerformanceProfileRequest;
+import com.dell.cpsd.storage.capabilities.api.SioSdcUpdatePerformanceProfileRequestMessage;
+import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +21,19 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.IOCTL_INI_GUI_STR;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.UPDATE_SDC_PERFORMANCE_PROFILE_FAILED;
 
+/**
+ * Update ScaleIo Data Client (SDC) performance profile.
+ * <p>
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries. All Rights Reserved. Dell EMC Confidential/Proprietary Information
+ * </p>
+ *
+ * @version 1.0
+ * @since 1.0
+ */
 @Component
 @Scope("prototype")
 @Qualifier("updateSDCPerformanceProfile")
@@ -39,22 +54,11 @@ public class UpdateSDCPerformanceProfile extends BaseWorkflowDelegate
      */
     private final DataServiceRepository repository;
 
-    /*
-    * The time to wait before sending the request to update the sdc performance profile
-    */
-    //private final long waitTime;
-
-    /*
-    * ScaleIO gateway credential components
-    */
-    private static final String COMPONENT_TYPE = "SCALEIO-CLUSTER";
-
     /**
      * UpdateSdcPerformanceProfileTaskHandler constructor
      *
      * @param nodeService - The <code>NodeService</code> instance
      * @param repository  - The <code>DataServiceRepository</code> instance
-     * @param waitTime    - Time to wait before requesting the ScaleIO SDC performance profile update.
      */
     @Autowired
     public UpdateSDCPerformanceProfile(final NodeService nodeService, final DataServiceRepository repository)
@@ -70,11 +74,21 @@ public class UpdateSDCPerformanceProfile extends BaseWorkflowDelegate
         final String taskMessage = "Update ScaleIO SDC Performance Profile";
 
         final NodeDetail nodeDetail = (NodeDetail) delegateExecution.getVariable(NODE_DETAIL);
-/*        final ComponentEndpointIds componentEndpointIds = repository.getVCenterComponentEndpointIdsByEndpointType(
-                "VCENTER-CUSTOMER");
-        final String sdcGUID = (String) delegateExecution.getVariable(DelegateConstants.IOCTL_INI_GUI_STR);
-
+        final String sdcGUID = (String) delegateExecution.getVariable(IOCTL_INI_GUI_STR);
         final String scaleIoSdcIpAddress = nodeDetail.getEsxiManagementIpAddress();
+
+        ComponentEndpointIds componentEndpointIds;
+        try
+        {
+            componentEndpointIds = repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER");
+        }
+        catch (Exception e)
+        {
+            String errorMessage = "An Unexpected Exception occurred attempting to retrieve VCenter Component Endpoints.  Reason: ";
+            LOGGER.error(errorMessage, e);
+            updateDelegateStatus(errorMessage + e.getMessage());
+            throw new BpmnError(UPDATE_SDC_PERFORMANCE_PROFILE_FAILED, errorMessage + e.getMessage());
+        }
 
         final PerformanceProfileRequest performanceProfileRequest = new PerformanceProfileRequest();
         performanceProfileRequest.setSdcIp(scaleIoSdcIpAddress);
@@ -86,36 +100,32 @@ public class UpdateSDCPerformanceProfile extends BaseWorkflowDelegate
         requestMessage.setEndpointUrl("https://" + componentEndpointIds.getEndpointUrl());
         requestMessage.setComponentEndpointIds(
                 new com.dell.cpsd.storage.capabilities.api.ComponentEndpointIds(componentEndpointIds.getComponentUuid(),
-                                                                                componentEndpointIds.getEndpointUuid(),
-                                                                                componentEndpointIds
-                                                                                        .getCredentialUuid()));
+                        componentEndpointIds.getEndpointUuid(), componentEndpointIds.getCredentialUuid()));
 
-        boolean succeeded = false;
+        boolean succeeded;
         try
         {
-            this.nodeService.requestUpdateSdcPerformanceProfile(requestMessage);
+            succeeded = this.nodeService.requestUpdateSdcPerformanceProfile(requestMessage);
 
         }
         catch (Exception ex)
         {
-            LOGGER.error("An Unexpected Exception occurred attempting to Install ScaleIO Vib.", ex);
-            updateDelegateStatus(
-                    "An Unexpected Exception occurred attempting to request " + taskMessage + ".  Reason: " +
-                    ex.getMessage());
-            throw new BpmnError(CONFIGURE_SCALEIO_VIB_FAILED,
-                                "An Unexpected Exception occurred attempting to request " + taskMessage +
-                                ".  Reason: " + ex.getMessage());
+            String errorMessage = "An Unexpected Exception occurred attempting to request " + taskMessage + ".  Reason: ";
+            LOGGER.error(errorMessage, ex);
+            updateDelegateStatus(errorMessage + ex.getMessage());
+            throw new BpmnError(UPDATE_SDC_PERFORMANCE_PROFILE_FAILED,
+                    errorMessage + ex.getMessage());
         }
         if (!succeeded)
         {
-            LOGGER.error(taskMessage + " on Node " + nodeDetail.getServiceTag() + " failed!");
-            updateDelegateStatus(taskMessage + " on Node " + nodeDetail.getServiceTag() + " failed!");
-            throw new BpmnError(CONFIGURE_SCALEIO_VIB_FAILED,
-                                taskMessage + " on Node " + nodeDetail.getServiceTag() + " failed!");
-        }*/
+            String errorMessage = taskMessage + " on Node " + nodeDetail.getServiceTag() + " failed!";
+            LOGGER.error(errorMessage);
+            updateDelegateStatus(errorMessage);
+            throw new BpmnError(UPDATE_SDC_PERFORMANCE_PROFILE_FAILED, errorMessage);
+        }
 
-        LOGGER.info(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
-        updateDelegateStatus(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
-
+        String returnMessage = taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.";
+        LOGGER.info(returnMessage);
+        updateDelegateStatus(returnMessage);
     }
 }

@@ -48,7 +48,7 @@ public class ConfigureObmSettingsTest {
         nodeService = mock(NodeService.class);
         obmServices[0] = "abc";
         obmServices[1] = "xyz";
-        configureObmSettings = new ConfigureObmSettings(nodeService, obmServices);
+        configureObmSettings = new ConfigureObmSettings(nodeService);
         delegateExecution = mock(DelegateExecution.class);
         nodeDetail = new NodeDetail();
         idracNetworkSettingsRequest = mock(IdracNetworkSettingsRequest.class);
@@ -77,7 +77,7 @@ public class ConfigureObmSettingsTest {
         obmSettingsResponse.setStatus("SUCCESS");
         when(delegateExecution.getVariable(NODE_DETAIL)).thenReturn(nodeDetail);
         when(nodeService.obmSettingsResponse(any())).thenReturn(obmSettingsResponse);
-        final ConfigureObmSettings c = spy(new ConfigureObmSettings(nodeService, obmServices));
+        final ConfigureObmSettings c = spy(new ConfigureObmSettings(nodeService));
         c.delegateExecute(delegateExecution);
         verify(c).updateDelegateStatus("Obm Settings on Node abc were configured successfully.");
     }

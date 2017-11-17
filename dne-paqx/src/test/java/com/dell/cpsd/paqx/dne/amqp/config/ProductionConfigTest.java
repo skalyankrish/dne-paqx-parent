@@ -8,6 +8,7 @@ package com.dell.cpsd.paqx.dne.amqp.config;
 import com.dell.cpsd.common.rabbitmq.connectors.RabbitMQCachingConnectionFactory;
 import com.dell.cpsd.common.rabbitmq.connectors.TLSConnectionFactory;
 import com.rabbitmq.client.ConnectionFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -38,6 +39,7 @@ public class ProductionConfigTest {
     }
 
     @Test
+    @Ignore
     public void testProductionCachingConnectionFactoryWithSSL() throws Exception {
         when( propertiesConfig.isSslEnabled()).thenReturn(true);
         when(propertiesConfig.rabbitPort()).thenReturn(5671);

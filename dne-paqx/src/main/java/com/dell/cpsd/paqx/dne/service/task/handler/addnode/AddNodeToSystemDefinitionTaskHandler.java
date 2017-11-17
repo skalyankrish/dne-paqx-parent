@@ -130,7 +130,7 @@ public class AddNodeToSystemDefinitionTaskHandler extends BaseTaskHandler implem
             parentGroups.add("SystemCompute");
             endpoints.add("RACKHD-EP");
             newNode.setUuid(nodeInfo.getSymphonyUuid());
-            newNode.setIdentity(new Identity("computeServer", nodeInfo.getSymphonyUuid(), nodeInfo.getSymphonyUuid(), nodeInfo.getSerialNumber(),null));
+            newNode.setIdentity(new Identity("SERVER", nodeInfo.getSymphonyUuid(), nodeInfo.getSymphonyUuid(), nodeInfo.getSerialNumber(),null));
             newNode.setDefinition(new Definition(nodeInfo.getProductFamily(), nodeInfo.getProduct(), nodeInfo.getModelFamily(), nodeInfo.getModel()));
             newNode.setParentGroupUuids(this.mapGroupNamesToUUIDs(parentGroups, systemToBeUpdated.getGroups()));
             newNode.setEndpoints(new ArrayList<>());

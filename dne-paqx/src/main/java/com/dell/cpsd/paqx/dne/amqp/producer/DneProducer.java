@@ -5,14 +5,7 @@
 
 package com.dell.cpsd.paqx.dne.amqp.producer;
 
-import com.dell.cpsd.ChangeIdracCredentialsRequestMessage;
-import com.dell.cpsd.CompleteNodeAllocationRequestMessage;
-import com.dell.cpsd.ConfigureBootDeviceIdracRequestMessage;
-import com.dell.cpsd.ConfigurePxeBootRequestMessage;
-import com.dell.cpsd.InstallESXiRequestMessage;
-import com.dell.cpsd.ListNodes;
-import com.dell.cpsd.NodeInventoryRequestMessage;
-import com.dell.cpsd.SetObmSettingsRequestMessage;
+import com.dell.cpsd.*;
 import com.dell.cpsd.rackhd.adapter.model.idrac.IdracNetworkSettingsRequestMessage;
 import com.dell.cpsd.service.engineering.standards.EssValidateProtectionDomainsRequestMessage;
 import com.dell.cpsd.service.engineering.standards.EssValidateStoragePoolRequestMessage;
@@ -293,4 +286,18 @@ public interface DneProducer
      * @param requestMessage CreateProtectionDomainRequestMessage
      */
     void publishCreateProtectionDomain(CreateProtectionDomainRequestMessage requestMessage);
+
+    /**
+     * Start node allocation
+     *
+     * @param requestMessage
+     */
+    void publishStartedNodeAllocation(StartNodeAllocationRequestMessage requestMessage);
+
+    /**
+     * Fail node allocation
+     *
+     * @param requestMessage
+     */
+    void publishFailedNodeAllocation(FailNodeAllocationRequestMessage requestMessage);
 }

@@ -39,18 +39,21 @@ public class NotifyNodeDiscoveryToUpdateStatusTaskHandler extends BaseTaskHandle
      * The <code>NodeService</code> instance
      */
     private final NodeService nodeService;
-    
+
+    private final String action;
+
     /**
      * NotifyNodeDiscoveryToUpdateStatusTaskHandler constructor.
-     * 
+     *
      * @param nodeService
      *            - The <code>NodeService</code> instance.
      * 
      * @since 1.0
      */
-    public NotifyNodeDiscoveryToUpdateStatusTaskHandler(NodeService nodeService)
+    public NotifyNodeDiscoveryToUpdateStatusTaskHandler(NodeService nodeService, String action)
     {
         this.nodeService = nodeService;
+        this.action = action;
     }
 
     /**
@@ -84,11 +87,11 @@ public class NotifyNodeDiscoveryToUpdateStatusTaskHandler extends BaseTaskHandle
                 throw new IllegalStateException("Symphony uuid is null");
             }
             
-            boolean succeeded = this.nodeService.notifyNodeAllocationComplete(symphonyUuid);
+            boolean succeeded = this.nodeService.notifyNodeAllocationStatus(symphonyUuid, action);
             
             if (!succeeded)
             {
-                throw new IllegalStateException("Node allocation completion failed");
+                throw new IllegalStateException("Node allocation status change failed");
             }
 
             response.setWorkFlowTaskStatus(Status.SUCCEEDED);

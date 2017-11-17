@@ -69,7 +69,8 @@ public class FindDiscoveredNodesTest {
     @Ignore @Test
     public void nodeDiscovered() throws Exception
     {
-        discoveredNode = new DiscoveredNode("1", com.dell.cpsd.DiscoveredNode.AllocationStatus.DISCOVERED);
+        discoveredNode = new DiscoveredNode("1", com.dell.cpsd.DiscoveredNode.AllocationStatus.DISCOVERED, "testserial", "testproduct",
+                "test_vendor");
         discoveredNodesResponse.add(discoveredNode);
         when(nodeService.listDiscoveredNodes()).thenReturn(discoveredNodesResponse);
         findDiscoveredNodes.delegateExecute(delegateExecution);

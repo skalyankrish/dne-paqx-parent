@@ -43,7 +43,7 @@ public class FindVClusterTaskHandler extends BaseTaskHandler implements IWorkflo
     @Override
     public boolean executeTask(Job job)
     {
-        LOGGER.info("Execute FindVCluster task");
+        LOGGER.info("Execute FindVCenterCluster task");
 
         TaskResponse response = initializeResponse(job);
 

@@ -177,7 +177,8 @@ public class ConfigureScaleIoVibTaskHandler extends BaseTaskHandler implements I
                 // Scan the master element info the ips
                 scaleIOMdmCluster.getMasterElementInfo().stream().filter(Objects::nonNull)
                         .forEach(scaleIOSDSElementInfo -> scaleIOSDSElementInfo.getIps().forEach(scaleIOIP -> {
-                            if (!scaleIOIP.getSdsElementInfo().getRole().equalsIgnoreCase("TieBreaker"))
+                            if (!scaleIOIP.getSdsElementInfo().getRole().equalsIgnoreCase("TieBreaker") && "master"
+                                    .equalsIgnoreCase(scaleIOIP.getType()))
                             {
                                 mdmIpList.add(scaleIOIP.getIp());
                             }
@@ -186,7 +187,8 @@ public class ConfigureScaleIoVibTaskHandler extends BaseTaskHandler implements I
                 // Scan the slave element info for ips
                 scaleIOMdmCluster.getSlaveElementInfo().stream().filter(Objects::nonNull)
                         .forEach(scaleIOSDSElementInfo -> scaleIOSDSElementInfo.getIps().forEach(scaleIOIP -> {
-                            if (!scaleIOIP.getSdsElementInfo().getRole().equalsIgnoreCase("TieBreaker"))
+                            if (!scaleIOIP.getSdsElementInfo().getRole().equalsIgnoreCase("TieBreaker") && "slave"
+                                    .equalsIgnoreCase(scaleIOIP.getType()))
                             {
                                 mdmIpList.add(scaleIOIP.getIp());
                             }

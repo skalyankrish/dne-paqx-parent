@@ -122,7 +122,7 @@ public class AddNodeToSystemDefinitionTaskHandlerTest
 
         Identity identity = new Identity();
         identity.setIdentifier("testuuid");
-        identity.setElementType("computeServer");
+        identity.setElementType("SERVER");
         identity.setSerialNumber("SerialNumber");
         com.setIdentity(identity);
         updatedSystem.setComponents(Collections.singletonList(com));

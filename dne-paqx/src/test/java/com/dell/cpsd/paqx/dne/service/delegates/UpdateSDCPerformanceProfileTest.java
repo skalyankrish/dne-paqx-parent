@@ -1,4 +1,3 @@
-
 /**
  * <p>
  * Copyright &copy; 2017 Dell Inc. or its subsidiaries. All Rights Reserved. Dell EMC Confidential/Proprietary Information
@@ -15,23 +14,31 @@ import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.HOSTNAME;
+import java.util.UUID;
+
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.IOCTL_INI_GUI_STR;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-public class UpdateSDCPerformanceProfileTest {
-
+@RunWith(MockitoJUnitRunner.class)
+public class UpdateSDCPerformanceProfileTest
+{
     private UpdateSDCPerformanceProfile updateSDCPerformanceProfile;
-    private NodeService nodeService;
-    private DataServiceRepository repository;
-    private DelegateExecution delegateExecution;
-    private NodeDetail nodeDetail;
-    private ComponentEndpointIds componentEndpointIds;
+    private NodeService                 nodeService;
+    private DelegateExecution           delegateExecution;
+    private DataServiceRepository       repository;
+    private ComponentEndpointIds        componentEndpointIds;
+    private NodeDetail                  nodeDetail;
 
     @Before
     public void setUp() throws Exception
@@ -40,57 +47,74 @@ public class UpdateSDCPerformanceProfileTest {
         repository = mock(DataServiceRepository.class);
         updateSDCPerformanceProfile = new UpdateSDCPerformanceProfile(nodeService, repository);
         delegateExecution = mock(DelegateExecution.class);
+        componentEndpointIds = new ComponentEndpointIds("abc", "abc", "abc", "abc");
         nodeDetail = new NodeDetail();
         nodeDetail.setServiceTag("abc");
         nodeDetail.setEsxiManagementIpAddress("abc");
-        componentEndpointIds = new ComponentEndpointIds("abc","abc","abc", "abc");
     }
 
-    @Ignore @Test
-    public void testFailed() throws Exception
+    @Test
+    public void testExceptionThrown1() throws Exception
     {
-        try {
-            when(delegateExecution.getVariable(HOSTNAME)).thenReturn("abc");
-            when(delegateExecution.getVariable(NODE_DETAIL)).thenReturn(nodeDetail);
-            when(repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER")).thenReturn(componentEndpointIds);
-            when(delegateExecution.getVariable(DelegateConstants.IOCTL_INI_GUI_STR)).thenReturn("abc");
-            when(nodeService.requestUpdateSdcPerformanceProfile(any())).thenReturn(false);
-            updateSDCPerformanceProfile.delegateExecute(delegateExecution);
-        } catch (BpmnError error)
+        try
         {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.CONFIGURE_SCALEIO_VIB_FAILED));
-            assertTrue(error.getMessage().contains("Update ScaleIO SDC Performance Profile on Node abc failed!"));
+            when(delegateExecution.getVariable(IOCTL_INI_GUI_STR)).thenReturn(UUID.randomUUID().toString());
+            when(delegateExecution.getVariable(NODE_DETAIL)).thenReturn(nodeDetail);
+            given(repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER")).willThrow(new NullPointerException());
+            updateSDCPerformanceProfile.delegateExecute(delegateExecution);
+        }
+        catch (BpmnError error)
+        {
+            assertTrue(error.getErrorCode().equals(DelegateConstants.UPDATE_SDC_PERFORMANCE_PROFILE_FAILED));
+            assertTrue(error.getMessage().contains("An Unexpected Exception occurred attempting to retrieve VCenter Component Endpoints."));
         }
     }
 
-    @Ignore @Test
-    public void testFailedException() throws Exception
+    @Test
+    public void testExceptionThrown2() throws Exception
     {
-        try {
-            when(delegateExecution.getVariable(HOSTNAME)).thenReturn("abc");
+        try
+        {
+            when(delegateExecution.getVariable(IOCTL_INI_GUI_STR)).thenReturn(UUID.randomUUID().toString());
             when(delegateExecution.getVariable(NODE_DETAIL)).thenReturn(nodeDetail);
             when(repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER")).thenReturn(componentEndpointIds);
-            when(delegateExecution.getVariable(DelegateConstants.IOCTL_INI_GUI_STR)).thenReturn("abc");
             given(nodeService.requestUpdateSdcPerformanceProfile(any())).willThrow(new NullPointerException());
             updateSDCPerformanceProfile.delegateExecute(delegateExecution);
-        } catch (BpmnError error)
+        }
+        catch (BpmnError error)
         {
-            assertTrue(error.getErrorCode().equals(DelegateConstants.CONFIGURE_SCALEIO_VIB_FAILED));
-            assertTrue(error.getMessage().contains("An Unexpected Exception occurred attempting to request Update ScaleIO SDC Performance Profile"));
+            assertTrue(error.getErrorCode().equals(DelegateConstants.UPDATE_SDC_PERFORMANCE_PROFILE_FAILED));
+            assertTrue(error.getMessage().contains("An Unexpected Exception occurred attempting to request"));
         }
     }
 
-    //commenting out this test for now because succeeded flag is not assigned properly in the class (UpdateSDCPerformanceProfile:103)
-    /* @Ignore @Test
-    public void testSuccess() throws Exception
+    @Test
+    public void testExecutionFailed()
     {
-            when(delegateExecution.getVariable(HOSTNAME)).thenReturn("abc");
+        try
+        {
+            when(delegateExecution.getVariable(IOCTL_INI_GUI_STR)).thenReturn(UUID.randomUUID().toString());
             when(delegateExecution.getVariable(NODE_DETAIL)).thenReturn(nodeDetail);
             when(repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER")).thenReturn(componentEndpointIds);
-            when(delegateExecution.getVariable(DelegateConstants.IOCTL_INI_GUI_STR)).thenReturn("abc");
-            when(nodeService.requestUpdateSdcPerformanceProfile(any())).thenReturn(true);
-            final UpdateSDCPerformanceProfile c = spy(new UpdateSDCPerformanceProfile(nodeService, repository));
-            c.delegateExecute(delegateExecution);
-            verify(c).updateDelegateStatus("Update ScaleIO SDC Performance Profile on Node abc was successful.");
-    } */
+            when(nodeService.requestUpdateSdcPerformanceProfile(any())).thenReturn(false);
+            updateSDCPerformanceProfile.delegateExecute(delegateExecution);
+        }
+        catch (BpmnError error)
+        {
+            assertTrue(error.getErrorCode().equals(DelegateConstants.UPDATE_SDC_PERFORMANCE_PROFILE_FAILED));
+            assertTrue(error.getMessage().contains("on Node " + nodeDetail.getServiceTag() + " failed"));
+        }
+    }
+
+    @Test
+    public void testSuccess()
+    {
+        when(delegateExecution.getVariable(IOCTL_INI_GUI_STR)).thenReturn(UUID.randomUUID().toString());
+        when(delegateExecution.getVariable(NODE_DETAIL)).thenReturn(nodeDetail);
+        when(repository.getVCenterComponentEndpointIdsByEndpointType("VCENTER-CUSTOMER")).thenReturn(componentEndpointIds);
+        when(nodeService.requestUpdateSdcPerformanceProfile(any())).thenReturn(true);
+        final UpdateSDCPerformanceProfile updateSDCPerformanceProfileSpy = spy(updateSDCPerformanceProfile);
+        updateSDCPerformanceProfileSpy.delegateExecute(delegateExecution);
+        verify(updateSDCPerformanceProfileSpy).updateDelegateStatus("Update ScaleIO SDC Performance Profile on Node abc was successful.");
+    }
 }

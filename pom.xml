@@ -47,14 +47,13 @@
         <!-- Common test libraries -->
         <!-- Maven plugins -->
         <plugin-maven-dependency-version>2.10</plugin-maven-dependency-version>
-        <plugin-jsonschema2pojo-version>0.4.27</plugin-jsonschema2pojo-version>
+        <plugin-jsonschema2pojo-version>0.4.37</plugin-jsonschema2pojo-version>
         <javax-validation-version>1.1.0.Final</javax-validation-version>
     </properties>
 
     <modules>
         <module>dne-paqx</module>
         <module>dne-paqx-web</module>
-        <module>dne-paqx-distribution</module>
         <module>dne-paqx-packaging</module>
     </modules>
 
@@ -75,14 +74,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.dell.cpsd</groupId>
-                <artifactId>common-dependencies</artifactId>
-                <version>1.2-SNAPSHOT</version>
-                <scope>import</scope>
-                <type>pom</type>
-            </dependency>
-
-            <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
@@ -95,6 +86,7 @@
                 <artifactId>spring-boot-starter</artifactId>
                 <version>${spring-boot.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
