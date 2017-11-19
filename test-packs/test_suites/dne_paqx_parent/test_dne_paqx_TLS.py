@@ -3,7 +3,7 @@
 # Author: russed5
 # Revision: 1.2
 # Code Reviewed by:
-# Description: Verify that the DNE-PAQX service communicates over TLS to the Rabbitmq AMQP bus
+# Description: Verify that the Dell CPSD DNE Node Expansion Service communicates over TLS to the Rabbitmq AMQP bus
 
 #
 # Copyright (c) 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
@@ -44,7 +44,7 @@ def load_test_data():
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_dnePAQX_container_using_AMQP_over_TLS():
-    """ Verify DNE-PAQX service communicates with rabbitmq over TLS
+    """ Verify Dell CPSD DNE Node Expansion Service communicates with rabbitmq over TLS
 
     this test uses the  processId of the dne paqx container
     to verify that the network connection to rabbitmq for that container
@@ -59,7 +59,7 @@ def test_dnePAQX_container_using_AMQP_over_TLS():
         # and use this ip address with the 'netstat' command to find the dne-rabbitmq port-pairing.
         # example return text would be :
         # tcp6       0      0 172.17.0.1:5671         172.21.0.2:47338        ESTABLISHED 987/beam.smp
-        connectionPorts = getDockerNetworkConnectionPorts('symphony-dne-paqx')
+        connectionPorts = getDockerNetworkConnectionPorts('dell-cpsd-dne-node-expansion-service')
 
         # shouldn't be more then 1 line returned, but just in case we split them
         connectionsText = connectionPorts.splitlines()
@@ -86,7 +86,7 @@ def test_dnePAQX_container_using_AMQP_over_TLS():
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_DNEpaqx_AMQP_data_is_encrypted():
-    """ Verify DNE-PAQX to Rabbitmq data is encrypted.
+    """ Verify Dell CPSD DNE Node Expansion to Rabbitmq data is encrypted.
 
     1. get the DNE containerID and associated IP address
     2. Get the Rabbitmq ContainerID and associated IP Address
@@ -94,7 +94,7 @@ def test_DNEpaqx_AMQP_data_is_encrypted():
     4. Run tcpdump against DNE -> rabbitmq messaging and check if data is marked as amqps (ie. encrypted)"""
 
     # get the containerID of the DNE container
-    DNEcontainerID = getContainerId('symphony-dne-paqx')
+    DNEcontainerID = getContainerId('dell-cpsd-dne-node-expansion-service')
     # get the ipaddress of the DNE container
     DNEipAddressText = getContainerIPAddress(DNEcontainerID)
 

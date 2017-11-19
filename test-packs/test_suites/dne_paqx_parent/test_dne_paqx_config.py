@@ -52,7 +52,7 @@ def test_dne_servicerunning(setup):
 
     print('\n* * * Testing the DNE PAQX on system:', setup['IP'], '* * *\n')
 
-    service_name = 'symphony-dne-paqx'
+    service_name = 'dell-cpsd-dne-node-expansion-service'
 
     sendCommand = "docker ps --filter name=" + service_name + "  --format '{{.Status}}' | awk '{print $1}'"
     my_return_status = af_support_tools.send_ssh_command(host=setup['IP'], username=setup['cli_user'],
@@ -68,14 +68,14 @@ def test_dne_servicerunning(setup):
 def test_dne_registered_in_Consul(setup):
     """
     Test Case Title :
-    Description     :       This method tests that dne-paqx is registered in the Consul API http://{SymphonyIP}:8500/v1/agent/services
+    Description     :       This method tests that dell-cpsd-dne-node-expansion-service is registered in the Consul API http://{SymphonyIP}:8500/v1/agent/services
                             It will fail if :
-                                The line 'Service: "dne-paqx"' is not present
+                                The line 'Service: "dell-cpsd-dne-node-expansion-service"' is not present
     Parameters      :       none
     Returns         :       None
     """
 
-    service = 'symphony-dne-paqx'
+    service = 'dell-cpsd-dne-node-expansion-service'
 
     url_body = ':8500/v1/agent/services'
     my_url = 'https://' + setup['IP'] + url_body
@@ -110,13 +110,13 @@ def test_dne_registered_in_Consul(setup):
 @pytest.mark.dne_paqx_parent_mvp_extended
 def test_dne_passing_status_in_Consul(setup):
     """
-    Description     :       This method tests that dne-paqx has a passing status in the Consul API http://{SymphonyIP}:8500/v1/health/checks/dne-paqx
+    Description     :       This method tests that dell-cpsd-dne-node-expansion-service has a passing status in the Consul API http://{SymphonyIP}:8500/v1/health/checks/dell-cpsd-dne-node-expansion-service
                             It will fail if :
                                 The line '"Status": "passing"' is not present
     Parameters      :       none
     Returns         :       None
     """
-    service = 'symphony-dne-paqx'
+    service = 'dell-cpsd-dne-node-expansion-service'
 
     url_body = ':8500/v1/health/checks/' + service
     my_url = 'https://' + setup['IP'] + url_body
@@ -219,10 +219,10 @@ def test_dne_log_files_exist(setup):
     Parameters      :       None
     Returns         :       None
     """
-    service = 'cpsd-dne-paqx'
-    filePath = '/opt/dell/cpsd/dne-paqx/logs/'
-    errorLogFile = 'dne-paqx-error.log'
-    infoLogFile = 'dne-paqx-info.log'
+    service = 'dell-cpsd-dne-node-expansion-service'
+    filePath = '/opt/dell/cpsd/dne/node-expansion-service/logs/'
+    errorLogFile = 'node-expansion-service-error.log'
+    infoLogFile = 'node-expansion-service-info.log'
 
     sendCommand = 'docker ps | grep ' + service + ' | awk \'{system("docker exec -i "$1" ls ' + filePath + '") }\''
 
@@ -255,9 +255,9 @@ def test_dne_log_files_free_of_exceptions(setup):
     Returns         :       None
     """
 
-    service = 'cpsd-dne-paqx'
-    filePath = '/opt/dell/cpsd/dne-paqx/logs/'
-    errorLogFile = 'dne-paqx-error.log'
+    service = 'dell-cpsd-dne-node-expansion-service'
+    filePath = '/opt/dell/cpsd/dne/node-expansion-service/logs/'
+    errorLogFile = 'node-expansion-service-error.log'
 
     excep1 = 'AuthenticationFailureException'
     excep2 = 'RuntimeException'

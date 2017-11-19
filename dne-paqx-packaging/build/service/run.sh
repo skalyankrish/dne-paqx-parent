@@ -137,5 +137,5 @@ java -Xms64m -Xmx192m \
     -Dcontainer.id=$CONTAINERID \
     -Djavax.net.ssl.trustStore=${JKS_FILE} \
     -Djavax.net.ssl.trustStorePassword=${JKS_PASSPHRASE} \
-    -Dlog4j.configuration=file:/opt/dell/cpsd/dne/node-expansion-service/conf/dne-paqx-log4j.xml \
+    -Dlog4j.configuration=file:/opt/dell/cpsd/dne/node-expansion-service/conf/dne-node-expansion-service-log4j.xml \
     -Dspring.profiles.active=production com.dell.cpsd.paqx.dne.rest.NodeExpansionWebApplication

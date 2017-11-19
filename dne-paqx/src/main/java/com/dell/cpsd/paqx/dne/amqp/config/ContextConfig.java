@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ContextConfig extends ConsumerContextConfig {
-    private static final String CONSUMER_NAME = "dne-paqx";
+    private static final String CONSUMER_NAME = "dell-cpsd-dne-node-expansion-service";
 
     /**
      * ContextConfig constructor.

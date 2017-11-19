@@ -13,7 +13,7 @@
 
     <appender name="errorFileAppender" class="org.apache.log4j.RollingFileAppender">
         <param name="Threshold" value="ERROR"/>
-        <param name="File" value="/opt/dell/cpsd/dne/node-expansion-service/logs/dne-paqx-error.log"/>
+        <param name="File" value="/opt/dell/cpsd/dne/node-expansion-service/logs/node-expansion-service-error.log"/>
         <param name="MaxFileSize" value="10MB"/>
         <param name="MaxBackupIndex" value="5"/>
         <layout class="org.apache.log4j.PatternLayout">
@@ -23,7 +23,7 @@
 
     <appender name="infoFileAppender" class="org.apache.log4j.RollingFileAppender">
         <param name="Threshold" value="INFO"/>
-        <param name="File" value="/opt/dell/cpsd/dne/node-expansion-service/logs/dne-paqx-info.log"/>
+        <param name="File" value="/opt/dell/cpsd/dne/node-expansion-service/logs/node-expansion-service-info.log"/>
         <param name="MaxFileSize" value="10MB"/>
         <param name="MaxBackupIndex" value="5"/>
         <layout class="org.apache.log4j.PatternLayout">
@@ -33,7 +33,7 @@
 
     <appender name="debugFileAppender" class="org.apache.log4j.RollingFileAppender">
         <param name="Threshold" value="INFO"/>
-        <param name="File" value="/opt/dell/cpsd/dne/node-expansion-service/logs/dne-paqx-trace.log"/>
+        <param name="File" value="/opt/dell/cpsd/dne/node-expansion-service/logs/node-expansion-service-trace.log"/>
         <param name="MaxFileSize" value="10MB"/>
         <param name="MaxBackupIndex" value="5"/>
         <layout class="org.apache.log4j.PatternLayout">

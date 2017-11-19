@@ -3,7 +3,7 @@
 # Dell EMC Confidential/Proprietary Information
 #
 #  USAGE: (from .. dir)
-#    docker build -f dne-paqx-distribution/Dockerfile --tag=dne-paqx dne-paqx
+#    docker build -f dne-paqx-distribution/Dockerfile --tag=dell-cpsd-dne-node-expansion-service dell-cpsd-dne-node-expansion-service
 #
 
 # Start from base image with Java 8

@@ -19,7 +19,7 @@ def load_test_data():
 #####################################################################
 @pytest.mark.dne_paqx_parent_mvp
 @pytest.mark.dne_paqx_parent_mvp_extended
-@pytest.mark.parametrize("container_name", [("symphony-dne-paqx")])
+@pytest.mark.parametrize("container_name", [("dell-cpsd-dne-node-expansion-service")])
 def test_verify_docker_container(container_name):
     """
     Description        :       This method tests docker service for a container
