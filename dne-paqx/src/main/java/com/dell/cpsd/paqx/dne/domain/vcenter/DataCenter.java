@@ -35,16 +35,6 @@ public class DataCenter
     @Column(name = "DATACENTER_NAME")
     private String name;
 
-    public DataCenter()
-    {
-    }
-
-    public DataCenter(String id, String name)
-    {
-        this.id = id;
-        this.name = name;
-    }
-
     @LazyCollection(LazyCollectionOption.FALSE)
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataCenter", orphanRemoval = true)
     private List<DVSwitch> dvSwitchList = new ArrayList<>();
@@ -63,6 +53,16 @@ public class DataCenter
 
     @ManyToOne(cascade = CascadeType.ALL)
     private VCenter vCenter;
+
+    public DataCenter()
+    {
+    }
+
+    public DataCenter(String id, String name)
+    {
+        this.id = id;
+        this.name = name;
+    }
 
     public Long getUuid()
     {

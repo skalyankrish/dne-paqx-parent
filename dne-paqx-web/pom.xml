@@ -73,6 +73,7 @@
             </exclusions>
         </dependency>
 
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -94,6 +95,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>4.3.12.RELEASE</version>
         </dependency>
 
         <!-- CONSUL DEPENDENCIES -->
@@ -131,9 +139,14 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-consul-discovery</artifactId>
             <version>${spring-cloud-starter-consul-version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-aop</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- END OF CONSUL DEPENDENCIES -->
-
 
         <dependency>
             <groupId>io.springfox</groupId>

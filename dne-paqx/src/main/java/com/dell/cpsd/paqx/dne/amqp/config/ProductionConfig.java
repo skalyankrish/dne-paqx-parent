@@ -65,6 +65,7 @@ public class ProductionConfig
         }
         catch (Exception e)
         {
+            LOGGER.error("Exception retrieving connection factory", e);
             e.printStackTrace();
         }
 

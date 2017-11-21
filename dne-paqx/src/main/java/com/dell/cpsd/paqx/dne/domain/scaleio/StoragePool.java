@@ -29,18 +29,6 @@ import javax.persistence.Table;
 @Table(name = "STORAGE_POOL")
 public class StoragePool
 {
-    public StoragePool()
-    {
-        // Default Constructor
-    }
-
-    public StoragePool(final String id, final String name, final String protectionDomainId)
-    {
-        this.id = id;
-        this.name = name;
-        this.protectionDomainId = protectionDomainId;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "STORAGE_POOL_UUID")
@@ -57,6 +45,18 @@ public class StoragePool
 
     @OneToOne(cascade = CascadeType.ALL)
     private ScaleIOSDCVolume scaleIoSdcVolume;
+
+    public StoragePool()
+    {
+        // Default Constructor
+    }
+
+    public StoragePool(final String id, final String name, final String protectionDomainId)
+    {
+        this.id = id;
+        this.name = name;
+        this.protectionDomainId = protectionDomainId;
+    }
 
     public Long getUuid()
     {
@@ -140,4 +140,3 @@ public class StoragePool
         return new HashCodeBuilder(17, 37).append(uuid).append(id).append(name).append(protectionDomainId).toHashCode();
     }
 }
-

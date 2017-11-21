@@ -5,15 +5,14 @@
 
 package com.dell.cpsd.paqx.dne.transformers;
 
-import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
-import com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants;
 import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
 import com.dell.cpsd.storage.capabilities.api.PerformanceProfileRequest;
 import com.dell.cpsd.storage.capabilities.api.SioSdcUpdatePerformanceProfileRequestMessage;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Component;
 
+import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.IOCTL_INI_GUI_STR;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
 
 /**
@@ -34,22 +33,21 @@ public class SdcPerformanceProfileRequestTransformer
     private static final String COMPONENT_TYPE   = "SCALEIO-CLUSTER";
     private static final String HTTPS_URL_SCHEME = "https://";
 
-    private final DataServiceRepository repository;
+    private final ComponentIdsTransformer componentIdsTransformer;
 
-    public SdcPerformanceProfileRequestTransformer(final DataServiceRepository repository)
+    public SdcPerformanceProfileRequestTransformer(final ComponentIdsTransformer componentIdsTransformer)
     {
-        this.repository = repository;
+        this.componentIdsTransformer = componentIdsTransformer;
     }
 
     public SioSdcUpdatePerformanceProfileRequestMessage buildSdcPerformanceProfileRequest(final DelegateExecution delegateExecution)
     {
-        final ComponentEndpointIds componentEndpointIds = getComponentEndpointIds();
+        final ComponentEndpointIds componentEndpointIds = componentIdsTransformer.getComponentEndpointIdsByComponentType(COMPONENT_TYPE);
         final NodeDetail nodeDetail = (NodeDetail) delegateExecution.getVariable(NODE_DETAIL);
-        final String sdcGUID = (String) delegateExecution.getVariable(DelegateConstants.IOCTL_INI_GUI_STR);
+        final String sdcGUID = (String) delegateExecution.getVariable(IOCTL_INI_GUI_STR);
         final String scaleIoSdcIpAddress = nodeDetail.getEsxiManagementIpAddress();
 
-        return getRequestMessage(componentEndpointIds, sdcGUID,
-                scaleIoSdcIpAddress);
+        return getRequestMessage(componentEndpointIds, sdcGUID, scaleIoSdcIpAddress);
     }
 
     private SioSdcUpdatePerformanceProfileRequestMessage getRequestMessage(final ComponentEndpointIds componentEndpointIds,
@@ -67,16 +65,5 @@ public class SdcPerformanceProfileRequestTransformer
                 new com.dell.cpsd.storage.capabilities.api.ComponentEndpointIds(componentEndpointIds.getComponentUuid(),
                         componentEndpointIds.getEndpointUuid(), componentEndpointIds.getCredentialUuid()));
         return requestMessage;
-    }
-
-    private ComponentEndpointIds getComponentEndpointIds()
-    {
-        final ComponentEndpointIds componentEndpointIds = repository.getComponentEndpointIds(COMPONENT_TYPE);
-
-        if (componentEndpointIds == null)
-        {
-            throw new IllegalStateException("No component ids found.");
-        }
-        return componentEndpointIds;
     }
 }

@@ -73,13 +73,12 @@ public class ConfigIdracIpAddress extends BaseWorkflowDelegate
         }
         if (idracInfo == null || !"SUCCESS".equalsIgnoreCase(idracInfo.getMessage()))
         {
-            LOGGER.error(taskMessage + " on Node " + nodeDetail.getServiceTag() + " failed!  Reason: " +
-                         idracInfo.getMessage());
-            updateDelegateStatus(taskMessage + " on Node " + nodeDetail.getServiceTag() + " failed!  Reason: " +
-                                 idracInfo.getMessage());
+            String errorMessage=taskMessage + " on Node " + nodeDetail.getServiceTag() + " failed!  Reason: " +
+                    (idracInfo==null?null:idracInfo.getMessage());
+            LOGGER.error(errorMessage);
+            updateDelegateStatus(errorMessage);
             throw new BpmnError(CONFIGURE_IP_ADDRESS_FAILED,
-                                taskMessage + " on Node " + nodeDetail.getServiceTag() + " failed!  Reason: " +
-                                idracInfo.getMessage());
+                                errorMessage);
         }
         LOGGER.info(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");
         updateDelegateStatus(taskMessage + " on Node " + nodeDetail.getServiceTag() + " was successful.");

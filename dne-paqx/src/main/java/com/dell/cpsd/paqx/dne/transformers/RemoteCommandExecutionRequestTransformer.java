@@ -5,7 +5,6 @@
 
 package com.dell.cpsd.paqx.dne.transformers;
 
-import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
 import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
 import com.dell.cpsd.virtualization.capabilities.api.RemoteCommandExecutionRequestMessage;
@@ -35,17 +34,18 @@ public class RemoteCommandExecutionRequestTransformer
     private static final String COMMON_CREDENTIALS  = "SVM-COMMON";
     private static final String FACTORY_CREDENTIALS = "SVM-FACTORY";
 
-    private final DataServiceRepository repository;
+    private final ComponentIdsTransformer componentIdsTransformer;
 
-    public RemoteCommandExecutionRequestTransformer(final DataServiceRepository repository)
+    public RemoteCommandExecutionRequestTransformer(final ComponentIdsTransformer componentIdsTransformer)
     {
-        this.repository = repository;
+        this.componentIdsTransformer = componentIdsTransformer;
     }
 
     public RemoteCommandExecutionRequestMessage buildRemoteCodeExecutionRequest(final DelegateExecution delegateExecution,
             final RemoteCommandExecutionRequestMessage.RemoteCommand remoteCommand)
     {
-        final ComponentEndpointIds componentEndpointIds = getComponentEndpointIds(COMMON_CREDENTIALS);
+        final ComponentEndpointIds componentEndpointIds = componentIdsTransformer
+                .getComponentEndpointIdsByCredentialType(COMPONENT_TYPE, ENDPOINT_TYPE, COMMON_CREDENTIALS);
         final NodeDetail nodeDetail = (NodeDetail) delegateExecution.getVariable(NODE_DETAIL);
         final String scaleIoSvmManagementIpAddress = nodeDetail.getScaleIoSvmManagementIpAddress();
 
@@ -67,23 +67,13 @@ public class RemoteCommandExecutionRequestTransformer
 
     private void setChangePasswordRequest(final RemoteCommandExecutionRequestMessage requestMessage)
     {
-        final ComponentEndpointIds factoryComponentEndpointIds = getComponentEndpointIds(FACTORY_CREDENTIALS);
+        final ComponentEndpointIds factoryComponentEndpointIds = componentIdsTransformer
+                .getComponentEndpointIdsByCredentialType(COMPONENT_TYPE, ENDPOINT_TYPE, FACTORY_CREDENTIALS);
         final VmPasswordUpdateRequest vmPasswordUpdateRequest = new VmPasswordUpdateRequest();
         vmPasswordUpdateRequest.setCredentialName(VmPasswordUpdateRequest.CredentialName.SVM_FACTORY);
         vmPasswordUpdateRequest.setComponentEndpointIds(
                 new com.dell.cpsd.virtualization.capabilities.api.ComponentEndpointIds(factoryComponentEndpointIds.getComponentUuid(),
                         factoryComponentEndpointIds.getEndpointUuid(), factoryComponentEndpointIds.getCredentialUuid()));
         requestMessage.setVmPasswordUpdateRequest(vmPasswordUpdateRequest);
-    }
-
-    private ComponentEndpointIds getComponentEndpointIds(final String credentialType)
-    {
-        final ComponentEndpointIds componentEndpointIds = repository.getComponentEndpointIds(COMPONENT_TYPE, ENDPOINT_TYPE, credentialType);
-
-        if (componentEndpointIds == null)
-        {
-            throw new IllegalStateException("No component ids found.");
-        }
-        return componentEndpointIds;
     }
 }

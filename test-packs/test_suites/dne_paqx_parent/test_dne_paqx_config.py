@@ -75,7 +75,7 @@ def test_dne_registered_in_Consul(setup):
     Returns         :       None
     """
 
-    service = 'dell-cpsd-dne-node-expansion-service'
+    service = 'node-expansion-service'
 
     url_body = ':8500/v1/agent/services'
     my_url = 'https://' + setup['IP'] + url_body
@@ -116,7 +116,7 @@ def test_dne_passing_status_in_Consul(setup):
     Parameters      :       none
     Returns         :       None
     """
-    service = 'dell-cpsd-dne-node-expansion-service'
+    service = 'node-expansion-service'
 
     url_body = ':8500/v1/health/checks/' + service
     my_url = 'https://' + setup['IP'] + url_body

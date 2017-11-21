@@ -33,16 +33,20 @@ public class ConfigureVmNetworkSettingsRequestTransformer
 {
     private static final String VCENTER_CUSTOMER_TYPE = "VCENTER-CUSTOMER";
 
-    private final DataServiceRepository repository;
+    private final DataServiceRepository   repository;
+    private final ComponentIdsTransformer componentIdsTransformer;
 
-    public ConfigureVmNetworkSettingsRequestTransformer(final DataServiceRepository repository)
+    public ConfigureVmNetworkSettingsRequestTransformer(final DataServiceRepository repository,
+            final ComponentIdsTransformer componentIdsTransformer)
     {
         this.repository = repository;
+        this.componentIdsTransformer = componentIdsTransformer;
     }
 
     public ConfigureVmNetworkSettingsRequestMessage buildConfigureVmNetworkSettingsRequest(final DelegateExecution delegateExecution)
     {
-        final ComponentEndpointIds componentEndpointIds = getComponentEndpointIds();
+        final ComponentEndpointIds componentEndpointIds = componentIdsTransformer
+                .getVCenterComponentEndpointIdsByEndpointType(VCENTER_CUSTOMER_TYPE);
         final String hostname = (String) delegateExecution.getVariable(HOSTNAME);
         final String virtualMachineName = (String) delegateExecution.getVariable(VIRTUAL_MACHINE_NAME);
         final Map<String, String> dvSwitchNames = getDvSwitchNamesMap();
@@ -86,17 +90,5 @@ public class ConfigureVmNetworkSettingsRequestTransformer
             throw new IllegalStateException("DVSwitch Names Map is null");
         }
         return dvSwitchNames;
-    }
-
-    private ComponentEndpointIds getComponentEndpointIds()
-    {
-        final ComponentEndpointIds componentEndpointIds = repository.getVCenterComponentEndpointIdsByEndpointType(VCENTER_CUSTOMER_TYPE);
-
-        if (componentEndpointIds == null)
-        {
-            throw new IllegalStateException("No VCenter Customer components found");
-        }
-
-        return componentEndpointIds;
     }
 }

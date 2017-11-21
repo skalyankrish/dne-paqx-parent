@@ -45,12 +45,12 @@ import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.N
 @Component
 @Scope("prototype")
 @Qualifier("addVCenterHostToProtectionDomain")
-public class AddVCenterHostToProtectionDomain extends BaseWorkflowDelegate
+public class AddSdsNodeToProtectionDomain extends BaseWorkflowDelegate
 {
     /**
      * The logger instance
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(AddVCenterHostToProtectionDomain.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AddSdsNodeToProtectionDomain.class);
 
     /**
      * The <code>NodeService</code> instance
@@ -60,7 +60,7 @@ public class AddVCenterHostToProtectionDomain extends BaseWorkflowDelegate
     private final DataServiceRepository repository;
 
     @Autowired
-    public AddVCenterHostToProtectionDomain(final NodeService nodeService, final DataServiceRepository repository)
+    public AddSdsNodeToProtectionDomain(final NodeService nodeService, final DataServiceRepository repository)
     {
         this.nodeService = nodeService;
         this.repository = repository;

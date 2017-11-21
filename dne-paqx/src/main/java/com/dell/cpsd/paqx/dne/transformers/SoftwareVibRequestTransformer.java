@@ -57,14 +57,17 @@ public class SoftwareVibRequestTransformer
     private static final String MDM_TYPE_MASTER       = "master";
     private static final String MDM_TYPE_SLAVE        = "slave";
 
-    private final DataServiceRepository repository;
-    private final String                sdcVibRemoteUrl;
+    private final DataServiceRepository   repository;
+    private final String                  sdcVibRemoteUrl;
+    private final ComponentIdsTransformer componentIdsTransformer;
 
     public SoftwareVibRequestTransformer(final DataServiceRepository repository,
-            @Value("${rackhd.sdc.vib.install.repo.url}") final String sdcVibRemoteUrl)
+            @Value("${rackhd.sdc.vib.install.repo.url}") final String sdcVibRemoteUrl,
+            final ComponentIdsTransformer componentIdsTransformer)
     {
         this.repository = repository;
         this.sdcVibRemoteUrl = sdcVibRemoteUrl;
+        this.componentIdsTransformer = componentIdsTransformer;
     }
 
     /**
@@ -76,7 +79,8 @@ public class SoftwareVibRequestTransformer
     public SoftwareVIBRequestMessage buildInstallSoftwareVibRequest(final DelegateExecution delegateExecution)
     {
         final String hostname = (String) delegateExecution.getVariable(HOSTNAME);
-        final ComponentEndpointIds componentEndpointIds = getComponentEndpointIds();
+        final ComponentEndpointIds componentEndpointIds = componentIdsTransformer
+                .getVCenterComponentEndpointIdsByEndpointType(VCENTER_CUSTOMER_TYPE);
 
         return getInstallSdcSoftwareVibRequestMessage(hostname, componentEndpointIds);
     }
@@ -91,7 +95,8 @@ public class SoftwareVibRequestTransformer
     public SoftwareVIBConfigureRequestMessage buildConfigureSoftwareVibRequest(final DelegateExecution delegateExecution) throws Exception
     {
         final String hostname = (String) delegateExecution.getVariable(HOSTNAME);
-        final ComponentEndpointIds componentEndpointIds = getComponentEndpointIds();
+        final ComponentEndpointIds componentEndpointIds = componentIdsTransformer
+                .getVCenterComponentEndpointIdsByEndpointType(VCENTER_CUSTOMER_TYPE);
         final ESXiCredentialDetails esxiCredentialDetails = (ESXiCredentialDetails) delegateExecution.getVariable(ESXI_CREDENTIAL_DETAILS);
         final String ioctlIniGuidStr = UUID.randomUUID().toString();
 
@@ -146,19 +151,7 @@ public class SoftwareVibRequestTransformer
         requestMessage.setSoftwareVIBConfigureRequest(softwareVIBConfigureRequest);
     }
 
-    private ComponentEndpointIds getComponentEndpointIds()
-    {
-        final ComponentEndpointIds componentEndpointIds = repository.getVCenterComponentEndpointIdsByEndpointType(VCENTER_CUSTOMER_TYPE);
-
-        if (componentEndpointIds == null)
-        {
-            throw new IllegalStateException("No VCenter Customer components found");
-        }
-
-        return componentEndpointIds;
-    }
-
-    private String buildModuleOptions(final String ioctlIniGuidStr) throws Exception
+    private String buildModuleOptions(final String ioctlIniGuidStr) throws IllegalStateException
     {
         try
         {
@@ -185,18 +178,23 @@ public class SoftwareVibRequestTransformer
         }
         catch (Exception exception)
         {
-            throw new Exception("Exception occurred", exception);
+            throw new IllegalStateException("Exception occurred", exception);
         }
     }
 
     private void getMdmScaleIoDataIps(final ScaleIOData scaleIOData, final Set<String> mdmIpList)
     {
         final ScaleIOMdmCluster scaleIOMdmCluster = scaleIOData.getMdmCluster();
-        if (scaleIOMdmCluster != null)
+
+        if (scaleIOMdmCluster == null)
         {
-            getMasterMdmDataIps(mdmIpList, scaleIOMdmCluster);
-            getSlaveMdmsDataIps(mdmIpList, scaleIOMdmCluster);
+            final String error = "ScaleIO MDM Cluster is null";
+            LOGGER.error(error);
+            throw new IllegalStateException(error);
         }
+
+        getMasterMdmDataIps(mdmIpList, scaleIOMdmCluster);
+        getSlaveMdmsDataIps(mdmIpList, scaleIOMdmCluster);
     }
 
     private void getSlaveMdmsDataIps(final Set<String> mdmIpList, final ScaleIOMdmCluster scaleIOMdmCluster)
@@ -231,8 +229,9 @@ public class SoftwareVibRequestTransformer
 
         if (scaleIOData == null)
         {
-            throw new Exception("ScaleIO Data is null");
+            throw new IllegalStateException("ScaleIO Data is null");
         }
+
         return scaleIOData;
     }
 }

@@ -32,22 +32,6 @@ import java.util.Set;
 @Table(name = "SCALEIO_SDC_VOLUME")
 public class ScaleIOSDCVolume
 {
-    public ScaleIOSDCVolume()
-    {
-        // Default Constructor
-    }
-
-    public ScaleIOSDCVolume(final String id, final String name, final Long sizeInKb, final String storagePoolId, final String volumeType,
-            final String vtreeId)
-    {
-        this.id = id;
-        this.name = name;
-        this.sizeInKb = sizeInKb;
-        this.storagePoolId = storagePoolId;
-        this.volumeType = volumeType;
-        this.vtreeId = vtreeId;
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SDC_VOLUME_UUID", unique = true, nullable = false)
@@ -76,6 +60,22 @@ public class ScaleIOSDCVolume
 
     @ManyToMany(mappedBy = "scaleIOSDCVolumes")
     private Set<ScaleIOSDC> scaleIOSDCList = new HashSet<>();
+
+    public ScaleIOSDCVolume()
+    {
+        // Default Constructor
+    }
+
+    public ScaleIOSDCVolume(final String id, final String name, final Long sizeInKb, final String storagePoolId, final String volumeType,
+            final String vtreeId)
+    {
+        this.id = id;
+        this.name = name;
+        this.sizeInKb = sizeInKb;
+        this.storagePoolId = storagePoolId;
+        this.volumeType = volumeType;
+        this.vtreeId = vtreeId;
+    }
 
     public Long getUuid()
     {
@@ -207,4 +207,3 @@ public class ScaleIOSDCVolume
         scaleIOSDCList.add(scaleIOSDC);
     }
 }
-

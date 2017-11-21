@@ -76,7 +76,8 @@ public class VerifyNodesSelected extends BaseWorkflowDelegate
                     if (nodeDetail.getServiceTag().equalsIgnoreCase(discoveredNode.getSerialNumber()))
                     {
                         final List<Host> vCenterHosts = repository.getVCenterHosts();
-                        final Optional<Host> foundHost = vCenterHosts.stream().filter(Objects::nonNull)
+                        final Optional<Host> foundHost = vCenterHosts.stream()
+                                .filter(Objects::nonNull)
                                 .filter(host -> {
                                     if (host.getName() != null)
                                     {
@@ -93,7 +94,8 @@ public class VerifyNodesSelected extends BaseWorkflowDelegate
                         }
                         else
                         {
-                            final Optional<ScaleIOSDC> foundSdc = repository.getScaleIoData().getSdcList().stream().filter(Objects::nonNull)
+                            final Optional<ScaleIOSDC> foundSdc = repository.getScaleIoData().getSdcList().stream()
+                                    .filter(Objects::nonNull)
                                     .filter(sdc -> {
                                         if(sdc.getName() != null)
                                         {
@@ -145,7 +147,7 @@ public class VerifyNodesSelected extends BaseWorkflowDelegate
         }
         catch (Exception e)
         {
-            final String message = "An Unexpected Exception occurred attempting to verify selected Nodes.";
+            final String message = "An unexpected exception occurred attempting to verify selected Nodes.";
             LOGGER.error(message, e);
             updateDelegateStatus(message);
             throw new BpmnError(VERIFY_NODES_SELECTED_FAILED, message);

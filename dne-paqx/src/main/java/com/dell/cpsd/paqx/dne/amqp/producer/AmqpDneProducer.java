@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 
 /**
@@ -653,7 +654,7 @@ public class AmqpDneProducer implements DneProducer
 
     private String messageType(Class messageClass)
     {
-        Message messageAnnotation = (Message) messageClass.getAnnotation(Message.class);
-        return messageAnnotation.value();
+        final Annotation annotation = messageClass.getAnnotation(Message.class);
+        return ((Message)(annotation)).value();
     }
 }

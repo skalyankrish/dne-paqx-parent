@@ -91,7 +91,7 @@ public class InventoryNode extends BaseWorkflowDelegate
                 nodeInventory = new NodeInventory(nodeDetail.getId(), nodeInventoryResponse.toString());
             }
             catch (JsonProcessingException jpe) {
-                final String message = "Update Node Inventory failed due to unrecognized response for Node " + nodeDetail.getServiceTag();
+                final String message = "Update Node Inventory failed due to unrecognized response for Node " + (nodeDetail==null?null:nodeDetail.getServiceTag());
                 LOGGER.error(message, jpe);
                 updateDelegateStatus(message);
                 throw new BpmnError(INVENTORY_NODE_FAILED, message);
@@ -104,7 +104,7 @@ public class InventoryNode extends BaseWorkflowDelegate
         }
         if (!isNodeInventorySaved)
         {
-            final String message = "Update Node Inventory failed for Node " + nodeDetail.getServiceTag();
+            final String message = "Update Node Inventory failed for Node " + (nodeDetail==null?null:nodeDetail.getServiceTag());
             LOGGER.error(message);
             updateDelegateStatus(message);
             throw new BpmnError(INVENTORY_NODE_FAILED, message);

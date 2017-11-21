@@ -5,7 +5,6 @@
 
 package com.dell.cpsd.paqx.dne.transformers;
 
-import com.dell.cpsd.paqx.dne.domain.vcenter.Host;
 import com.dell.cpsd.paqx.dne.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.dne.service.delegates.model.NodeDetail;
 import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
@@ -19,15 +18,10 @@ import com.dell.cpsd.virtualization.capabilities.api.VirtualMachineConfigSpec;
 import com.dell.cpsd.virtualization.capabilities.api.VmAutoStartConfig;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.HOSTNAME;
 import static com.dell.cpsd.paqx.dne.service.delegates.utils.DelegateConstants.NODE_DETAIL;
@@ -60,19 +54,22 @@ public class DeployScaleIoVmRequestTransformer
     private static final int     START_ORDER                   = 1;
     private static final boolean poweredOn                     = false;
     private static final boolean isTemplate                    = false;
-    private static final String  DOT_STRING                    = " ";
-    private static final String  HYPHEN_DELIMITER              = ",";
+    private static final char    DOT_STRING                    = '.';
+    private static final char    HYPHEN_DELIMITER              = '-';
 
-    private final DataServiceRepository repository;
+    private final DataServiceRepository   repository;
+    private final ComponentIdsTransformer componentIdsTransformer;
 
-    public DeployScaleIoVmRequestTransformer(final DataServiceRepository repository)
+    public DeployScaleIoVmRequestTransformer(final DataServiceRepository repository, final ComponentIdsTransformer componentIdsTransformer)
     {
         this.repository = repository;
+        this.componentIdsTransformer = componentIdsTransformer;
     }
 
     public DeployVMFromTemplateRequestMessage buildDeployVmRequest(final DelegateExecution delegateExecution)
     {
-        final ComponentEndpointIds componentEndpointIds = getComponentEndpointIds();
+        final ComponentEndpointIds componentEndpointIds = componentIdsTransformer
+                .getVCenterComponentEndpointIdsByEndpointType(VCENTER_CUSTOMER_TYPE);
         final String hostname = (String) delegateExecution.getVariable(HOSTNAME);
         final NodeDetail nodeDetail = (NodeDetail) delegateExecution.getVariable(NODE_DETAIL);
         final String clusterName = nodeDetail.getClusterName();
@@ -168,15 +165,6 @@ public class DeployScaleIoVmRequestTransformer
         virtualMachineCloneSpec.setVirtualMachineConfigSpec(virtualMachineConfigSpec);
     }
 
-    private VirtualMachineCloneSpec getVirtualMachineCloneSpec(final String domainName)
-    {
-        final VirtualMachineCloneSpec virtualMachineCloneSpec = new VirtualMachineCloneSpec();
-        virtualMachineCloneSpec.setPoweredOn(poweredOn);
-        virtualMachineCloneSpec.setTemplate(isTemplate);
-        virtualMachineCloneSpec.setDomain(domainName);
-        return virtualMachineCloneSpec;
-    }
-
     private List<NicSetting> getNicSettings(final NodeDetail nodeDetail, final String scaleIoSvmManagementIpAddress)
     {
         final String scaleIoSvmManagementGatewayAddress = nodeDetail.getScaleIoSvmManagementGatewayAddress();
@@ -206,18 +194,7 @@ public class DeployScaleIoVmRequestTransformer
 
     private List<String> getDnsServers()
     {
-        final Set<String> dnsServers = new HashSet<>();
-        final List<Host> vCenterHosts = repository.getVCenterHosts();
-
-        vCenterHosts.stream().filter(Objects::nonNull)
-                .forEach(hs -> hs.getHostDnsConfig().getDnsConfigIPs().stream().filter(Objects::nonNull).forEach(dnsServers::add));
-
-        if (CollectionUtils.isEmpty(dnsServers))
-        {
-            throw new IllegalStateException("No DNS config IPs");
-        }
-
-        return new ArrayList<>(dnsServers);
+        return repository.getDnsServers();
     }
 
     private String getDomainName()
@@ -240,17 +217,5 @@ public class DeployScaleIoVmRequestTransformer
             throw new IllegalStateException("DataCenter name is null");
         }
         return dataCenterName;
-    }
-
-    private ComponentEndpointIds getComponentEndpointIds()
-    {
-        final ComponentEndpointIds componentEndpointIds = repository.getVCenterComponentEndpointIdsByEndpointType(VCENTER_CUSTOMER_TYPE);
-
-        if (componentEndpointIds == null)
-        {
-            throw new IllegalStateException("No VCenter Customer components found");
-        }
-
-        return componentEndpointIds;
     }
 }

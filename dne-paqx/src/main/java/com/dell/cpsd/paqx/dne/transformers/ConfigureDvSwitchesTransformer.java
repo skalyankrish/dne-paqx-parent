@@ -40,11 +40,13 @@ public class ConfigureDvSwitchesTransformer
 {
     private static final String VCENTER_CUSTOMER_TYPE = "VCENTER-CUSTOMER";
 
-    private final DataServiceRepository repository;
+    private final DataServiceRepository   repository;
+    private final ComponentIdsTransformer componentIdsTransformer;
 
-    public ConfigureDvSwitchesTransformer(final DataServiceRepository repository)
+    public ConfigureDvSwitchesTransformer(final DataServiceRepository repository, final ComponentIdsTransformer componentIdsTransformer)
     {
         this.repository = repository;
+        this.componentIdsTransformer = componentIdsTransformer;
     }
 
     public AddHostToDvSwitchRequestMessage buildAddHostToDvSwitchRequest(final DelegateExecution delegateExecution)
@@ -58,7 +60,8 @@ public class ConfigureDvSwitchesTransformer
         final String scaleIoData1EsxSubnetMask = nodeDetail.getScaleIoData1EsxSubnetMask();
         final String scaleIoData2EsxSubnetMask = nodeDetail.getScaleIoData2EsxSubnetMask();
 
-        final ComponentEndpointIds componentEndpointIds = getComponentEndpointIds();
+        final ComponentEndpointIds componentEndpointIds = componentIdsTransformer
+                .getVCenterComponentEndpointIdsByEndpointType(VCENTER_CUSTOMER_TYPE);
         final Map<String, String> dvSwitchNames = getDvSwitchNamesMap();
         final String dvSwitchManagementName = getDvSwitchManagementName(dvSwitchNames);
         final String dvSwitchScaleIoData1Name = getDvSwitchScaleIoData1Name(dvSwitchNames);
@@ -230,17 +233,5 @@ public class ConfigureDvSwitchesTransformer
             throw new IllegalStateException("DV Switch Names are null");
         }
         return dvSwitchNames;
-    }
-
-    private ComponentEndpointIds getComponentEndpointIds()
-    {
-        final ComponentEndpointIds componentEndpointIds = repository.getVCenterComponentEndpointIdsByEndpointType(VCENTER_CUSTOMER_TYPE);
-
-        if (componentEndpointIds == null)
-        {
-            throw new IllegalStateException("No VCenter Customer components found");
-        }
-
-        return componentEndpointIds;
     }
 }

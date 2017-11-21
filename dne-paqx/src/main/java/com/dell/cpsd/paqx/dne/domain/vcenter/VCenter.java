@@ -39,6 +39,10 @@ public class VCenter
     @OneToOne(optional = false, mappedBy = "vcenter", cascade = CascadeType.ALL)
     private DneJob job;
 
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vCenter", orphanRemoval = true)
+    private List<DataCenter> dataCenterList = new ArrayList<>();
+
     public VCenter()
     {
 
@@ -49,11 +53,7 @@ public class VCenter
         this.id = id;
         this.name = name;
     }
-
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "vCenter", orphanRemoval = true)
-    private List<DataCenter> dataCenterList = new ArrayList<>();
-
+    
     public Long getUuid()
     {
         return uuid;

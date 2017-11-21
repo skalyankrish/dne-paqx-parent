@@ -53,11 +53,8 @@ public class Job
 
     private String initialStep;
 
-    public String getInitialStep() {
-        return initialStep;
-    }
-
     private NodeExpansionRequest inputParams;
+
     /**
      * Job constructor.
      * 
@@ -95,6 +92,10 @@ public class Job
         this.taskMap = taskMap;
         taskResponseMap = new HashMap<>();
         taskResponseList = new ArrayList<>();
+    }
+
+    public String getInitialStep() {
+        return initialStep;
     }
     
 

@@ -41,6 +41,13 @@ public class Datastore
     @Column(name = "DATASTORE_URL")
     private String url;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    private DataCenter dataCenter;
+
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "datastore", orphanRemoval = true)
+    private List<VirtualMachine> virtualMachineList = new ArrayList<>();
+
     public Datastore()
     {
     }
@@ -52,13 +59,6 @@ public class Datastore
         this.type = type;
         this.url = url;
     }
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    private DataCenter dataCenter;
-
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "datastore", orphanRemoval = true)
-    private List<VirtualMachine> virtualMachineList = new ArrayList<>();
 
     public Long getUuid()
     {

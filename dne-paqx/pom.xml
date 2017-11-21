@@ -234,6 +234,10 @@
                     <groupId>com.dell.cpsd</groupId>
                     <artifactId>common-rabbitmq</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-core</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -247,6 +251,10 @@
                 <exclusion>
                     <groupId>com.dell.cpsd</groupId>
                     <artifactId>common-rabbitmq</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -284,6 +292,12 @@
             <artifactId>hibernate-entitymanager</artifactId>
             <version>5.0.11.Final</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -299,15 +313,21 @@
         </dependency>
 
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>5.0.11.Final</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.1-api</artifactId>
             <version>1.0.0.Final</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>5.2.12.Final</version>
         </dependency>
 
         <!-- H2 DB -->
@@ -320,16 +340,33 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>1.7.21</version>
         </dependency>
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
+            <version>2.8.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>9.3.11.v20160721</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-util</artifactId>
+            <version>9.3.11.v20160721</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
@@ -378,18 +415,6 @@
                         </configuration>
                     </execution>
 
-                    <!--<execution>-->
-                        <!--<phase>generate-sources</phase>-->
-                        <!--<id>unpack-json-schemas-credential-service-api</id>-->
-                        <!--<goals>-->
-                            <!--<goal>unpack-dependencies</goal>-->
-                        <!--</goals>-->
-                        <!--<configuration>-->
-                            <!--<includeGroupIds>com.dell.cpsd</includeGroupIds>-->
-                            <!--<includeArtifactIds>credential-service-api</includeArtifactIds>-->
-                            <!--<includes>**\/*.jsd</includes>-->
-                        <!--</configuration>-->
-                    <!--</execution>-->
                 </executions>
             </plugin>
 

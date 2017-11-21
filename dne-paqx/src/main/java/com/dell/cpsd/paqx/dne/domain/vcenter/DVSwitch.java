@@ -41,17 +41,6 @@ public class DVSwitch
     @Column(name = "ALLOW_PROMISCUOUS")
     private boolean allowPromiscuous;
 
-    public DVSwitch()
-    {
-    }
-
-    public DVSwitch(String id, String name, boolean allowPromiscuous)
-    {
-        this.id = id;
-        this.name = name;
-        this.allowPromiscuous = allowPromiscuous;
-    }
-
     @ManyToOne(cascade = CascadeType.ALL)
     private DataCenter dataCenter;
 
@@ -66,6 +55,17 @@ public class DVSwitch
     @ElementCollection
     @CollectionTable(name = "HOST_MEMBER_ID", joinColumns = @JoinColumn(name = "UUID"))
     private List<String> hostMemberIds = new ArrayList<>();
+
+    public DVSwitch()
+    {
+    }
+
+    public DVSwitch(String id, String name, boolean allowPromiscuous)
+    {
+        this.id = id;
+        this.name = name;
+        this.allowPromiscuous = allowPromiscuous;
+    }
 
     public Long getUuid()
     {

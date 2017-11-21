@@ -18,7 +18,6 @@ import com.dell.cpsd.paqx.dne.domain.vcenter.PortGroup;
 import com.dell.cpsd.paqx.dne.domain.vcenter.VCenter;
 import com.dell.cpsd.paqx.dne.service.model.ComponentEndpointIds;
 
-import javax.persistence.NoResultException;
 import java.util.List;
 import java.util.Map;
 
@@ -70,11 +69,13 @@ public interface DataServiceRepository
 
     boolean saveScaleIoData(String jobId, ScaleIOData scaleIOData);
 
-    Host getVCenterHost(String hostName) throws NoResultException;
+    Host getVCenterHost(String hostName);
 
-    List<Host> getVCenterHosts() throws NoResultException;
+    List<Host> getVCenterHosts();
 
-    Host getExistingVCenterHost() throws NoResultException;
+    List<String> getDnsServers();
+
+    Host getExistingVCenterHost();
 
     List<PortGroup> getPortGroups();
 
@@ -100,7 +101,7 @@ public interface DataServiceRepository
 
     boolean saveNodeInventory(NodeInventory nodeInventory);
 
-    NodeInventory getNodeInventory(String symphonyUUID) throws NoResultException;
+    NodeInventory getNodeInventory(String symphonyUUID);
 
     String getDomainName();
     boolean saveDiscoveredNodeInfo(DiscoveredNodeInfo discoveredNodeInfo);

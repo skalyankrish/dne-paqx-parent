@@ -1,5 +1,6 @@
 [![License](https://img.shields.io/badge/License-EPL%201.0-red.svg)](https://opensource.org/licenses/EPL-1.0)
 [![Build Status](https://travis-ci.org/dellemc-symphony/dne-paqx-parent.svg?branch=master)](https://travis-ci.org/dellemc-symphony/dne-paqx-parent)
+[![Slack](http://img.shields.io/badge/slack-join%20the%20chat-00B9FF.svg?style=flat-square)](https://codecommunity.slack.com/messages/symphony)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3ab32acc00e94837b6ed943ca2310c3f)](https://www.codacy.com/app/svc-pebuildrelease/dne-paqx-parent?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dellemc-symphony/dne-paqx-parent&amp;utm_campaign=Badge_Grade)
 # dne-paqx-parent
 ## Description

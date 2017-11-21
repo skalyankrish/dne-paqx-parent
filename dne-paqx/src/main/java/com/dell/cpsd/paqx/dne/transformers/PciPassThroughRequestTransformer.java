@@ -13,6 +13,7 @@ import com.dell.cpsd.virtualization.capabilities.api.EnablePCIPassthroughRequest
 import com.dell.cpsd.virtualization.capabilities.api.UpdatePCIPassthruSVMRequestMessage;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -40,17 +41,20 @@ public class PciPassThroughRequestTransformer
     private static final String PCI_BUS_DEVICE_ID     = "0000:02:00.0";
     private static final String VCENTER_CUSTOMER_TYPE = "VCENTER-CUSTOMER";
 
-    private final DataServiceRepository repository;
+    private final DataServiceRepository   repository;
+    private final ComponentIdsTransformer componentIdsTransformer;
 
-    public PciPassThroughRequestTransformer(final DataServiceRepository repository)
+    public PciPassThroughRequestTransformer(final DataServiceRepository repository, final ComponentIdsTransformer componentIdsTransformer)
     {
         this.repository = repository;
+        this.componentIdsTransformer = componentIdsTransformer;
     }
 
     public EnablePCIPassthroughRequestMessage buildEnablePciPassThroughRequest(final DelegateExecution delegateExecution)
     {
         final String hostname = (String) delegateExecution.getVariable(HOSTNAME);
-        final ComponentEndpointIds componentEndpointIds = getComponentEndpointIds();
+        final ComponentEndpointIds componentEndpointIds = componentIdsTransformer
+                .getVCenterComponentEndpointIdsByEndpointType(VCENTER_CUSTOMER_TYPE);
         final List<PciDevice> pciDeviceList = getPciDeviceList();
         final String hostPciDeviceId = filterDellPercPciDeviceId(pciDeviceList);
 
@@ -60,7 +64,8 @@ public class PciPassThroughRequestTransformer
     public UpdatePCIPassthruSVMRequestMessage buildUpdatePciPassThroughRequest(final DelegateExecution delegateExecution)
     {
         final String hostname = (String) delegateExecution.getVariable(HOSTNAME);
-        final ComponentEndpointIds componentEndpointIds = getComponentEndpointIds();
+        final ComponentEndpointIds componentEndpointIds = componentIdsTransformer
+                .getVCenterComponentEndpointIdsByEndpointType(VCENTER_CUSTOMER_TYPE);
         final String hostPciDeviceId = (String) delegateExecution.getVariable(HOST_PCI_DEVICE_ID);
         final String virtualMachineName = (String) delegateExecution.getVariable(VIRTUAL_MACHINE_NAME);
 
@@ -81,25 +86,13 @@ public class PciPassThroughRequestTransformer
         return requestMessage;
     }
 
-    private ComponentEndpointIds getComponentEndpointIds()
-    {
-        final ComponentEndpointIds componentEndpointIds = repository.getVCenterComponentEndpointIdsByEndpointType(VCENTER_CUSTOMER_TYPE);
-
-        if (componentEndpointIds == null)
-        {
-            throw new IllegalStateException("No VCenter Customer components found");
-        }
-
-        return componentEndpointIds;
-    }
-
     private List<PciDevice> getPciDeviceList()
     {
         final List<PciDevice> pciDeviceList = repository.getPciDeviceList();
 
         if (pciDeviceList == null || pciDeviceList.isEmpty())
         {
-            throw new IllegalStateException("PCI Device List is empty");
+            return null;
         }
         return pciDeviceList;
     }
@@ -119,14 +112,18 @@ public class PciPassThroughRequestTransformer
 
     private String filterDellPercPciDeviceId(final List<PciDevice> pciDeviceList) throws IllegalStateException
     {
-        final PciDevice requiredPciDevice = pciDeviceList.stream()
-                .filter(obj -> Objects.nonNull(obj) && obj.getDeviceName().matches(DELL_PCI_REGEX)).findFirst().orElse(null);
-
-        if (requiredPciDevice == null)
+        if (!CollectionUtils.isEmpty(pciDeviceList))
         {
-            return PCI_BUS_DEVICE_ID;
-        }
+            final PciDevice requiredPciDevice = pciDeviceList.stream()
+                    .filter(obj -> Objects.nonNull(obj) && obj.getDeviceName().matches(DELL_PCI_REGEX)).findFirst().orElse(null);
 
-        return requiredPciDevice.getId();
+            if (requiredPciDevice == null)
+            {
+                return PCI_BUS_DEVICE_ID;
+            }
+
+            return requiredPciDevice.getId();
+        }
+        return PCI_BUS_DEVICE_ID;
     }
 }

@@ -88,7 +88,6 @@ import com.dell.cpsd.paqx.dne.service.model.ObmSettingsResponse;
 import com.dell.cpsd.paqx.dne.transformers.DiscoveryInfoToVCenterDomainTransformer;
 import com.dell.cpsd.paqx.dne.transformers.ScaleIORestToScaleIODomainTransformer;
 import com.dell.cpsd.paqx.dne.transformers.StoragePoolEssRequestTransformer;
-import com.dell.cpsd.paqx.dne.util.NodeInventoryParsingUtil;
 import com.dell.cpsd.rackhd.adapter.model.idrac.IdracNetworkSettings;
 import com.dell.cpsd.rackhd.adapter.model.idrac.IdracNetworkSettingsRequestMessage;
 import com.dell.cpsd.rackhd.adapter.model.idrac.IdracNetworkSettingsResponseMessage;
